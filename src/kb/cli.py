@@ -1659,6 +1659,10 @@ def corpus_text_for_row(row: sqlite3.Row) -> str:
 
 def classify_article(title: str, account: str | None, text: str) -> tuple[str, int, list[str]]:
     haystack = f"{title}\n{account or ''}\n{text[:1600]}"
+    if title.startswith(("预告", "【预告】", "通知", "公告", "名单", "公示")):
+        return "notice_info", 95, ["预告" if "预告" in title[:6] else title[:2]]
+    if "《史良》连载" in title:
+        return "history_commemoration", 95, ["《史良》连载"]
     scored = []
     for index, rule in enumerate(ARTICLE_TYPE_RULES):
         matched = [kw for kw in rule["keywords"] if kw in haystack]

@@ -133,6 +133,35 @@ class CorpusCommandTests(unittest.TestCase):
         self.assertEqual(article_type, "notice_info")
         self.assertIn("新年快乐", matched)
 
+    def test_notice_prefix_overrides_person_profile_keywords(self) -> None:
+        article_type, confidence, matched = classify_article(
+            "预告丨如何睡个好觉？盟员医生带你告别失眠",
+            "上海民盟",
+            "盟员医生将开展健康科普讲座。",
+        )
+        self.assertEqual(article_type, "notice_info")
+        self.assertGreaterEqual(confidence, 90)
+        self.assertIn("预告", matched)
+
+        article_type, confidence, matched = classify_article(
+            "【预告】今日下午3时，民主党派中央和全国工商联领导人集体接受媒体采访！",
+            "中国民主同盟",
+            "媒体采访预告。",
+        )
+        self.assertEqual(article_type, "notice_info")
+        self.assertGreaterEqual(confidence, 90)
+        self.assertIn("预告", matched)
+
+    def test_history_serial_overrides_other(self) -> None:
+        article_type, confidence, matched = classify_article(
+            "《史良》连载36 | 加入民盟",
+            "中国民主同盟",
+            "",
+        )
+        self.assertEqual(article_type, "history_commemoration")
+        self.assertGreaterEqual(confidence, 90)
+        self.assertIn("《史良》连载", matched)
+
     def test_theme_and_history_title_priority(self) -> None:
         article_type, _, matched = classify_article(
             "丰富形式，走深走实！上海民盟各级组织开展主题教育",
