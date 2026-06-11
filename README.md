@@ -236,7 +236,9 @@ kb corpus-style
 `corpus-audit` 会生成分类抽检材料：
 
 - `index/corpus/classification_review.csv`：人工校订用抽检表。
+- `index/corpus/classification_priority_review.csv`：优先校订清单，默认列出最该先看的 100 篇。
 - `wiki/研究助手/微信公众号文章分类抽检表.md`：按类型、低置信、其他/待判汇总的抽检清单。
+- `wiki/研究助手/微信公众号分类优先校订清单.md`：按优先级排序的人工复核入口。
 - `wiki/研究助手/微信公众号语料库人工校订说明.md`：校订口径和回写流程。
 
 `corpus-style` 会生成写作和研究入口：

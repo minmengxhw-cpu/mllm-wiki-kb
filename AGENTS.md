@@ -35,9 +35,11 @@
 
 - `index/corpus/article_labels.jsonl`
 - `index/corpus/classification_review.csv`
+- `index/corpus/classification_priority_review.csv`
 - `wiki/研究助手/微信公众号语料库体检报告.md`
 - `wiki/研究助手/微信公众号分类质量诊断报告.md`
 - `wiki/研究助手/微信公众号文章分类抽检表.md`
+- `wiki/研究助手/微信公众号分类优先校订清单.md`
 - `wiki/研究助手/上海民盟微信公众号分体裁写作模板.md`
 - `wiki/研究助手/上海民盟2023年以来写作样本库.md`
 - `wiki/研究助手/微信公众号文史盟史文章专题库.md`

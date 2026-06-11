@@ -13,6 +13,8 @@ from kb.cli import (  # noqa: E402
     classify_article,
     corpus_audit_markdown,
     corpus_quality_diagnostic_markdown,
+    corpus_priority_review_markdown,
+    corpus_priority_review_rows,
     corpus_review_rows,
     dict_to_row,
     history_research_entry_markdown,
@@ -124,6 +126,10 @@ class CorpusCommandTests(unittest.TestCase):
         self.assertEqual(article_type, "notice_info")
         self.assertIn("预告", matched)
 
+        article_type, _, matched = classify_article("民盟上海市委祝广大盟员新年快乐！", "上海民盟", "")
+        self.assertEqual(article_type, "notice_info")
+        self.assertIn("新年快乐", matched)
+
     def test_theme_and_history_title_priority(self) -> None:
         article_type, _, matched = classify_article(
             "丰富形式，走深走实！上海民盟各级组织开展主题教育",
@@ -182,7 +188,7 @@ class CorpusCommandTests(unittest.TestCase):
     def test_quality_diagnostic_markdown_contains_boundary_sections(self) -> None:
         labels = [
             {
-                "title": "预告 | 周末盟史讲座报名开启",
+                "title": "民盟上海市委祝广大盟员新年快乐！",
                 "account": "上海民盟",
                 "published_at": "2025-01-01",
                 "article_type": "other",
@@ -194,6 +200,48 @@ class CorpusCommandTests(unittest.TestCase):
         body = corpus_quality_diagnostic_markdown(labels, "2026-06-11T00:00:00")
         self.assertIn("微信公众号分类质量诊断报告", body)
         self.assertIn("其他/待判中疑似通知预告", body)
+
+    def test_priority_review_rows_rank_suspicious_items(self) -> None:
+        labels = [
+            {
+                "article_id": 1,
+                "title": "预告 | 周末盟史讲座报名开启",
+                "account": "上海民盟",
+                "published_at": "2025-01-01",
+                "year": "2025",
+                "article_type": "other",
+                "article_type_name": "其他/待判",
+                "classification_confidence": 0,
+                "matched_keywords": [],
+                "topic_tags": [],
+                "people": [],
+                "raw_path": "/tmp/1.md",
+                "is_history": False,
+                "is_writing_sample": False,
+            },
+            {
+                "article_id": 2,
+                "title": "民盟市委召开会议",
+                "account": "上海民盟",
+                "published_at": "2025-01-02",
+                "year": "2025",
+                "article_type": "meeting_report",
+                "article_type_name": "会议报道",
+                "classification_confidence": 90,
+                "matched_keywords": ["会议"],
+                "topic_tags": [],
+                "people": [],
+                "raw_path": "/tmp/2.md",
+                "is_history": False,
+                "is_writing_sample": True,
+            },
+        ]
+        rows = corpus_priority_review_rows(labels, limit=10)
+        self.assertEqual(rows[0]["article_id"], 1)
+        self.assertEqual(rows[0]["suggested_type"], "notice_info")
+        body = corpus_priority_review_markdown(rows, "2026-06-11T00:00:00")
+        self.assertIn("微信公众号分类优先校订清单", body)
+        self.assertIn("通知公告/信息发布", body)
 
 
 if __name__ == "__main__":

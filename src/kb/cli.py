@@ -1540,7 +1540,7 @@ ARTICLE_TYPE_RULES = [
     {"type": "theme_education", "name": "主题教育", "keywords": ["主题教育", "主题教育进行时", "参政为公", "实干为民", "凝心铸魂", "学规定", "强作风", "树形象", "政治共识", "学习贯彻习近平", "学习贯彻中共"]},
     {"type": "organization_building", "name": "组织建设", "keywords": ["组织建设", "基层组织", "支部", "区委", "委员会", "换届", "盟员之家", "新盟员", "入盟"]},
     {"type": "social_service", "name": "社会服务", "keywords": ["社会服务", "帮扶", "乡村振兴", "烛光行动", "黄丝带", "公益", "医疗", "教育帮扶"]},
-    {"type": "notice_info", "name": "通知公告/信息发布", "keywords": ["通知", "公告", "预告", "名单", "公示", "目录", "招聘", "征集", "报名", "结果出炉"]},
+    {"type": "notice_info", "name": "通知公告/信息发布", "keywords": ["通知", "公告", "预告", "名单", "公示", "目录", "招聘", "征集", "报名", "结果出炉", "节日快乐", "新年快乐", "拜年", "中秋快乐", "国庆", "迎春", "祝广大盟员"]},
     {"type": "commentary_theory", "name": "评论综述/理论文章", "keywords": ["综述", "理论", "评论", "学习体会", "心得", "观察", "解读", "述评"]},
 ]
 
@@ -1663,7 +1663,10 @@ def classify_article(title: str, account: str | None, text: str) -> tuple[str, i
                 score += 6
             if rule["type"] == "history_commemoration" and any(kw in title for kw in ["盟史钩沉", "民盟先贤", "五一口号", "诞辰", "旧政协", "新政协"]):
                 score += 6
-            if rule["type"] == "notice_info" and title.startswith(("预告", "通知", "公告", "名单", "公示")):
+            if rule["type"] == "notice_info" and (
+                title.startswith(("预告", "通知", "公告", "名单", "公示"))
+                or any(kw in title for kw in ["节日快乐", "新年快乐", "拜年", "中秋快乐", "国庆", "迎春"])
+            ):
                 score += 6
             scored.append((score, -index, rule["type"], matched))
     if not scored:
@@ -2102,6 +2105,165 @@ def write_corpus_review_csv(path: Path, rows: list[dict]) -> None:
             )
 
 
+def suggested_review_type(label: dict) -> tuple[str, list[str]]:
+    title = label.get("title") or ""
+    current = label.get("article_type") or ""
+    suggestions: list[tuple[str, str]] = []
+    if title.startswith(("预告", "通知", "公告", "名单", "公示")):
+        suggestions.append(("notice_info", "标题为通知预告类"))
+    if any(term in title for term in ["节日快乐", "新年快乐", "拜年", "中秋快乐", "国庆", "迎春"]):
+        suggestions.append(("notice_info", "标题为节庆问候/信息发布类"))
+    if any(term in title for term in ["祝贺", "荣获", "获得", "获评", "获奖", "获颁", "入选", "表彰", "当选", "提名奖"]):
+        suggestions.append(("member_achievement", "标题含获奖/入选/表彰信号"))
+    if any(term in title for term in ["主题教育", "凝心铸魂", "参政为公", "实干为民", "学规定", "强作风"]):
+        suggestions.append(("theme_education", "标题含主题教育信号"))
+    if any(term in title for term in ["盟史钩沉", "民盟先贤", "五一口号", "旧政协", "新政协", "诞辰"]):
+        suggestions.append(("history_commemoration", "标题含文史纪念信号"))
+    if current == "other" and not suggestions and any(term in title for term in ["盟员", "先生", "人物", "风采", "访谈", "专访"]):
+        suggestions.append(("person_profile", "其他/待判中疑似人物文章"))
+    if not suggestions:
+        return "", []
+    suggested = suggestions[0][0]
+    reasons = [reason for _, reason in suggestions]
+    return suggested, reasons
+
+
+def corpus_priority_review_rows(labels: list[dict], limit: int = 100) -> list[dict]:
+    rows = []
+    for label in labels:
+        suggested, reasons = suggested_review_type(label)
+        score = 0
+        title = label.get("title") or ""
+        confidence = int(label.get("classification_confidence") or 0)
+        if label.get("article_type") == "other":
+            score += 40
+            reasons.append("当前为其他/待判")
+        if confidence < 70:
+            score += 30
+            reasons.append(f"置信度较低:{confidence}")
+        if suggested and suggested != label.get("article_type"):
+            score += 35
+            reasons.append(f"建议复核为:{ARTICLE_TYPE_NAMES.get(suggested, suggested)}")
+        if label.get("account") == "上海民盟" and label.get("year") >= "2023":
+            score += 15
+            reasons.append("上海民盟近年样本优先")
+        if label.get("is_history"):
+            score += 10
+            reasons.append("文史/盟史候选")
+        if label.get("is_writing_sample"):
+            score += 10
+            reasons.append("写作样本候选")
+        if label.get("article_type") == "activity_report" and any(term in title for term in ["主题教育", "纪念", "盟史", "获", "表彰"]):
+            score += 15
+            reasons.append("活动报道中含交叉体裁信号")
+        if score <= 0:
+            continue
+        rows.append(
+            {
+                **label,
+                "priority_score": score,
+                "suggested_type": suggested,
+                "suggested_type_name": ARTICLE_TYPE_NAMES.get(suggested, "") if suggested else "",
+                "priority_reasons": sorted(set(reasons)),
+            }
+        )
+    rows.sort(key=lambda item: (-int(item["priority_score"]), item.get("published_at") or "", int(item["article_id"])))
+    return rows[:limit]
+
+
+def write_corpus_priority_review_csv(path: Path, rows: list[dict]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fieldnames = [
+        "priority_score",
+        "article_id",
+        "account",
+        "published_at",
+        "title",
+        "current_type",
+        "classification_confidence",
+        "suggested_type",
+        "suggested_type_name",
+        "priority_reasons",
+        "matched_keywords",
+        "topic_tags",
+        "review_result",
+        "review_note",
+        "raw_path",
+    ]
+    with path.open("w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(
+                {
+                    "priority_score": row["priority_score"],
+                    "article_id": row["article_id"],
+                    "account": row.get("account") or "",
+                    "published_at": row.get("published_at") or "",
+                    "title": row.get("title") or "",
+                    "current_type": row.get("article_type_name") or "",
+                    "classification_confidence": row.get("classification_confidence") or "",
+                    "suggested_type": row.get("suggested_type") or "",
+                    "suggested_type_name": row.get("suggested_type_name") or "",
+                    "priority_reasons": "；".join(row.get("priority_reasons") or []),
+                    "matched_keywords": "、".join(row.get("matched_keywords") or []),
+                    "topic_tags": "、".join(row.get("topic_tags") or []),
+                    "review_result": "",
+                    "review_note": "",
+                    "raw_path": row.get("raw_path") or "",
+                }
+            )
+
+
+def corpus_priority_review_markdown(rows: list[dict], created_at: str) -> str:
+    by_current = Counter(row.get("article_type_name") or "unknown" for row in rows)
+    by_suggested = Counter(row.get("suggested_type_name") or "待人工判断" for row in rows)
+    table = [["分数", "日期", "账号", "当前类型", "建议类型", "标题", "原因", "raw 原文"]]
+    for row in rows:
+        table.append(
+            [
+                str(row["priority_score"]),
+                row.get("published_at") or "日期不详",
+                row.get("account") or "",
+                row.get("article_type_name") or "",
+                row.get("suggested_type_name") or "待人工判断",
+                f"《{row.get('title') or ''}》",
+                "；".join(row.get("priority_reasons") or []),
+                f"`{row.get('raw_path') or ''}`",
+            ]
+        )
+    return f"""# 微信公众号分类优先校订清单
+
+生成时间：{created_at}
+
+本页从全库标签中自动挑出最值得优先人工复核的文章。它服务于分类校订闭环，不代表最终分类结论。
+
+## 总览
+
+- 优先校订样本：{len(rows)} 篇。
+- CSV 文件：`index/corpus/classification_priority_review.csv`。
+
+## 按当前类型分布
+
+{markdown_table([["当前类型", "篇数"]] + [[k, str(v)] for k, v in by_current.most_common()])}
+
+## 按建议类型分布
+
+{markdown_table([["建议类型", "篇数"]] + [[k, str(v)] for k, v in by_suggested.most_common()])}
+
+## 优先校订清单
+
+{markdown_table(table)}
+
+## 校订办法
+
+1. 优先打开分数最高的文章 raw 原文。
+2. 在 CSV 中填写 `review_result` 和 `review_note`。
+3. 如果建议类型正确，后续把相同规则固化进分类规则。
+4. 如果属于体裁交叉，保留当前类型并在备注中说明原因。
+"""
+
+
 def corpus_review_markdown(rows: list[dict], created_at: str) -> str:
     by_bucket = Counter(row["review_bucket"] for row in rows)
     overview = markdown_table([["抽检桶", "篇数"]] + [[k, str(v)] for k, v in by_bucket.most_common()])
@@ -2229,16 +2391,22 @@ def command_corpus_audit(args: argparse.Namespace) -> int:
     root = project_root_from_args(args.project_root)
     labels = load_article_labels(root)
     rows = corpus_review_rows(labels, args.per_type, args.low_confidence, args.other)
+    priority_rows = corpus_priority_review_rows(labels, args.priority)
     created_at = now_iso()
     out_dir = corpus_dir(root)
     reports = report_dir(root)
     write_corpus_review_csv(out_dir / "classification_review.csv", rows)
+    write_corpus_priority_review_csv(out_dir / "classification_priority_review.csv", priority_rows)
     (reports / "微信公众号文章分类抽检表.md").write_text(corpus_review_markdown(rows, created_at), encoding="utf-8")
+    (reports / "微信公众号分类优先校订清单.md").write_text(corpus_priority_review_markdown(priority_rows, created_at), encoding="utf-8")
     (reports / "微信公众号语料库人工校订说明.md").write_text(corpus_review_guide_markdown(created_at), encoding="utf-8")
     log_operation(root, "corpus-audit", "ok", f"review samples {len(rows)}", {"output": str(out_dir / "classification_review.csv")})
     print(f"Review samples: {len(rows)}")
+    print(f"Priority samples: {len(priority_rows)}")
     print(f"CSV: {out_dir / 'classification_review.csv'}")
+    print(f"Priority CSV: {out_dir / 'classification_priority_review.csv'}")
     print(f"Report: {reports / '微信公众号文章分类抽检表.md'}")
+    print(f"Priority report: {reports / '微信公众号分类优先校订清单.md'}")
     print(f"Guide: {reports / '微信公众号语料库人工校订说明.md'}")
     return 0
 
@@ -3527,6 +3695,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--per-type", type=int, default=20)
     p.add_argument("--low-confidence", type=int, default=80)
     p.add_argument("--other", type=int, default=80)
+    p.add_argument("--priority", type=int, default=100)
     p.set_defaults(func=command_corpus_audit)
 
     p = sub.add_parser("corpus-style", help="生成上海民盟写作模板和文史盟史研究入口")
