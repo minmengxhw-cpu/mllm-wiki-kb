@@ -26,6 +26,7 @@
 - 微信公众号语料库体检、分类标签和样本库更新用 `kb corpus`。
 - 微信公众号文章分类抽检和人工校订表更新用 `kb corpus-audit`。
 - 上海民盟分体裁写作模板和文史盟史研究入口更新用 `kb corpus-style`。
+- Google Drive 外部参考层状态查看用 `kb external-sources`；需要写入 wiki 时用 `kb external-sources --save`。
 - 核心人物研究档案更新用 `kb build-research-dossiers --set core-people`；核心事件研究档案更新用 `kb build-research-dossiers --set core-events`。
 - 盟参种子库位于 `index/formulations.jsonl`、`index/blacklist.csv`、`index/entities/*.jsonl`。
 - 种子库先保证可拦截高风险问题，再逐步扩展，不把未校订条目写成定论。
@@ -50,5 +51,6 @@
 - `wiki/研究助手/核心人物研究档案/索引.md`
 - `wiki/研究助手/核心事件研究档案/索引.md`
 - `wiki/研究助手/Google Drive工作资料接入清单.md`
+- `wiki/研究助手/Google Drive外部参考层状态.md`
 
 Google Drive 工作材料暂作为外部参考层，不直接混入微信公众号主语料层。已登记入口见 `index/external_sources/google_drive_folders.jsonl`；处理时先做文件级清单，再判断是否可进入公开公众号语料。

@@ -267,6 +267,13 @@ kb corpus-style
 
 这些材料先作为外部参考层，不直接并入微信公众号主语料。后续接入时应先做文件级清单，再区分公开文章、工作材料、研究报告、讲话稿、公文事务和附件；只有确认可作为公开语料复用的内容，才进入微信公众号主语料层。
 
+```bash
+kb external-sources
+kb external-sources --save
+```
+
+`external-sources` 会汇总 Drive 外部参考层登记情况；加 `--save` 会写入 `wiki/研究助手/Google Drive外部参考层状态.md`。
+
 ## 自动编译 wiki 页面
 
 ```bash

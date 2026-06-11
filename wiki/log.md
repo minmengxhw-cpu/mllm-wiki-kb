@@ -118,6 +118,9 @@ needs_review: false
 
 - 2026-06-11T15:40:40 生成核心事件研究档案：9 个
 
+
+- 2026-06-11T22:14:52 生成 Drive 外部参考层状态：wiki/研究助手/Google Drive外部参考层状态.md
+
 <!-- KB-GENERATED:END -->
 <!-- HUMAN-NOTES:START -->
 

@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from kb.cli import (  # noqa: E402
     build_parser,
     dict_to_row,
+    external_sources_report_markdown,
     normalized_similarity,
     staff_check_issues,
     staff_draft_body,
@@ -236,6 +237,33 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("Drive 外部参考层", body)
             self.assertIn("谷超豪.md", body)
             self.assertIn("外部参考，适合人物研究补充", body)
+        finally:
+            shutil.rmtree(root)
+
+    def test_external_sources_report_summarizes_drive_layer(self) -> None:
+        root = self.make_root()
+        try:
+            external_dir = root / "index" / "external_sources"
+            external_dir.mkdir(parents=True)
+            (external_dir / "google_drive_folders.jsonl").write_text(
+                (
+                    '{"name":"研究室知识库","role":"参政议政外部参考层","status":"已登记"}\n'
+                ),
+                encoding="utf-8",
+            )
+            (external_dir / "google_drive_inventory.jsonl").write_text(
+                (
+                    '{"source":"研究室知识库","layer":"wiki","path":"wiki/先贤/谷超豪.md",'
+                    '"title":"谷超豪.md","url":"https://drive.example/gu",'
+                    '"item_type":"file","import_decision":"外部参考，适合人物研究补充"}\n'
+                ),
+                encoding="utf-8",
+            )
+            body = external_sources_report_markdown(root, "2026-06-11T00:00:00")
+            self.assertIn("Google Drive外部参考层状态", body)
+            self.assertIn("已登记知识库：1 个", body)
+            self.assertIn("谷超豪.md", body)
+            self.assertIn("不等同于微信公众号主语料", body)
         finally:
             shutil.rmtree(root)
 

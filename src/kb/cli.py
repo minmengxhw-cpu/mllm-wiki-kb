@@ -1251,6 +1251,66 @@ def external_reference_block(root: Path, topic: str) -> str:
     return markdown_table(rows)
 
 
+def external_sources_report_markdown(root: Path, created_at: str) -> str:
+    folders = load_jsonl(staff_index_dir(root) / "external_sources" / "google_drive_folders.jsonl")
+    inventory = load_external_inventory(root)
+    by_source = Counter(str(item.get("source") or "unknown") for item in inventory)
+    by_decision = Counter(str(item.get("import_decision") or "未判定") for item in inventory)
+    folder_rows = [["知识库", "用途", "状态"]]
+    for item in folders:
+        folder_rows.append([
+            str(item.get("name") or ""),
+            str(item.get("role") or ""),
+            str(item.get("status") or ""),
+        ])
+    inventory_rows = [["材料", "来源层", "导入判断", "链接"]]
+    for item in inventory:
+        if item.get("item_type") == "folder":
+            continue
+        inventory_rows.append([
+            str(item.get("title") or ""),
+            f"{item.get('source') or ''}/{item.get('layer') or ''}",
+            str(item.get("import_decision") or ""),
+            f"[打开]({item.get('url') or ''})",
+        ])
+    return f"""# Google Drive外部参考层状态
+
+生成时间：{created_at}
+
+本页用于查看已连接的 Google Drive 工作资料。它们当前是外部参考层，不等同于微信公众号主语料，也不自动作为事实出处。
+
+## 总体结论
+
+- 已登记知识库：{len(folders)} 个。
+- 文件级清单记录：{len(inventory)} 条。
+- 当前 `raw` 文件夹盘点结果显示暂无新的原始公众号文章，现有可用内容主要在 `wiki` 成果层。
+- `/稿` 和 `/史` 会在主题命中时提示相关 Drive 材料，但仍要求回到公开语料、原始文件或权威资料核验。
+
+## 已登记知识库
+
+{markdown_table(folder_rows)}
+
+## 按来源统计
+
+{markdown_table([["来源", "记录数"]] + [[k, str(v)] for k, v in by_source.most_common()])}
+
+## 按导入判断统计
+
+{markdown_table([["导入判断", "记录数"]] + [[k, str(v)] for k, v in by_decision.most_common()])}
+
+## 可人工参考材料
+
+{markdown_table(inventory_rows)}
+
+## 使用边界
+
+- 公开微信公众号文章仍是主语料层。
+- Drive 工作材料只作外部参考和人工查阅提示。
+- 个人履历、内部草稿、红头文件和未公开工作材料不进入公众号主语料。
+- 正式发稿、史实判断和口径判断仍以权威资料、内部口径和人工终审为准。
+"""
+
+
 def research_dossier_matches(root: Path, topic: str, limit: int = 6) -> list[Path]:
     dirs = [
         root / "wiki" / "研究助手" / "核心人物研究档案",
@@ -3048,6 +3108,22 @@ def command_corpus_style(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_external_sources(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    created_at = now_iso()
+    body = external_sources_report_markdown(root, created_at)
+    if args.save:
+        path = report_dir(root) / "Google Drive外部参考层状态.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(body, encoding="utf-8")
+        append_wiki_log(root, f"生成 Drive 外部参考层状态：{path.relative_to(root)}")
+        log_operation(root, "external-sources", "ok", "report saved", {"output": str(path)})
+        print(path)
+    else:
+        print(body)
+    return 0
+
+
 def source_title_list(rows: list[sqlite3.Row], limit: int = 12) -> str:
     lines = []
     seen: set[int] = set()
@@ -4623,6 +4699,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("corpus-style", help="生成上海民盟写作模板和文史盟史研究入口")
     p.set_defaults(func=command_corpus_style)
+
+    p = sub.add_parser("external-sources", help="查看 Google Drive 外部参考层状态")
+    p.add_argument("--save", action="store_true")
+    p.set_defaults(func=command_external_sources)
 
     p = sub.add_parser("compile")
     p.add_argument("--topic", default=None)
