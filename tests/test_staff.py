@@ -67,6 +67,46 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("## 风险提示", body)
             self.assertIn("[S1]", body)
             self.assertIn("raw 原文", body)
+            self.assertIn("精选写作样本", body)
+        finally:
+            shutil.rmtree(root)
+
+    def test_staff_draft_body_uses_curated_samples_when_available(self) -> None:
+        root = self.make_root()
+        try:
+            (root / "index" / "corpus").mkdir(parents=True)
+            (root / "index" / "corpus" / "article_labels.jsonl").write_text(
+                "\n".join(
+                    [
+                        (
+                            '{"article_id":1,"title":"民盟上海市委召开十六届十四次常委（扩大）会议",'
+                            '"account":"上海民盟","published_at":"2025-04-11","year":"2025",'
+                            '"article_type":"meeting_report","article_type_name":"会议报道",'
+                            '"classification_confidence":95,"matched_keywords":["会议"],"topic_tags":["上海民盟"],'
+                            '"people":[],"raw_path":"/tmp/meeting.md","token_estimate":1500,'
+                            '"is_history":false,"is_writing_sample":true,"can_be_formulation_source":true}'
+                        )
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            row = dict_to_row(
+                {
+                    "article_id": 2,
+                    "chunk_id": 2,
+                    "title": "民盟上海市委召开会议",
+                    "account": "上海民盟",
+                    "published_at": "2025-05-01",
+                    "raw_path": "/tmp/raw.md",
+                    "snippet": "会议围绕重点工作进行部署。",
+                    "score": 0,
+                }
+            )
+            body = staff_draft_body(root, "民盟市委会议报道", [row])
+            self.assertIn("初步判断适用体裁：会议报道", body)
+            self.assertIn("民盟上海市委召开十六届十四次常委", body)
+            self.assertIn("/tmp/meeting.md", body)
         finally:
             shutil.rmtree(root)
 

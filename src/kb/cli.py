@@ -1214,13 +1214,60 @@ def staff_cards_block(root: Path, topic: str) -> str:
     )
 
 
+def staff_draft_article_type(topic: str) -> str:
+    article_type, _, _ = classify_article(topic, "上海民盟", topic)
+    if article_type == "other":
+        return "activity_report"
+    if article_type == "notice_info":
+        return "activity_report"
+    return article_type
+
+
+def staff_curated_writing_samples(root: Path, topic: str, limit: int = 6) -> tuple[str, str]:
+    article_type = staff_draft_article_type(topic)
+    labels_path = corpus_dir(root) / "article_labels.jsonl"
+    if not labels_path.exists():
+        return article_type, "- 未找到 `index/corpus/article_labels.jsonl`，请先运行 `kb corpus` 生成精选样本索引。"
+    labels = [json.loads(line) for line in labels_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    candidates = []
+    for label in labels:
+        if label.get("account") != "上海民盟":
+            continue
+        if label.get("article_type") != article_type:
+            continue
+        if not label.get("is_writing_sample"):
+            continue
+        if not year_at_least(label.get("year"), "2023"):
+            continue
+        score, reasons = writing_sample_score(label)
+        candidates.append({**label, "sample_score": score, "sample_reasons": reasons})
+    candidates.sort(key=lambda item: (-int(item["sample_score"]), item.get("published_at") or "", int(item["article_id"])))
+    rows = [["分数", "日期", "标题", "入选理由", "raw 原文"]]
+    for item in candidates[:limit]:
+        rows.append(
+            [
+                str(item["sample_score"]),
+                item.get("published_at") or "日期不详",
+                f"《{item.get('title') or ''}》",
+                "；".join(item.get("sample_reasons") or []),
+                f"`{item.get('raw_path') or ''}`",
+            ]
+        )
+    if len(rows) == 1:
+        return article_type, "- 未找到同体裁精选样本；可退回全库同题历史稿和 `上海民盟2023年以来写作样本库.md`。"
+    return article_type, markdown_table(rows)
+
+
 def staff_draft_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
     formulations = match_staff_items(load_formulations(root), topic)
+    article_type, curated_samples = staff_curated_writing_samples(root, topic)
+    type_name = ARTICLE_TYPE_NAMES.get(article_type, article_type)
     return f"""# 盟参 /稿：{topic}
 
 ## 结论
 
 - 本次为“文稿素材包”，不是最终成稿；已检索到 {len(rows)} 条片段，覆盖 {len({int(row['article_id']) for row in rows}) if rows else 0} 篇来源文章。
+- 初步判断适用体裁：{type_name}。写作时优先参考 `wiki/研究助手/上海民盟微信公众号精选写作样本.md` 中同体裁样本。
 - 可先按“同题历史稿 + 口径要点 + 常用结构 + 风险提示”进入起草；事实性句子必须保留 [S] 来源或标注 [待核]。
 - 若要生成正式微信公众号文章，请继续补充时间、地点、人物职务、主办承办单位、活动流程、讲话要点和图片说明。
 
@@ -1231,6 +1278,10 @@ def staff_draft_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
 | 编号 | 公众号 | 日期 | 标题 | raw 原文 |
 |---|---|---|---|---|
 {citation_table(rows)}
+
+### 精选写作样本
+
+{curated_samples}
 
 ### 证据摘录
 
