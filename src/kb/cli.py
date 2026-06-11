@@ -1578,7 +1578,7 @@ def staff_draft_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
 ## 结论
 
 - 本次为“文稿素材包”，不是最终成稿；已检索到 {len(rows)} 条片段，覆盖 {len({int(row['article_id']) for row in rows}) if rows else 0} 篇来源文章。
-- 初步判断适用体裁：{type_name}。写作时优先参考 `wiki/研究助手/上海民盟微信公众号精选写作样本.md` 中同体裁样本。
+- 初步判断适用体裁：{type_name}。写作时优先参考 `wiki/研究助手/上海民盟微信公众号写作风格规则卡.md` 和同体裁精选样本。
 - 可先按“同题历史稿 + 口径要点 + 常用结构 + 风险提示”进入起草；事实性句子必须保留 [S] 来源或标注 [待核]。
 - 若要生成正式微信公众号文章，请继续补充时间、地点、人物职务、主办承办单位、活动流程、讲话要点和图片说明。
 
@@ -2463,6 +2463,73 @@ def writing_style_templates_markdown(labels: list[dict], created_at: str, limit_
 """
 
 
+def shanghai_style_rule_card_markdown(labels: list[dict], created_at: str) -> str:
+    samples = [label for label in labels if label["account"] == "上海民盟" and year_at_least(label["year"], "2023") and label["is_writing_sample"]]
+    by_type = Counter(label["article_type_name"] for label in samples)
+    recent = sorted(samples, key=lambda item: item["published_at"] or "", reverse=True)
+    representative_rows = [["体裁", "近年样本数", "优先写法"]]
+    rule_map = {
+        "会议报道": "标题点明会议名称；导语交代时间、地点、会议主体和议题；主体按会议议程、讲话要点、审议事项和工作要求展开。",
+        "活动报道": "导语先给完整事实；主体写活动流程、现场交流和实际成果；结尾落到履职、服务、传承或下一步工作。",
+        "人物采访/人物风采": "标题突出人物身份或贡献；开头用具体场景进入；主体用经历、细节、观点和贡献支撑人物形象。",
+        "参政议政": "围绕问题、调研、建议、办理或成效组织；避免只写活动过程，必须凸显履职价值。",
+        "主题教育": "突出政治学习、组织落实、交流研讨和作风建设；表述要稳，不夸张拔高。",
+        "文史纪念": "先核史实和出处；按人物、事件、地点或文献组织；历史评价要有来源边界。",
+        "盟史研究": "先列来源和争议，再组织时间线、人物关系和历史评价；无法证明的判断标注待核。",
+        "组织建设": "写清组织层级、换届或建设动作；主体呈现程序、交流、组织活力和后续工作。",
+        "社会服务": "先写服务对象和具体行动；再写专业优势、社会效果和民盟特色。",
+        "盟员履职/成果荣誉": "突出成果事实、人物身份和专业贡献；避免把个人荣誉泛化成组织结论。",
+        "领导讲话/工作部署": "先交代会议或活动场景，再提炼讲话要点、部署要求和落实方向；避免脱离来源扩写。",
+        "文化作品/展示传播": "先呈现作品、展览或传播事实，再写作者身份、主题表达和社会反响。",
+    }
+    for type_name, count in by_type.most_common():
+        representative_rows.append([type_name, str(count), rule_map.get(type_name, "按标题、导语、事实主体、意义落点和风险核验组织。")])
+    source_rows = [["日期", "体裁", "标题", "raw 原文"]]
+    for item in recent[:20]:
+        source_rows.append([
+            item["published_at"] or "日期不详",
+            item["article_type_name"],
+            f"《{item['title']}》",
+            f"`{item['raw_path']}`",
+        ])
+    return f"""# 上海民盟微信公众号写作风格规则卡
+
+生成时间：{created_at}
+
+本页把 2023 年以来上海民盟微信公众号写作样本压缩成“可直接执行”的规则卡。它服务于 `/稿`，用于收到活动材料、人物材料、讲话材料后快速判断体裁和组织结构。
+
+## 总体判断
+
+- 当前近年上海民盟写作样本：{len(samples)} 篇。
+- 覆盖体裁：{len(by_type)} 类。
+- 正式写稿时，优先同时查看本页、`上海民盟微信公众号精选写作样本.md` 和 `上海民盟微信公众号分体裁写作模板.md`。
+
+## 通用风格
+
+- 标题：直接点明主体、事件、成果或人物，不使用过度文学化标题替代事实。
+- 导语：第一段交代时间、地点、主体、事项和主题，尽量一次说清新闻事实。
+- 主体：按事实顺序组织，常见顺序是背景、现场、讲话/观点、成果、下一步。
+- 表述：多用稳健、规范、组织化表达；少用无来源的宏大评价。
+- 结尾：落到民盟履职、优良传统、组织建设、主题教育、社会服务或下一步工作。
+- 风险：职务、会议名称、机构名称、历史年份、数字和评价必须回材料或 raw 原文核验。
+
+## 分体裁规则
+
+{markdown_table(representative_rows)}
+
+## 最近可参照样本
+
+{markdown_table(source_rows)}
+
+## 使用方法
+
+1. 先判断材料属于会议、活动、人物、参政议政、主题教育、文史纪念还是组织建设。
+2. 按本页分体裁规则确定标题、导语和主体顺序。
+3. 到精选样本库选 3 篇同体裁 raw 原文对照语气和段落长度。
+4. 初稿完成后，用 `/核` 检查口径、错字、史实和引用。
+"""
+
+
 def history_research_entry_markdown(labels: list[dict], created_at: str, limit_per_group: int = 40) -> str:
     items = [label for label in labels if label["is_history"]]
     by_account = Counter(label["account"] or "unknown" for label in items)
@@ -3080,6 +3147,7 @@ def command_corpus(args: argparse.Namespace) -> int:
     (reports / "上海民盟2023年以来写作样本库.md").write_text(writing_samples_markdown(labels, created_at), encoding="utf-8")
     (reports / "上海民盟微信公众号精选写作样本.md").write_text(curated_writing_samples_markdown(labels, created_at), encoding="utf-8")
     (reports / "上海民盟微信公众号分体裁写作模板.md").write_text(writing_style_templates_markdown(labels, created_at), encoding="utf-8")
+    (reports / "上海民盟微信公众号写作风格规则卡.md").write_text(shanghai_style_rule_card_markdown(labels, created_at), encoding="utf-8")
     (reports / "微信公众号文史盟史文章专题库.md").write_text(history_corpus_markdown(labels, created_at), encoding="utf-8")
     (reports / "微信公众号文史盟史研究入口清单.md").write_text(history_research_entry_markdown(labels, created_at), encoding="utf-8")
     log_operation(root, "corpus", "ok", f"labeled {len(labels)} articles", {"output": str(out_dir)})
@@ -3097,13 +3165,16 @@ def command_corpus_style(args: argparse.Namespace) -> int:
     reports = report_dir(root)
     style_path = reports / "上海民盟微信公众号分体裁写作模板.md"
     curated_path = reports / "上海民盟微信公众号精选写作样本.md"
+    rule_card_path = reports / "上海民盟微信公众号写作风格规则卡.md"
     history_path = reports / "微信公众号文史盟史研究入口清单.md"
     style_path.write_text(writing_style_templates_markdown(labels, created_at), encoding="utf-8")
     curated_path.write_text(curated_writing_samples_markdown(labels, created_at), encoding="utf-8")
+    rule_card_path.write_text(shanghai_style_rule_card_markdown(labels, created_at), encoding="utf-8")
     history_path.write_text(history_research_entry_markdown(labels, created_at), encoding="utf-8")
-    log_operation(root, "corpus-style", "ok", "writing style and history research entries updated", {"style": str(style_path), "curated": str(curated_path), "history": str(history_path)})
+    log_operation(root, "corpus-style", "ok", "writing style and history research entries updated", {"style": str(style_path), "curated": str(curated_path), "rule_card": str(rule_card_path), "history": str(history_path)})
     print(f"Style templates: {style_path}")
     print(f"Curated samples: {curated_path}")
+    print(f"Style rule card: {rule_card_path}")
     print(f"History entries: {history_path}")
     return 0
 

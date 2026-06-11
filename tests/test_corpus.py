@@ -22,6 +22,7 @@ from kb.cli import (  # noqa: E402
     event_research_dossier_body,
     history_research_entry_markdown,
     person_research_dossier_body,
+    shanghai_style_rule_card_markdown,
     writing_style_templates_markdown,
 )
 
@@ -265,9 +266,13 @@ class CorpusCommandTests(unittest.TestCase):
             },
         ]
         style = writing_style_templates_markdown(labels, "2026-06-11T00:00:00")
+        rule_card = shanghai_style_rule_card_markdown(labels, "2026-06-11T00:00:00")
         history = history_research_entry_markdown(labels, "2026-06-11T00:00:00")
         self.assertIn("上海民盟微信公众号分体裁写作模板", style)
         self.assertIn("活动报道", style)
+        self.assertIn("上海民盟微信公众号写作风格规则卡", rule_card)
+        self.assertIn("通用风格", rule_card)
+        self.assertIn("活动报道", rule_card)
         self.assertIn("微信公众号文史盟史研究入口清单", history)
         self.assertIn("沈钧儒", history)
 
