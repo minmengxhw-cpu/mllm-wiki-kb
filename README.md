@@ -218,6 +218,7 @@ kb staff check --file ~/Desktop/draft.txt
 ```bash
 kb corpus
 kb corpus-audit
+kb corpus-style
 ```
 
 如果当前 shell 里没有全局 `kb` 命令，可在项目目录使用 `.venv/bin/kb corpus`。
@@ -236,6 +237,11 @@ kb corpus-audit
 - `index/corpus/classification_review.csv`：人工校订用抽检表。
 - `wiki/研究助手/微信公众号文章分类抽检表.md`：按类型、低置信、其他/待判汇总的抽检清单。
 - `wiki/研究助手/微信公众号语料库人工校订说明.md`：校订口径和回写流程。
+
+`corpus-style` 会生成写作和研究入口：
+
+- `wiki/研究助手/上海民盟微信公众号分体裁写作模板.md`：按体裁沉淀标题、导语、结构和风险提示。
+- `wiki/研究助手/微信公众号文史盟史研究入口清单.md`：文史/盟史候选文章的人物、主题和来源入口。
 
 这一步不修改微信公众号原文，也不把 SQLite 数据库提交到 GitHub。
 

@@ -8,7 +8,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from kb.cli import build_article_label, classify_article, corpus_audit_markdown, corpus_review_rows, dict_to_row  # noqa: E402
+from kb.cli import (  # noqa: E402
+    build_article_label,
+    classify_article,
+    corpus_audit_markdown,
+    corpus_review_rows,
+    dict_to_row,
+    history_research_entry_markdown,
+    writing_style_templates_markdown,
+)
 
 
 class CorpusCommandTests(unittest.TestCase):
@@ -96,6 +104,49 @@ class CorpusCommandTests(unittest.TestCase):
         self.assertIn("按类型抽检:会议报道", buckets)
         self.assertIn("低置信抽检", buckets)
         self.assertIn("其他/待判抽检", buckets)
+
+    def test_theme_education_does_not_match_scientific_thought(self) -> None:
+        article_type, _, matched = classify_article("田刚院士：科学思想的力量", "上海民盟", "")
+        self.assertNotEqual(article_type, "theme_education")
+        self.assertNotIn("学思想", matched)
+
+    def test_style_and_history_markdown_have_core_sections(self) -> None:
+        labels = [
+            {
+                "article_id": 1,
+                "title": "民盟上海市委开展专题调研",
+                "account": "上海民盟",
+                "published_at": "2025-01-01",
+                "year": "2025",
+                "article_type": "activity_report",
+                "article_type_name": "活动报道",
+                "topic_tags": ["上海民盟"],
+                "people": [],
+                "raw_path": "/tmp/1.md",
+                "is_writing_sample": True,
+                "is_history": False,
+            },
+            {
+                "article_id": 2,
+                "title": "沈钧儒与民盟历史",
+                "account": "中国民主同盟",
+                "published_at": "2024-01-01",
+                "year": "2024",
+                "article_type": "history_research",
+                "article_type_name": "盟史研究",
+                "topic_tags": ["民盟史"],
+                "people": ["沈钧儒"],
+                "raw_path": "/tmp/2.md",
+                "is_writing_sample": False,
+                "is_history": True,
+            },
+        ]
+        style = writing_style_templates_markdown(labels, "2026-06-11T00:00:00")
+        history = history_research_entry_markdown(labels, "2026-06-11T00:00:00")
+        self.assertIn("上海民盟微信公众号分体裁写作模板", style)
+        self.assertIn("活动报道", style)
+        self.assertIn("微信公众号文史盟史研究入口清单", history)
+        self.assertIn("沈钧儒", history)
 
 
 if __name__ == "__main__":

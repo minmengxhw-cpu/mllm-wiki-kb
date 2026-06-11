@@ -25,6 +25,7 @@
 - 文章增量用 `kb refresh`。
 - 微信公众号语料库体检、分类标签和样本库更新用 `kb corpus`。
 - 微信公众号文章分类抽检和人工校订表更新用 `kb corpus-audit`。
+- 上海民盟分体裁写作模板和文史盟史研究入口更新用 `kb corpus-style`。
 - 盟参种子库位于 `index/formulations.jsonl`、`index/blacklist.csv`、`index/entities/*.jsonl`。
 - 种子库先保证可拦截高风险问题，再逐步扩展，不把未校订条目写成定论。
 
@@ -36,7 +37,9 @@
 - `index/corpus/classification_review.csv`
 - `wiki/研究助手/微信公众号语料库体检报告.md`
 - `wiki/研究助手/微信公众号文章分类抽检表.md`
+- `wiki/研究助手/上海民盟微信公众号分体裁写作模板.md`
 - `wiki/研究助手/上海民盟2023年以来写作样本库.md`
 - `wiki/研究助手/微信公众号文史盟史文章专题库.md`
+- `wiki/研究助手/微信公众号文史盟史研究入口清单.md`
 
 Google Drive 工作材料暂作为外部参考层，不直接混入微信公众号主语料层。

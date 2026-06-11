@@ -1546,6 +1546,79 @@ ARTICLE_TYPE_RULES = [
 
 ARTICLE_TYPE_NAMES = {item["type"]: item["name"] for item in ARTICLE_TYPE_RULES} | {"other": "其他/待判"}
 
+WRITING_STYLE_GUIDES = {
+    "meeting_report": {
+        "use": "适合全委会、常委会、主委会、专题座谈会、工作推进会等会议新闻。",
+        "structure": "标题点明会议名称或核心任务；导语交代时间、地点、会议主体和议题；主体按领导讲话、会议内容、审议事项、工作要求展开；结尾落到贯彻落实或下一步安排。",
+        "title": "常见标题以“召开”“举行”“专题学习”“部署推进”等动词承载事实，避免只写口号。",
+        "lead": "首段要一次性回答谁、何时、何地、开什么会、围绕什么主题。",
+        "risk": "会议名称、职务排序、参会范围和审议事项必须核对原文或正式通知。",
+    },
+    "activity_report": {
+        "use": "适合调研、培训、走访、参观、交流、讲座、比赛等动态报道。",
+        "structure": "标题突出活动动作和对象；导语交代活动基本信息；主体写活动环节、现场交流、成果反馈；结尾写活动意义或后续转化。",
+        "title": "常见标题使用“赴”“开展”“举办”“走进”“举行”等动作词，重点放在具体活动而不是抽象表态。",
+        "lead": "导语宜短，先给出活动事实，再补充主办单位和参加人员。",
+        "risk": "不要把一般活动拔高为制度成果；活动效果要有具体事实支撑。",
+    },
+    "person_profile": {
+        "use": "适合人物采访、盟员风采、先贤纪念、先进典型和口述材料。",
+        "structure": "标题突出人物身份或精神特质；开头以人物核心贡献或场景切入；主体按经历、贡献、细节故事、民盟关联展开；结尾回到时代价值或履职启示。",
+        "title": "常见标题会用人物姓名加身份、贡献或一句代表性表述，增强识别度。",
+        "lead": "导语可用一个典型细节引入，但必须尽快交代人物与民盟、上海或主题的关系。",
+        "risk": "生卒年、职务、入盟时间、历史评价和引语必须有出处；避免把文学化描写写成史实。",
+    },
+    "policy_advice": {
+        "use": "适合参政议政、社情民意、提案建议、调研成果和履职综述。",
+        "structure": "标题点出议题和履职动作；导语说明调研或建言背景；主体按问题发现、调研依据、建议内容、办理反馈或社会价值展开。",
+        "title": "常见标题包含“建言”“调研”“提案”“社情民意”“助力”等关键词。",
+        "lead": "导语应把议题、履职主体和建言场景说清楚，不宜直接堆政策概念。",
+        "risk": "政策判断和数据要注明来源；建议表述要可操作，避免空泛口号。",
+    },
+    "theme_education": {
+        "use": "适合主题教育、政治学习、思想共识、作风建设和专题学习类稿件。",
+        "structure": "标题通常围绕主题和行动；导语写学习背景和组织方式；主体写学习内容、交流发言、实践转化；结尾强调凝聚共识和履职实效。",
+        "title": "常见标题会包含“主题教育”“凝心铸魂”“学规定、强作风、树形象”等规范表述。",
+        "lead": "导语应先写活动或会议事实，再写学习主题，避免只有抽象政治表述。",
+        "risk": "政治表述必须使用现行规范口径；引用上级部署时要核对原文。",
+    },
+    "history_commemoration": {
+        "use": "适合文史纪念、盟史传播、先贤故事、纪念活动和传统教育基地介绍。",
+        "structure": "标题点明人物、事件或纪念节点；导语说明历史对象和现实语境；主体按史实脉络、人物贡献、民盟关联、今日启示展开。",
+        "title": "常见标题偏庄重，常用“纪念”“回望”“钩沉”“先贤”等词。",
+        "lead": "导语要交代时间坐标和史实对象，不宜直接抒情。",
+        "risk": "高风险史实必须回到原始来源或权威档案；争议问题要标注待核。",
+    },
+    "leadership_speech": {
+        "use": "适合领导讲话、工作部署、年度工作报告和重要会议精神整理。",
+        "structure": "标题突出会议层级或部署主题；导语写讲话场景；主体按肯定成绩、指出问题、提出要求、部署任务展开。",
+        "title": "标题应稳健准确，少用修辞，优先体现讲话场景和任务方向。",
+        "lead": "导语必须准确写明讲话人、职务、会议和时间。",
+        "risk": "领导职务、讲话原意和提法边界必须核对，不要二次发挥。",
+    },
+    "member_achievement": {
+        "use": "适合盟员获奖、成果发布、入选名单、履职成果和先进典型报道。",
+        "structure": "标题点明获奖或成果事实；导语说明人物/团队、奖项和时间；主体补充成果背景、专业贡献、民盟身份和社会影响。",
+        "title": "常见标题使用“荣获”“入选”“获评”“成果”等事实词，信息密度高。",
+        "lead": "导语先讲清楚谁获得了什么，再补充评选单位或成果领域。",
+        "risk": "奖项名称、层级、授予单位和人物身份必须逐字核对。",
+    },
+    "organization_building": {
+        "use": "适合基层组织、支部活动、换届、新盟员、盟员之家等组织建设稿件。",
+        "structure": "标题点明组织和动作；导语交代组织层级与事项；主体写流程、交流、组织成效和下一步建设。",
+        "title": "常见标题包含“基层组织”“支部”“换届”“盟员之家”“新盟员”等组织词。",
+        "lead": "导语要明确组织名称和活动性质，避免只写泛泛学习交流。",
+        "risk": "组织名称、届次、职务和程序性表述要准确。",
+    },
+    "social_service": {
+        "use": "适合社会服务、帮扶、教育医疗公益、乡村振兴和品牌项目报道。",
+        "structure": "标题突出服务对象和行动；导语写服务时间地点与主体；主体写服务内容、受益对象、项目机制和持续效果。",
+        "title": "常见标题使用“助力”“帮扶”“公益”“乡村振兴”“烛光行动”等行动词。",
+        "lead": "导语应先写具体服务事实，再写价值意义。",
+        "risk": "服务成效不能夸大；人数、物资、项目名称等要有来源。",
+    },
+}
+
 TOPIC_KEYWORDS = {
     "民盟史": ["盟史", "中国民主政团同盟", "旧政协", "新政协", "五一口号", "李闻", "民盟先贤", "传统教育基地"],
     "上海民盟": ["上海民盟", "民盟市委", "民盟上海市委", "上海"],
@@ -1629,7 +1702,8 @@ def build_article_label(row: sqlite3.Row) -> dict:
     is_history = article_type in {"history_commemoration", "history_research"} or "民盟史" in topics
     is_writing_sample = row["account"] == "上海民盟" and year >= "2023" and article_type in {
         "activity_report", "meeting_report", "person_profile", "history_commemoration",
-        "policy_advice", "theme_education", "leadership_speech",
+        "policy_advice", "theme_education", "leadership_speech", "member_achievement",
+        "organization_building", "social_service",
     }
     return {
         "article_id": int(row["id"]),
@@ -1776,6 +1850,138 @@ def writing_samples_markdown(labels: list[dict], created_at: str, limit_per_type
 - 每类先精选 20 篇高质量样本。
 - 标注标题方式、导语方式、段落结构、结尾落点和可复用表达。
 - 将不适合作为风格样本的短讯、通知、转载类文章剔除。
+"""
+
+
+def writing_style_templates_markdown(labels: list[dict], created_at: str, limit_per_type: int = 12) -> str:
+    samples = [label for label in labels if label["account"] == "上海民盟" and label["year"] >= "2023" and label["is_writing_sample"]]
+    by_type: dict[str, list[dict]] = {}
+    for label in sorted(samples, key=lambda item: item["published_at"] or "", reverse=True):
+        by_type.setdefault(label["article_type"], []).append(label)
+    sections = []
+    for type_code, guide in WRITING_STYLE_GUIDES.items():
+        items = by_type.get(type_code, [])
+        rows = [["日期", "标题", "主题词", "raw 原文"]]
+        for item in items[:limit_per_type]:
+            rows.append(
+                [
+                    item["published_at"] or "日期不详",
+                    f"《{item['title']}》",
+                    "、".join(item["topic_tags"][:4]) or "待补",
+                    f"`{item['raw_path']}`",
+                ]
+            )
+        sample_table = markdown_table(rows) if items else "暂无 2023 年以后上海民盟样本。"
+        sections.append(
+            f"""## {ARTICLE_TYPE_NAMES.get(type_code, type_code)}
+
+- 适用场景：{guide["use"]}
+- 常用结构：{guide["structure"]}
+- 标题习惯：{guide["title"]}
+- 导语写法：{guide["lead"]}
+- 风险提示：{guide["risk"]}
+- 当前样本数：{len(items)} 篇。
+
+### 代表样本
+
+{sample_table}
+"""
+        )
+    return f"""# 上海民盟微信公众号分体裁写作模板
+
+生成时间：{created_at}
+
+本页把 2023 年以后上海民盟微信公众号文章，按体裁沉淀为可调用的写作模板。后续你给材料时，可以先判断材料属于哪一类，再套用对应结构生成初稿。
+
+## 使用方式
+
+- 事件、调研、培训、参观优先走“活动报道”。
+- 全委会、常委会、座谈会、推进会优先走“会议报道”。
+- 采访、风采、纪念人物优先走“人物采访/人物风采”。
+- 提案、社情民意、调研建议优先走“参政议政”。
+- 主题教育、政治学习、作风建设优先走“主题教育”。
+- 文史纪念和盟史传播先做史实核验，再进入写作。
+
+## 总览
+
+- 当前纳入写作样本：{len(samples)} 篇。
+- 覆盖模板：{len(WRITING_STYLE_GUIDES)} 类。
+- 每类展示最近 {limit_per_type} 篇代表样本。
+
+{chr(10).join(sections)}
+
+## 写作红线
+
+- 事实先行：没有材料支撑的成果、评价、数字和历史结论标 `[待核]`。
+- 口径优先：红头文件、内部口径和人工终审高于公众号公开表述。
+- 风格服从体裁：新闻稿重事实顺序，人物稿重细节和贡献，文史稿重出处和史实边界。
+"""
+
+
+def history_research_entry_markdown(labels: list[dict], created_at: str, limit_per_group: int = 40) -> str:
+    items = [label for label in labels if label["is_history"]]
+    by_account = Counter(label["account"] or "unknown" for label in items)
+    by_type = Counter(label["article_type_name"] for label in items)
+    people = Counter()
+    topics = Counter()
+    for item in items:
+        people.update(item.get("people") or [])
+        topics.update(item.get("topic_tags") or [])
+
+    recent_rows = [["日期", "账号", "类型", "标题", "人物", "raw 原文"]]
+    for item in sorted(items, key=lambda label: label["published_at"] or "", reverse=True)[:limit_per_group]:
+        recent_rows.append(
+            [
+                item["published_at"] or "日期不详",
+                item["account"] or "",
+                item["article_type_name"],
+                f"《{item['title']}》",
+                "、".join(item["people"][:4]) or "待抽取",
+                f"`{item['raw_path']}`",
+            ]
+        )
+
+    people_rows = [["人物", "命中文章数"]]
+    people_rows.extend([[name, str(count)] for name, count in people.most_common(30)])
+    topic_rows = [["主题", "命中文章数"]]
+    topic_rows.extend([[name, str(count)] for name, count in topics.most_common(20)])
+
+    return f"""# 微信公众号文史盟史研究入口清单
+
+生成时间：{created_at}
+
+本页是文史/盟史研究的入口页，用于把上海民盟、中国民主同盟、群言杂志中的文史候选文章先集中起来，再逐步升级成人物卡、事件卡、机构卡和地点卡。
+
+## 总览
+
+- 文史/盟史候选文章：{len(items)} 篇。
+- 按账号分布：
+
+{markdown_table([["账号", "篇数"]] + [[k, str(v)] for k, v in by_account.most_common()])}
+
+- 按类型分布：
+
+{markdown_table([["类型", "篇数"]] + [[k, str(v)] for k, v in by_type.most_common()])}
+
+## 高频人物线索
+
+{markdown_table(people_rows)}
+
+## 高频主题线索
+
+{markdown_table(topic_rows)}
+
+## 最近候选文章
+
+{markdown_table(recent_rows)}
+
+## 下一步研究法
+
+1. 先按人物建立研究卡，尤其是沈钧儒、史良、张澜、黄炎培、费孝通等核心人物。
+2. 再按事件建立专题线索，如建盟、旧政协、五一口号、李闻事件、新政协等。
+3. 上海地方史材料单列，避免与全国民盟史混写。
+4. 对生卒年、任职、会议日期、机构名称等事实字段逐条回 raw 原文核验。
+5. 有争议或口径风险的条目进入 `index/blacklist.csv` 或 `index/formulations.jsonl`。
 """
 
 
@@ -1989,12 +2195,29 @@ def command_corpus(args: argparse.Namespace) -> int:
     (reports / "微信公众号语料库体检报告.md").write_text(corpus_audit_markdown(labels, created_at), encoding="utf-8")
     (reports / "微信公众号文章分类体系.md").write_text(type_system_markdown(created_at), encoding="utf-8")
     (reports / "上海民盟2023年以来写作样本库.md").write_text(writing_samples_markdown(labels, created_at), encoding="utf-8")
+    (reports / "上海民盟微信公众号分体裁写作模板.md").write_text(writing_style_templates_markdown(labels, created_at), encoding="utf-8")
     (reports / "微信公众号文史盟史文章专题库.md").write_text(history_corpus_markdown(labels, created_at), encoding="utf-8")
+    (reports / "微信公众号文史盟史研究入口清单.md").write_text(history_research_entry_markdown(labels, created_at), encoding="utf-8")
     log_operation(root, "corpus", "ok", f"labeled {len(labels)} articles", {"output": str(out_dir)})
     print(f"Articles labeled: {len(labels)}")
     print(f"Labels: {out_dir / 'article_labels.jsonl'}")
     print(f"Types: {out_dir / 'article_types.json'}")
     print(f"Reports: {reports}")
+    return 0
+
+
+def command_corpus_style(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    labels = load_article_labels(root)
+    created_at = now_iso()
+    reports = report_dir(root)
+    style_path = reports / "上海民盟微信公众号分体裁写作模板.md"
+    history_path = reports / "微信公众号文史盟史研究入口清单.md"
+    style_path.write_text(writing_style_templates_markdown(labels, created_at), encoding="utf-8")
+    history_path.write_text(history_research_entry_markdown(labels, created_at), encoding="utf-8")
+    log_operation(root, "corpus-style", "ok", "writing style and history research entries updated", {"style": str(style_path), "history": str(history_path)})
+    print(f"Style templates: {style_path}")
+    print(f"History entries: {history_path}")
     return 0
 
 
@@ -3243,6 +3466,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--low-confidence", type=int, default=80)
     p.add_argument("--other", type=int, default=80)
     p.set_defaults(func=command_corpus_audit)
+
+    p = sub.add_parser("corpus-style", help="生成上海民盟写作模板和文史盟史研究入口")
+    p.set_defaults(func=command_corpus_style)
 
     p = sub.add_parser("compile")
     p.add_argument("--topic", default=None)
