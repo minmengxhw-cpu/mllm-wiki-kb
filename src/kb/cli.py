@@ -3066,6 +3066,19 @@ TOPIC_PACKS = [
     ("参政议政写作素材库", "参政议政 社情民意 提案 调研 建言 写作 素材", "policy"),
 ]
 
+RESEARCH_DOSSIER_SETS = {
+    "core-people": ["沈钧儒", "史良", "张澜", "黄炎培", "费孝通", "李公朴", "闻一多", "陶行知", "钱伟长"],
+    "founding-people": ["沈钧儒", "张澜", "黄炎培", "史良", "李公朴", "闻一多"],
+}
+
+PERSON_RESEARCH_THEMES = {
+    "民盟史主线": ["民盟", "民盟史", "中国民主同盟", "民主政团同盟"],
+    "多党合作与政协": ["政协", "新政协", "旧政协", "五一口号", "多党合作"],
+    "上海地方线索": ["上海", "上海民盟", "沪", "周公馆", "福寿园", "虹桥"],
+    "文史纪念传播": ["纪念", "先贤", "诞辰", "传统教育", "盟史钩沉"],
+    "参政议政线索": ["参政议政", "提案", "社情民意", "建言", "履职"],
+}
+
 WRITING_WORKFLOWS = {
     "活动会议报道": {
         "query": "上海民盟 活动 会议 报道 举行 出席 讲话",
@@ -3357,6 +3370,163 @@ def card_body(name: str, page_type: str, rows: list[sqlite3.Row]) -> str:
 
 {source_lines or '- 未检索到可靠来源。'}
 """
+
+
+def dossier_dir(root: Path) -> Path:
+    return root / "wiki" / "研究助手" / "核心人物研究档案"
+
+
+def row_text(row: sqlite3.Row) -> str:
+    return " ".join(str(row[key] or "") for key in ("title", "account", "published_at", "snippet", "raw_path"))
+
+
+def rows_matching_keywords(rows: list[sqlite3.Row], keywords: list[str]) -> list[sqlite3.Row]:
+    return [row for row in rows if any(keyword in row_text(row) for keyword in keywords)]
+
+
+def person_research_dossier_body(name: str, rows: list[sqlite3.Row], created_at: str) -> str:
+    sources = unique_source_rows(rows, 18)
+    by_account = Counter(row["account"] or "unknown" for row in sources)
+    by_year = Counter((row["published_at"] or "日期不详")[:4] for row in sources)
+    theme_rows = []
+    theme_sections = []
+    for theme, keywords in PERSON_RESEARCH_THEMES.items():
+        matched = rows_matching_keywords(sources, keywords)
+        theme_rows.append([theme, str(len(matched)), "、".join(keywords[:6])])
+        if matched:
+            table = [["编号", "日期", "账号", "标题", "raw 原文"]]
+            for row in matched[:6]:
+                idx = sources.index(row) + 1 if row in sources else 0
+                table.append([f"S{idx}", row["published_at"] or "日期不详", row["account"] or "", f"《{row['title']}》", f"`{row['raw_path']}`"])
+            theme_sections.append(f"### {theme}\n\n{markdown_table(table)}")
+
+    evidence_rows = [["编号", "日期", "账号", "标题", "证据摘录"]]
+    for idx, row in enumerate(sources[:12], 1):
+        evidence_rows.append([f"S{idx}", row["published_at"] or "日期不详", row["account"] or "", f"《{row['title']}》", clean_snippet(row["snippet"], 180)])
+
+    source_table = [["编号", "账号", "日期", "标题", "raw 原文"]]
+    for idx, row in enumerate(sources, 1):
+        source_table.append([f"S{idx}", row["account"] or "", row["published_at"] or "日期不详", f"《{row['title']}》", f"`{row['raw_path']}`"])
+
+    return f"""# {name}研究档案
+
+生成时间：{created_at}
+
+本档案是“盟参”研究型知识库的人物入口页，依据本地微信公众号语料自动生成。它只整理可追溯线索，不把机器摘录写成最终史实结论。
+
+## 研究定位
+
+- 人物：{name}
+- 档案性质：核心人物研究入口
+- 命中片段：{len(rows)} 条
+- 去重来源文章：{len(sources)} 篇
+- 结论状态：待人工核验
+
+## 来源分布
+
+{markdown_table([["账号", "来源篇数"]] + [[k, str(v)] for k, v in by_account.most_common()])}
+
+{markdown_table([["年份", "来源篇数"]] + [[k, str(v)] for k, v in sorted(by_year.items(), reverse=True)])}
+
+## 主题线索
+
+{markdown_table([["主题", "命中来源数", "识别词"]] + theme_rows)}
+
+{chr(10).join(theme_sections) if theme_sections else '暂无明显主题线索。'}
+
+## 时间线线索
+
+{timeline_candidates(sources, 12)}
+
+## 证据摘录
+
+{markdown_table(evidence_rows)}
+
+## 待核字段
+
+- 生卒年、籍贯、主要身份、入盟或参与民盟活动时间。
+- 民盟内职务、政府/政协/社会职务及其任期。
+- 与重要事件的关系，如建盟、旧政协、五一口号、新政协、李闻事件等。
+- 上海地方史关联：地点、组织、活动、纪念资源和传承实践。
+- 引语、评价、历史判断是否来自原文、转载、纪念性表述或权威档案。
+
+## 写作与研究用法
+
+- 写文史纪念文章：先从“时间线线索”选一个具体事件，不直接铺陈完整生平。
+- 写人物风采文章：优先寻找可验证细节、具体场景和人物贡献。
+- 做盟史研究：区分全国民盟史主线与上海地方史线索。
+- 做口径核验：涉及职务、日期、组织名称、历史评价的表述必须回到 raw 原文。
+
+## 来源表
+
+{markdown_table(source_table)}
+"""
+
+
+def write_person_research_dossier(root: Path, name: str, rows: list[sqlite3.Row], created_at: str) -> Path:
+    path = dossier_dir(root) / f"{name}.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    body = person_research_dossier_body(name, rows, created_at)
+    path.write_text(body, encoding="utf-8")
+    return path
+
+
+def person_dossier_rows(root: Path, name: str, top_k: int) -> list[sqlite3.Row]:
+    rows = search_rows(root, name, top_k * 3)
+    focused = [row for row in rows if name in row_text(row)]
+    if len(focused) < top_k:
+        broad = search_rows(root, f"{name} 民盟", top_k * 2)
+        seen = {int(row["chunk_id"]) for row in focused if row["chunk_id"] is not None}
+        for row in broad:
+            if name not in row_text(row):
+                continue
+            chunk_id = int(row["chunk_id"])
+            if chunk_id in seen:
+                continue
+            focused.append(row)
+            seen.add(chunk_id)
+            if len(focused) >= top_k:
+                break
+    return focused[:top_k]
+
+
+def research_dossier_index_body(created: list[Path], created_at: str) -> str:
+    rows = [["人物", "档案路径"]]
+    for path in created:
+        rows.append([path.stem, f"`{path}`"])
+    return f"""# 核心人物研究档案索引
+
+生成时间：{created_at}
+
+本页汇总“盟参”当前已生成的核心人物研究档案。人物档案用于盟史研究、文史纪念写作、口径核验和后续人工校订。
+
+{markdown_table(rows)}
+
+## 使用原则
+
+- 档案中的事实线索必须回到 raw 原文核验后使用。
+- 没有明确来源支撑的生平、职务、时间和评价不得直接写入正式稿。
+- 上海地方史线索与全国民盟史主线应分别整理，再决定写作角度。
+"""
+
+
+def command_build_research_dossiers(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    names = RESEARCH_DOSSIER_SETS[args.set]
+    created_at = now_iso()
+    created: list[Path] = []
+    for name in names[: args.limit or None]:
+        rows = person_dossier_rows(root, name, args.top_k)
+        created.append(write_person_research_dossier(root, name, rows, created_at))
+    index_path = dossier_dir(root) / "索引.md"
+    index_path.write_text(research_dossier_index_body(created, created_at), encoding="utf-8")
+    append_wiki_log(root, f"生成核心人物研究档案：{len(created)} 个")
+    log_operation(root, "build-research-dossiers", "ok", f"{len(created)} dossiers", {"set": args.set})
+    print(f"Created/updated research dossiers: {len(created)}")
+    print(index_path)
+    for path in created:
+        print(path)
+    return 0
 
 
 def command_build_cards(args: argparse.Namespace) -> int:
@@ -3731,6 +3901,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--limit", type=int, default=0)
     p.add_argument("--top-k", type=int, default=8)
     p.set_defaults(func=command_build_cards)
+
+    p = sub.add_parser("build-research-dossiers")
+    p.add_argument("--set", choices=sorted(RESEARCH_DOSSIER_SETS), default="core-people")
+    p.add_argument("--limit", type=int, default=0)
+    p.add_argument("--top-k", type=int, default=24)
+    p.set_defaults(func=command_build_research_dossiers)
 
     p = sub.add_parser("curate-cards")
     p.set_defaults(func=command_curate_cards)

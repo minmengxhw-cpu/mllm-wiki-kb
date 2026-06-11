@@ -267,6 +267,14 @@ kb build-cards --set shanghai-history-people --top-k 15
 
 预置卡片包括民盟核心历史人物、上海民盟历史人物、关键事件和传统教育相关地点。生成后可用 `kb obsidian-sync` 同步到 Obsidian。
 
+## 核心人物研究档案
+
+```bash
+kb build-research-dossiers --set core-people --top-k 24
+```
+
+研究档案会写入 `wiki/研究助手/核心人物研究档案/`，用于把核心人物的来源分布、主题线索、时间线线索、证据摘录和待核字段集中到一个研究入口。它不替代 `wiki/人物/` 下的自动人物卡，而是面向盟史研究和写作核验。
+
 ## 研究卡校订状态
 
 ```bash

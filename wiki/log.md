@@ -109,6 +109,12 @@ needs_review: false
 
 - 2026-06-10T15:40:13 一键刷新知识库：articles 9368->9368; indexed=19917; priority=21
 
+
+- 2026-06-11T15:36:05 生成核心人物研究档案：9 个
+
+
+- 2026-06-11T15:36:44 生成核心人物研究档案：9 个
+
 <!-- KB-GENERATED:END -->
 <!-- HUMAN-NOTES:START -->
 

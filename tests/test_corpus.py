@@ -18,6 +18,7 @@ from kb.cli import (  # noqa: E402
     corpus_review_rows,
     dict_to_row,
     history_research_entry_markdown,
+    person_research_dossier_body,
     writing_style_templates_markdown,
 )
 
@@ -255,6 +256,27 @@ class CorpusCommandTests(unittest.TestCase):
         body = corpus_priority_review_markdown(rows, "2026-06-11T00:00:00")
         self.assertIn("微信公众号分类优先校订清单", body)
         self.assertIn("通知公告/信息发布", body)
+
+    def test_person_research_dossier_contains_research_sections(self) -> None:
+        rows = [
+            dict_to_row(
+                {
+                    "article_id": 1,
+                    "chunk_id": 1,
+                    "title": "沈钧儒与人民政协制度的创建",
+                    "account": "中国民主同盟",
+                    "published_at": "2025-01-02",
+                    "raw_path": "/tmp/shen.md",
+                    "snippet": "沈钧儒参与新政协筹备，与民盟历史和多党合作密切相关。",
+                    "score": 0,
+                }
+            )
+        ]
+        body = person_research_dossier_body("沈钧儒", rows, "2026-06-11T00:00:00")
+        self.assertIn("沈钧儒研究档案", body)
+        self.assertIn("主题线索", body)
+        self.assertIn("待核字段", body)
+        self.assertIn("来源表", body)
 
 
 if __name__ == "__main__":
