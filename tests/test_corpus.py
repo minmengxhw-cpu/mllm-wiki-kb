@@ -12,6 +12,7 @@ from kb.cli import (  # noqa: E402
     build_article_label,
     classify_article,
     corpus_audit_markdown,
+    corpus_quality_diagnostic_markdown,
     corpus_review_rows,
     dict_to_row,
     history_research_entry_markdown,
@@ -110,6 +111,36 @@ class CorpusCommandTests(unittest.TestCase):
         self.assertNotEqual(article_type, "theme_education")
         self.assertNotIn("学思想", matched)
 
+    def test_achievement_and_notice_title_priority(self) -> None:
+        article_type, _, matched = classify_article(
+            "祝贺！盟员陈子善获颁中国现代文学学术贡献荣誉奖",
+            "上海民盟",
+            "活动举办，现场举行颁奖。",
+        )
+        self.assertEqual(article_type, "member_achievement")
+        self.assertIn("祝贺", matched)
+
+        article_type, _, matched = classify_article("预告 | 周末盟史讲座报名开启", "上海民盟", "")
+        self.assertEqual(article_type, "notice_info")
+        self.assertIn("预告", matched)
+
+    def test_theme_and_history_title_priority(self) -> None:
+        article_type, _, matched = classify_article(
+            "丰富形式，走深走实！上海民盟各级组织开展主题教育",
+            "上海民盟",
+            "活动举办，现场交流。",
+        )
+        self.assertEqual(article_type, "theme_education")
+        self.assertIn("主题教育", matched)
+
+        article_type, _, matched = classify_article(
+            "民盟先贤廉洁自律事迹丨张澜：布衣风骨 清廉永存",
+            "中国民主同盟",
+            "活动开展，现场参观。",
+        )
+        self.assertEqual(article_type, "history_commemoration")
+        self.assertIn("先贤", matched)
+
     def test_style_and_history_markdown_have_core_sections(self) -> None:
         labels = [
             {
@@ -147,6 +178,22 @@ class CorpusCommandTests(unittest.TestCase):
         self.assertIn("活动报道", style)
         self.assertIn("微信公众号文史盟史研究入口清单", history)
         self.assertIn("沈钧儒", history)
+
+    def test_quality_diagnostic_markdown_contains_boundary_sections(self) -> None:
+        labels = [
+            {
+                "title": "预告 | 周末盟史讲座报名开启",
+                "account": "上海民盟",
+                "published_at": "2025-01-01",
+                "article_type": "other",
+                "article_type_name": "其他/待判",
+                "matched_keywords": [],
+                "raw_path": "/tmp/1.md",
+            }
+        ]
+        body = corpus_quality_diagnostic_markdown(labels, "2026-06-11T00:00:00")
+        self.assertIn("微信公众号分类质量诊断报告", body)
+        self.assertIn("其他/待判中疑似通知预告", body)
 
 
 if __name__ == "__main__":

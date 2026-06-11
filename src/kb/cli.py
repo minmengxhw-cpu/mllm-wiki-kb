@@ -1532,15 +1532,15 @@ ARTICLE_TYPE_RULES = [
     {"type": "meeting_report", "name": "会议报道", "keywords": ["会议", "全委", "常委会", "主委会议", "代表大会", "座谈会", "开题会", "推进会", "工作会", "学习交流会"]},
     {"type": "activity_report", "name": "活动报道", "keywords": ["活动", "举行", "举办", "开展", "走进", "启动", "参观", "调研", "培训班", "讲座", "比赛"]},
     {"type": "leadership_speech", "name": "领导讲话/工作部署", "keywords": ["讲话", "工作报告", "工作要点", "部署", "要求", "指出", "强调", "主委会议通过", "全会"]},
-    {"type": "member_achievement", "name": "盟员履职/成果荣誉", "keywords": ["荣获", "获评", "获奖", "喜获", "当选", "入选", "成果", "团队", "院士", "科学技术奖", "五一劳动奖章", "创新争先", "典型在身边", "履职风采"]},
+    {"type": "member_achievement", "name": "盟员履职/成果荣誉", "keywords": ["祝贺", "荣获", "获得", "获评", "获奖", "获颁", "获表彰", "表彰", "提名奖", "喜获", "当选", "入选", "成果", "团队", "院士", "科学技术奖", "五一劳动奖章", "创新争先", "典型在身边", "履职风采"]},
     {"type": "person_profile", "name": "人物采访/人物风采", "keywords": ["人物", "采访", "风采", "盟员风采", "专访", "故事", "诞辰", "纪念", "先生"]},
     {"type": "history_commemoration", "name": "文史纪念", "keywords": ["盟史", "文史", "纪念", "先贤", "旧政协", "新政协", "五一口号", "李闻", "钩沉", "口述史", "传统教育基地"]},
     {"type": "history_research", "name": "盟史研究", "keywords": ["盟史研究", "民盟历史", "档案", "史料", "史实", "考证", "历史资料", "理论和盟史"]},
     {"type": "policy_advice", "name": "参政议政", "keywords": ["参政议政", "提案", "社情民意", "建言", "调研", "建议", "政协", "两会", "履职"]},
-    {"type": "theme_education", "name": "主题教育", "keywords": ["主题教育", "参政为公", "实干为民", "凝心铸魂", "学规定", "强作风", "树形象", "政治共识", "学习贯彻习近平", "学习贯彻中共"]},
+    {"type": "theme_education", "name": "主题教育", "keywords": ["主题教育", "主题教育进行时", "参政为公", "实干为民", "凝心铸魂", "学规定", "强作风", "树形象", "政治共识", "学习贯彻习近平", "学习贯彻中共"]},
     {"type": "organization_building", "name": "组织建设", "keywords": ["组织建设", "基层组织", "支部", "区委", "委员会", "换届", "盟员之家", "新盟员", "入盟"]},
     {"type": "social_service", "name": "社会服务", "keywords": ["社会服务", "帮扶", "乡村振兴", "烛光行动", "黄丝带", "公益", "医疗", "教育帮扶"]},
-    {"type": "notice_info", "name": "通知公告/信息发布", "keywords": ["通知", "公告", "名单", "公示", "目录", "招聘", "征集", "报名", "结果出炉"]},
+    {"type": "notice_info", "name": "通知公告/信息发布", "keywords": ["通知", "公告", "预告", "名单", "公示", "目录", "招聘", "征集", "报名", "结果出炉"]},
     {"type": "commentary_theory", "name": "评论综述/理论文章", "keywords": ["综述", "理论", "评论", "学习体会", "心得", "观察", "解读", "述评"]},
 ]
 
@@ -1652,15 +1652,24 @@ def corpus_text_for_row(row: sqlite3.Row) -> str:
 def classify_article(title: str, account: str | None, text: str) -> tuple[str, int, list[str]]:
     haystack = f"{title}\n{account or ''}\n{text[:1600]}"
     scored = []
-    for rule in ARTICLE_TYPE_RULES:
+    for index, rule in enumerate(ARTICLE_TYPE_RULES):
         matched = [kw for kw in rule["keywords"] if kw in haystack]
         if matched:
-            title_hits = sum(2 for kw in matched if kw in title)
-            scored.append((len(matched) + title_hits, rule["type"], matched))
+            title_hits = sum(3 for kw in matched if kw in title)
+            score = len(matched) + title_hits
+            if rule["type"] == "member_achievement" and any(kw in title for kw in ["祝贺", "获", "入选", "表彰", "当选"]):
+                score += 6
+            if rule["type"] == "theme_education" and any(kw in title for kw in ["主题教育", "凝心铸魂", "参政为公", "实干为民", "学规定", "强作风"]):
+                score += 6
+            if rule["type"] == "history_commemoration" and any(kw in title for kw in ["盟史钩沉", "民盟先贤", "五一口号", "诞辰", "旧政协", "新政协"]):
+                score += 6
+            if rule["type"] == "notice_info" and title.startswith(("预告", "通知", "公告", "名单", "公示")):
+                score += 6
+            scored.append((score, -index, rule["type"], matched))
     if not scored:
         return "other", 0, []
     scored.sort(key=lambda item: item[0], reverse=True)
-    score, article_type, matched = scored[0]
+    score, _, article_type, matched = scored[0]
     return article_type, min(95, 50 + score * 8), matched[:8]
 
 
@@ -2164,6 +2173,58 @@ def corpus_review_guide_markdown(created_at: str) -> str:
 """
 
 
+def corpus_quality_diagnostic_markdown(labels: list[dict], created_at: str, limit: int = 30) -> str:
+    checks = [
+        ("活动报道中疑似履职成果", lambda item: item["article_type"] == "activity_report" and any(term in (item["title"] or "") for term in ["祝贺", "获", "入选", "表彰", "当选"])),
+        ("活动报道中疑似主题教育", lambda item: item["article_type"] == "activity_report" and "主题教育" in (item["title"] or "")),
+        ("活动报道中疑似文史纪念", lambda item: item["article_type"] == "activity_report" and any(term in (item["title"] or "") for term in ["盟史", "民盟先贤", "纪念", "诞辰", "五一口号"])),
+        ("其他/待判中疑似通知预告", lambda item: item["article_type"] == "other" and (item["title"] or "").startswith(("预告", "通知", "公告", "名单", "公示"))),
+        ("其他/待判中疑似人物文章", lambda item: item["article_type"] == "other" and any(term in (item["title"] or "") for term in ["盟员", "先生", "人物", "风采", "访谈"])),
+    ]
+    overview = []
+    sections = []
+    for name, predicate in checks:
+        matched = [item for item in labels if predicate(item)]
+        overview.append([name, str(len(matched))])
+        rows = [["日期", "账号", "当前类型", "标题", "命中词", "raw 原文"]]
+        for item in sorted(matched, key=lambda row: row["published_at"] or "", reverse=True)[:limit]:
+            rows.append(
+                [
+                    item["published_at"] or "日期不详",
+                    item["account"] or "",
+                    item["article_type_name"],
+                    f"《{item['title']}》",
+                    "、".join(item.get("matched_keywords") or []) or "无",
+                    f"`{item['raw_path']}`",
+                ]
+            )
+        sections.append(f"## {name}\n\n{markdown_table(rows) if matched else '暂未发现。'}")
+    by_type = Counter(item["article_type_name"] for item in labels)
+    return f"""# 微信公众号分类质量诊断报告
+
+生成时间：{created_at}
+
+本页用于发现机器分类的高频边界问题。它不是人工校订结论，只提示下一轮需要重点抽看的文章。
+
+## 当前类型分布
+
+{markdown_table([["类型", "篇数"]] + [[k, str(v)] for k, v in by_type.most_common()])}
+
+## 边界问题概览
+
+{markdown_table([["诊断项", "疑似篇数"]] + overview)}
+
+{chr(10).join(sections)}
+
+## 使用建议
+
+1. 疑似篇数高的项目，先抽看标题和 raw 原文。
+2. 如果误判集中来自某个词，修改 `ARTICLE_TYPE_RULES`。
+3. 如果属于体裁交叉，不强行修规则，保留人工校订备注。
+4. 每次运行 `kb corpus` 后都重新查看本页。
+"""
+
+
 def command_corpus_audit(args: argparse.Namespace) -> int:
     root = project_root_from_args(args.project_root)
     labels = load_article_labels(root)
@@ -2194,6 +2255,7 @@ def command_corpus(args: argparse.Namespace) -> int:
     reports.mkdir(parents=True, exist_ok=True)
     (reports / "微信公众号语料库体检报告.md").write_text(corpus_audit_markdown(labels, created_at), encoding="utf-8")
     (reports / "微信公众号文章分类体系.md").write_text(type_system_markdown(created_at), encoding="utf-8")
+    (reports / "微信公众号分类质量诊断报告.md").write_text(corpus_quality_diagnostic_markdown(labels, created_at), encoding="utf-8")
     (reports / "上海民盟2023年以来写作样本库.md").write_text(writing_samples_markdown(labels, created_at), encoding="utf-8")
     (reports / "上海民盟微信公众号分体裁写作模板.md").write_text(writing_style_templates_markdown(labels, created_at), encoding="utf-8")
     (reports / "微信公众号文史盟史文章专题库.md").write_text(history_corpus_markdown(labels, created_at), encoding="utf-8")
