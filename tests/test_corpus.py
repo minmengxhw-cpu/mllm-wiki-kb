@@ -22,6 +22,7 @@ from kb.cli import (  # noqa: E402
     event_research_dossier_body,
     history_research_entry_markdown,
     person_research_dossier_body,
+    policy_advice_material_index_markdown,
     shanghai_style_rule_card_markdown,
     writing_style_templates_markdown,
 )
@@ -275,6 +276,25 @@ class CorpusCommandTests(unittest.TestCase):
         self.assertIn("活动报道", rule_card)
         self.assertIn("微信公众号文史盟史研究入口清单", history)
         self.assertIn("沈钧儒", history)
+
+    def test_policy_advice_material_index_contains_topic_sections(self) -> None:
+        labels = [
+            {
+                "article_id": 1,
+                "title": "民盟市委围绕科技创新开展调研",
+                "account": "上海民盟",
+                "published_at": "2025-01-01",
+                "year": "2025",
+                "article_type": "policy_advice",
+                "article_type_name": "参政议政",
+                "topic_tags": ["参政议政"],
+                "raw_path": "/tmp/policy.md",
+            }
+        ]
+        body = policy_advice_material_index_markdown(labels, "2026-06-11T00:00:00")
+        self.assertIn("微信公众号参政议政素材主题库", body)
+        self.assertIn("参政议政候选文章：1 篇", body)
+        self.assertIn("/tmp/policy.md", body)
 
     def test_quality_diagnostic_markdown_contains_boundary_sections(self) -> None:
         labels = [

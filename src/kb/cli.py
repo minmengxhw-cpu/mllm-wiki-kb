@@ -2591,6 +2591,65 @@ def shanghai_style_rule_card_markdown(labels: list[dict], created_at: str) -> st
 """
 
 
+def policy_advice_material_index_markdown(labels: list[dict], created_at: str, limit: int = 80) -> str:
+    title_terms = ["参政议政", "调研", "提案", "社情民意", "建言", "建议", "民主监督", "专项监督", "履职风采", "课题"]
+    items = [
+        label for label in labels
+        if label["article_type"] == "policy_advice" or any(term in str(label.get("title") or "") for term in title_terms)
+    ]
+    by_account = Counter(label["account"] or "unknown" for label in items)
+    by_year = Counter(label["year"] for label in items)
+    by_topic = Counter()
+    for item in items:
+        by_topic.update(item.get("topic_tags") or [])
+    recent_rows = [["日期", "账号", "类型", "主题词", "标题", "raw 原文"]]
+    for item in sorted(items, key=lambda label: label["published_at"] or "", reverse=True)[:limit]:
+        recent_rows.append([
+            item["published_at"] or "日期不详",
+            item["account"] or "",
+            item["article_type_name"],
+            "、".join(item.get("topic_tags") or []) or "待补",
+            f"《{item['title']}》",
+            f"`{item['raw_path']}`",
+        ])
+    topic_rows = [["主题", "文章数"]]
+    topic_rows.extend([[topic, str(count)] for topic, count in by_topic.most_common(20)])
+    return f"""# 微信公众号参政议政素材主题库
+
+生成时间：{created_at}
+
+本页把微信公众号语料中的参政议政、调研、提案、社情民意和履职线索集中起来，服务 `/信`、参政议政报道和统战信息起草。
+
+## 总览
+
+- 参政议政候选文章：{len(items)} 篇。
+- 这些材料只能作为公开报道层线索；正式形成信息、提案或建议时，必须另行补充调研事实、数据、政策依据和办理反馈。
+
+## 按账号分布
+
+{markdown_table([["账号", "篇数"]] + [[k, str(v)] for k, v in by_account.most_common()])}
+
+## 按年份分布
+
+{markdown_table([["年份", "篇数"]] + [[k, str(v)] for k, v in sorted(by_year.items(), reverse=True)])}
+
+## 高频主题
+
+{markdown_table(topic_rows)}
+
+## 最近素材
+
+{markdown_table(recent_rows)}
+
+## 使用方法
+
+1. 先用本页判断同类主题是否已有报道基础。
+2. 再用 `/信 主题` 生成问题、依据、对策的素材包。
+3. 如果来源只是活动报道，只能当背景，不能直接推导政策建议。
+4. 涉及数据、政策条文、部门职责、办理结果和建议可行性时，统一标 `[待核]`，并回到正式材料核验。
+"""
+
+
 def history_research_entry_markdown(labels: list[dict], created_at: str, limit_per_group: int = 40) -> str:
     items = [label for label in labels if label["is_history"]]
     by_account = Counter(label["account"] or "unknown" for label in items)
@@ -3211,6 +3270,7 @@ def command_corpus(args: argparse.Namespace) -> int:
     (reports / "上海民盟微信公众号写作风格规则卡.md").write_text(shanghai_style_rule_card_markdown(labels, created_at), encoding="utf-8")
     (reports / "微信公众号文史盟史文章专题库.md").write_text(history_corpus_markdown(labels, created_at), encoding="utf-8")
     (reports / "微信公众号文史盟史研究入口清单.md").write_text(history_research_entry_markdown(labels, created_at), encoding="utf-8")
+    (reports / "微信公众号参政议政素材主题库.md").write_text(policy_advice_material_index_markdown(labels, created_at), encoding="utf-8")
     log_operation(root, "corpus", "ok", f"labeled {len(labels)} articles", {"output": str(out_dir)})
     print(f"Articles labeled: {len(labels)}")
     print(f"Labels: {out_dir / 'article_labels.jsonl'}")
@@ -3228,15 +3288,18 @@ def command_corpus_style(args: argparse.Namespace) -> int:
     curated_path = reports / "上海民盟微信公众号精选写作样本.md"
     rule_card_path = reports / "上海民盟微信公众号写作风格规则卡.md"
     history_path = reports / "微信公众号文史盟史研究入口清单.md"
+    policy_path = reports / "微信公众号参政议政素材主题库.md"
     style_path.write_text(writing_style_templates_markdown(labels, created_at), encoding="utf-8")
     curated_path.write_text(curated_writing_samples_markdown(labels, created_at), encoding="utf-8")
     rule_card_path.write_text(shanghai_style_rule_card_markdown(labels, created_at), encoding="utf-8")
     history_path.write_text(history_research_entry_markdown(labels, created_at), encoding="utf-8")
-    log_operation(root, "corpus-style", "ok", "writing style and history research entries updated", {"style": str(style_path), "curated": str(curated_path), "rule_card": str(rule_card_path), "history": str(history_path)})
+    policy_path.write_text(policy_advice_material_index_markdown(labels, created_at), encoding="utf-8")
+    log_operation(root, "corpus-style", "ok", "writing style and history research entries updated", {"style": str(style_path), "curated": str(curated_path), "rule_card": str(rule_card_path), "history": str(history_path), "policy": str(policy_path)})
     print(f"Style templates: {style_path}")
     print(f"Curated samples: {curated_path}")
     print(f"Style rule card: {rule_card_path}")
     print(f"History entries: {history_path}")
+    print(f"Policy advice materials: {policy_path}")
     return 0
 
 
