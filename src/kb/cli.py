@@ -2037,6 +2037,121 @@ def history_corpus_markdown(labels: list[dict], created_at: str, limit: int = 12
 """
 
 
+def corpus_dashboard_markdown(labels: list[dict], created_at: str) -> str:
+    total = len(labels)
+    shanghai_recent = [label for label in labels if label["account"] == "上海民盟" and label["year"] >= "2023"]
+    writing_samples = [label for label in labels if label["is_writing_sample"]]
+    history_items = [label for label in labels if label["is_history"]]
+    formulation_sources = [label for label in labels if label["can_be_formulation_source"]]
+    priority_rows = corpus_priority_review_rows(labels, limit=20)
+
+    by_account = Counter(label["account"] or "unknown" for label in labels)
+    by_type = Counter(label["article_type_name"] for label in labels)
+    shanghai_by_type = Counter(label["article_type_name"] for label in shanghai_recent)
+    history_by_account = Counter(label["account"] or "unknown" for label in history_items)
+    writing_by_type = Counter(label["article_type_name"] for label in writing_samples)
+    by_year = Counter(label["year"] for label in labels)
+
+    account_rows = [["账号", "总文章", "文史/盟史", "可作近期口径来源"]]
+    for account, count in by_account.most_common():
+        account_rows.append(
+            [
+                account,
+                str(count),
+                str(sum(1 for label in history_items if (label["account"] or "unknown") == account)),
+                str(sum(1 for label in formulation_sources if (label["account"] or "unknown") == account)),
+            ]
+        )
+
+    recent_rows = [["年份", "总文章", "上海民盟", "写作样本", "文史/盟史"]]
+    for year, _ in sorted(by_year.items(), reverse=True):
+        if year == "unknown":
+            continue
+        recent_rows.append(
+            [
+                year,
+                str(sum(1 for label in labels if label["year"] == year)),
+                str(sum(1 for label in labels if label["year"] == year and label["account"] == "上海民盟")),
+                str(sum(1 for label in writing_samples if label["year"] == year)),
+                str(sum(1 for label in history_items if label["year"] == year)),
+            ]
+        )
+
+    type_rows = [["类型", "全库", "上海民盟2023以后", "写作样本"]]
+    for type_name, count in by_type.most_common():
+        type_rows.append([type_name, str(count), str(shanghai_by_type.get(type_name, 0)), str(writing_by_type.get(type_name, 0))])
+
+    priority_table = [["分数", "日期", "账号", "当前类型", "建议类型", "标题", "原因", "raw 原文"]]
+    for row in priority_rows:
+        priority_table.append(
+            [
+                str(row["priority_score"]),
+                row.get("published_at") or "日期不详",
+                row.get("account") or "",
+                row.get("article_type_name") or "",
+                row.get("suggested_type_name") or "待人工判断",
+                f"《{row.get('title') or ''}》",
+                "；".join(row.get("priority_reasons") or []),
+                f"`{row.get('raw_path') or ''}`",
+            ]
+        )
+
+    return f"""# 微信公众号语料库工作台
+
+生成时间：{created_at}
+
+本页是“盟参”微信公众号语料库的总控入口，用来判断当前语料能支持什么任务、哪里需要先校订、哪些材料可以进入写作和盟史研究。
+
+## 一页结论
+
+- 全库文章：{total} 篇。
+- 上海民盟 2023 年以后文章：{len(shanghai_recent)} 篇，是写作风格学习的核心层。
+- 写作样本候选：{len(writing_samples)} 篇，覆盖 {len(writing_by_type)} 类体裁。
+- 文史/盟史候选：{len(history_items)} 篇，主要来自 {len(history_by_account)} 个账号。
+- 近期公开口径候选来源：{len(formulation_sources)} 篇。
+- 当前最需要人工校订的是分类边界：通知预告、人物风采、文史纪念、主题教育、成果荣誉之间仍有交叉。
+
+## 可用度判断
+
+| 模块 | 当前可用度 | 依据 | 下一步 |
+| --- | --- | --- | --- |
+| 微信写稿 | 可用，但需按体裁选样本 | 上海民盟近年样本 {len(shanghai_recent)} 篇，写作样本 {len(writing_samples)} 篇 | 先校订高频体裁样本，再沉淀标题/导语/结构 |
+| 盟史研究 | 可用作入口，不可直接定稿 | 文史/盟史候选 {len(history_items)} 篇，已有人物与事件研究档案 | 核心事实回 raw 原文和权威档案 |
+| 口径核验 | 种子版可用 | 近期公开口径候选 {len(formulation_sources)} 篇，已有黑名单与口径库 | 扩充高风险术语和争议史实 |
+| 新增公众号 | 框架可接入 | `kb refresh` 与 `kb corpus` 可重建标签 | 新增后必须重新跑体检和抽检 |
+
+## 账号层
+
+{markdown_table(account_rows)}
+
+## 年份层
+
+{markdown_table(recent_rows)}
+
+## 体裁层
+
+{markdown_table(type_rows)}
+
+## 优先校订清单 Top 20
+
+{markdown_table(priority_table)}
+
+## 使用路线
+
+1. 写上海民盟公众号文章：先看 `上海民盟微信公众号分体裁写作模板.md`，再从本页确认该体裁样本是否充足。
+2. 做盟史研究：先看 `微信公众号文史盟史研究入口清单.md`、核心人物档案和核心事件档案，再回 raw 原文核验。
+3. 做口径核验：先查 `index/blacklist.csv` 和 `index/formulations.jsonl`，再用 `/核` 输出问题清单。
+4. 做分类校订：优先处理本页 Top 20，再看 `微信公众号分类优先校订清单.md` 和 CSV。
+
+## 当前短板
+
+- 人物、事件、地点实体抽取仍是种子级，不能覆盖全部 9000 多篇。
+- 部分标题类文章容易误判，如“预告丨盟员医生”可能进入人物风采样本。
+- 文史候选文章中混有纪念活动和转载信息，不能全部视为深度研究文章。
+- source_url 缺失文章和 unknown 年份文章需要单独补元数据。
+"""
+
+
 def load_article_labels(root: Path) -> list[dict]:
     path = corpus_dir(root) / "article_labels.jsonl"
     if not path.exists():
@@ -2442,6 +2557,7 @@ def command_corpus(args: argparse.Namespace) -> int:
     (reports / "微信公众号语料库体检报告.md").write_text(corpus_audit_markdown(labels, created_at), encoding="utf-8")
     (reports / "微信公众号文章分类体系.md").write_text(type_system_markdown(created_at), encoding="utf-8")
     (reports / "微信公众号分类质量诊断报告.md").write_text(corpus_quality_diagnostic_markdown(labels, created_at), encoding="utf-8")
+    (reports / "微信公众号语料库工作台.md").write_text(corpus_dashboard_markdown(labels, created_at), encoding="utf-8")
     (reports / "上海民盟2023年以来写作样本库.md").write_text(writing_samples_markdown(labels, created_at), encoding="utf-8")
     (reports / "上海民盟微信公众号分体裁写作模板.md").write_text(writing_style_templates_markdown(labels, created_at), encoding="utf-8")
     (reports / "微信公众号文史盟史文章专题库.md").write_text(history_corpus_markdown(labels, created_at), encoding="utf-8")

@@ -16,6 +16,7 @@ from kb.cli import (  # noqa: E402
     corpus_priority_review_markdown,
     corpus_priority_review_rows,
     corpus_review_rows,
+    corpus_dashboard_markdown,
     dict_to_row,
     event_research_dossier_body,
     history_research_entry_markdown,
@@ -257,6 +258,50 @@ class CorpusCommandTests(unittest.TestCase):
         body = corpus_priority_review_markdown(rows, "2026-06-11T00:00:00")
         self.assertIn("微信公众号分类优先校订清单", body)
         self.assertIn("通知公告/信息发布", body)
+
+    def test_corpus_dashboard_contains_operational_sections(self) -> None:
+        labels = [
+            {
+                "article_id": 1,
+                "title": "预告 | 周末盟史讲座报名开启",
+                "account": "上海民盟",
+                "published_at": "2025-01-01",
+                "year": "2025",
+                "article_type": "other",
+                "article_type_name": "其他/待判",
+                "classification_confidence": 0,
+                "matched_keywords": [],
+                "topic_tags": ["上海民盟"],
+                "people": [],
+                "raw_path": "/tmp/1.md",
+                "is_history": False,
+                "is_writing_sample": False,
+                "can_be_formulation_source": True,
+            },
+            {
+                "article_id": 2,
+                "title": "沈钧儒与民盟历史",
+                "account": "中国民主同盟",
+                "published_at": "2024-01-01",
+                "year": "2024",
+                "article_type": "history_research",
+                "article_type_name": "盟史研究",
+                "classification_confidence": 90,
+                "matched_keywords": ["盟史研究"],
+                "topic_tags": ["民盟史"],
+                "people": ["沈钧儒"],
+                "raw_path": "/tmp/2.md",
+                "is_history": True,
+                "is_writing_sample": False,
+                "can_be_formulation_source": True,
+            },
+        ]
+        body = corpus_dashboard_markdown(labels, "2026-06-11T00:00:00")
+        self.assertIn("微信公众号语料库工作台", body)
+        self.assertIn("可用度判断", body)
+        self.assertIn("体裁层", body)
+        self.assertIn("优先校订清单 Top 20", body)
+        self.assertIn("预告 | 周末盟史讲座报名开启", body)
 
     def test_person_research_dossier_contains_research_sections(self) -> None:
         rows = [

@@ -38,6 +38,7 @@
 - `index/corpus/classification_review.csv`
 - `index/corpus/classification_priority_review.csv`
 - `wiki/研究助手/微信公众号语料库体检报告.md`
+- `wiki/研究助手/微信公众号语料库工作台.md`
 - `wiki/研究助手/微信公众号分类质量诊断报告.md`
 - `wiki/研究助手/微信公众号文章分类抽检表.md`
 - `wiki/研究助手/微信公众号分类优先校订清单.md`
