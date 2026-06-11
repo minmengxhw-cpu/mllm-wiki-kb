@@ -16,6 +16,7 @@ from kb.cli import (  # noqa: E402
     normalized_similarity,
     staff_check_issues,
     staff_draft_body,
+    staff_material_draft_body,
 )
 
 
@@ -32,6 +33,12 @@ class StaffCommandTests(unittest.TestCase):
         self.assertEqual(args.command, "staff")
         self.assertEqual(args.staff_command, "history")
         self.assertEqual(args.topic, "沈钧儒")
+
+    def test_parser_accepts_staff_draft_material(self) -> None:
+        args = build_parser().parse_args(["staff", "draft", "会议报道", "--material", "2026年6月1日召开会议"])
+        self.assertEqual(args.staff_command, "draft")
+        self.assertEqual(args.topic, "会议报道")
+        self.assertEqual(args.material, ["2026年6月1日召开会议"])
 
     def test_staff_check_flags_blacklist_and_missing_citation(self) -> None:
         root = self.make_root()
@@ -111,6 +118,32 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("民盟上海市委召开十六届十四次常委", body)
             self.assertIn("/tmp/meeting.md", body)
             self.assertIn("标题点明会议名称或核心任务", body)
+        finally:
+            shutil.rmtree(root)
+
+    def test_staff_material_draft_body_generates_article_draft(self) -> None:
+        root = self.make_root()
+        try:
+            row = dict_to_row(
+                {
+                    "article_id": 1,
+                    "chunk_id": 1,
+                    "title": "民盟上海市委召开会议",
+                    "account": "上海民盟",
+                    "published_at": "2025-05-01",
+                    "raw_path": "/tmp/raw.md",
+                    "snippet": "会议围绕重点工作进行部署。",
+                    "score": 0,
+                }
+            )
+            material = "2026年6月1日，民盟市委机关在民主党派大厦召开专题交流会。会议围绕主题教育开展交流。"
+            body = staff_material_draft_body(root, "主题教育会议报道", material, [row])
+            self.assertIn("## 初稿", body)
+            self.assertIn("标题备选", body)
+            self.assertIn("正文初稿", body)
+            self.assertIn("[M1]", body)
+            self.assertIn("自动核验提示", body)
+            self.assertIn("民盟上海市委召开会议", body)
         finally:
             shutil.rmtree(root)
 

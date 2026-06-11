@@ -191,6 +191,8 @@ kb assistant "上海民盟微信公众号人物采访写法" --mode writing --sa
 
 ```bash
 kb staff draft "80周年主委讲话" --top-k 12
+kb staff draft "主题教育会议报道" --material "这里粘贴活动材料"
+kb staff draft "主题教育会议报道" --file ~/Desktop/material.txt
 kb staff history "沈钧儒" --top-k 12
 kb staff topic "午间盟史课堂：费孝通与江村" --top-k 20
 kb staff check "这里粘贴需要核稿的正文"
@@ -204,6 +206,7 @@ kb staff check --file ~/Desktop/draft.txt
 - 结论：先判断当前材料能不能支撑写作、研究或放行。
 - 素材：列出同题历史稿、证据摘录、既有卡片或近似篇目，并带 `[S]` 来源和 raw 原文路径。
 - `/稿` 会先判断体裁，并自动带出 `上海民盟微信公众号精选写作样本.md` 中的同体裁样本。
+- `/稿 --material/--file` 会按体裁模板生成公众号初稿，并把缺失或无法确认的事实标成 `[待核]`。
 - 风险提示：提示口径、史实争议、黑名单命中和 `[待核]` 项。
 
 当前盟参种子库包括：

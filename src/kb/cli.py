@@ -1272,6 +1272,151 @@ def staff_draft_structure_block(article_type: str) -> str:
 - 体裁风险：{guide["risk"]}"""
 
 
+def material_points(text: str, limit: int = 8) -> list[str]:
+    parts = []
+    for line in text.splitlines():
+        line = line.strip(" -\t")
+        if not line:
+            continue
+        parts.extend(part.strip() for part in re.split(r"(?<=[。！？；])", line) if part.strip())
+    if not parts and text.strip():
+        parts = [text.strip()]
+    cleaned = []
+    seen = set()
+    for part in parts:
+        part = re.sub(r"\s+", " ", part).strip()
+        if not part or part in seen:
+            continue
+        seen.add(part)
+        cleaned.append(part)
+        if len(cleaned) >= limit:
+            break
+    return cleaned
+
+
+def material_field_hints(text: str) -> dict[str, str]:
+    date_match = re.search(r"(20\d{2}年\d{1,2}月\d{1,2}日|20\d{2}年\d{1,2}月|20\d{2}-\d{1,2}-\d{1,2})", text)
+    location_match = re.search(r"在([^，。；\n]{2,24})(?:举行|召开|开展|举办|启动)", text)
+    return {
+        "date": date_match.group(1) if date_match else "[时间待核]",
+        "location": location_match.group(1) if location_match else "[地点待核]",
+    }
+
+
+def title_suggestions(topic: str, article_type: str) -> list[str]:
+    if article_type == "meeting_report":
+        return [f"{topic}召开", f"围绕{topic}，这场会议作出部署"]
+    if article_type == "theme_education":
+        return [f"{topic}走深走实", f"以学促干，推动{topic}见行见效"]
+    if article_type == "policy_advice":
+        return [f"聚焦{topic}，上海民盟这样建言", f"围绕{topic}献良策、聚共识"]
+    if article_type == "person_profile":
+        return [f"这位盟员的{topic}故事", f"在{topic}中见初心"]
+    if article_type == "history_commemoration":
+        return [f"回望{topic}，赓续民盟优良传统", f"从{topic}中汲取前行力量"]
+    return [topic, f"围绕{topic}，上海民盟开展相关工作"]
+
+
+def draft_paragraphs_from_material(topic: str, article_type: str, material: str) -> list[str]:
+    fields = material_field_hints(material)
+    points = material_points(material, 6)
+    if article_type == "meeting_report":
+        lead = f"{fields['date']}，{topic}在{fields['location']}召开。会议围绕[会议主题待核]开展交流部署，相关负责人和人员参加。[M1]"
+    elif article_type == "theme_education":
+        lead = f"{fields['date']}，围绕{topic}，相关活动在{fields['location']}举行，推动学习教育与履职实践相结合。[M1]"
+    elif article_type == "policy_advice":
+        lead = f"围绕{topic}，上海民盟相关组织和盟员结合调研情况，聚焦问题、提出建议，服务中心大局。[M1]"
+    elif article_type == "person_profile":
+        lead = f"{topic}相关人物材料显示，人物经历、专业贡献和盟务履职之间具有可展开的报道价值。[M1]"
+    elif article_type == "history_commemoration":
+        lead = f"围绕{topic}，材料可从历史脉络、人物关系和现实传承三个层面展开。[M1]"
+    else:
+        lead = f"{fields['date']}，围绕{topic}，相关工作在{fields['location']}开展。[M1]"
+    body = [lead]
+    for idx, point in enumerate(points[:4], 1):
+        body.append(f"{point} [M{idx}]")
+    if article_type == "policy_advice":
+        body.append("下一步，可围绕问题发现、调研依据、对策建议和办理反馈继续补充材料，形成更完整的参政议政报道。[待核]")
+    elif article_type == "history_commemoration":
+        body.append("正式成稿前，应补充权威史料或 raw 原文出处，对时间、人物职务、历史评价逐条核验。[待核]")
+    else:
+        body.append("后续将结合相关部署和实际成效，持续推动工作走深走实。[待核]")
+    return body
+
+
+def staff_material_draft_body(root: Path, topic: str, material: str, rows: list[sqlite3.Row]) -> str:
+    formulations = match_staff_items(load_formulations(root), f"{topic}\n{material}")
+    article_type, curated_samples = staff_curated_writing_samples(root, topic)
+    type_name = ARTICLE_TYPE_NAMES.get(article_type, article_type)
+    structure_block = staff_draft_structure_block(article_type)
+    issues = staff_check_issues(root, material)
+    titles = title_suggestions(topic, article_type)
+    paragraphs = draft_paragraphs_from_material(topic, article_type, material)
+    title_lines = "\n".join(f"- {title}" for title in titles)
+    draft_text = "\n\n".join(paragraphs)
+    material_table = "\n".join(f"| M{idx} | {clean_snippet(point, 140)} |" for idx, point in enumerate(material_points(material, 10), 1))
+    return f"""# 盟参 /稿：{topic}
+
+## 结论
+
+- 已根据用户材料生成公众号初稿框架；初步判断适用体裁：{type_name}。
+- 初稿只使用用户材料 `[M]` 和本地参考来源 `[S]`，无法确认的事实已保留 `[待核]`。
+- 正式发稿前必须继续补齐时间、地点、人物职务、主办承办单位、数据、图片说明和权威口径。
+
+## 初稿
+
+### 标题备选
+
+{title_lines}
+
+### 正文初稿
+
+{draft_text}
+
+## 素材
+
+### 用户材料拆解
+
+| 编号 | 材料要点 |
+|---|---|
+{material_table or '| M1 | 用户材料为空或无法拆分。 |'}
+
+### 精选写作样本
+
+{curated_samples}
+
+### 体裁写作骨架
+
+{structure_block}
+
+### 本地参考来源
+
+| 编号 | 公众号 | 日期 | 标题 | raw 原文 |
+|---|---|---|---|---|
+{citation_table(rows)}
+
+### 参考摘录
+
+{cited_excerpts(rows, 6)}
+
+### 口径要点
+
+{staff_formulation_lines(formulations)}
+
+## 风险提示
+
+### 自动核验提示
+
+| 编号 | 严重度 | 类型 | 命中内容 | 建议处理 |
+|---|---|---|---|---|
+{issue_table(issues)}
+
+### 其他风险
+
+{staff_risk_lines(root, f"{topic}\n{material}", rows)}
+"""
+
+
 def staff_draft_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
     formulations = match_staff_items(load_formulations(root), topic)
     article_type, curated_samples = staff_curated_writing_samples(root, topic)
@@ -1572,7 +1717,16 @@ def command_staff(args: argparse.Namespace) -> int:
         topic = args.topic.strip()
         rows = staff_search_rows(root, args.staff_command, topic, args.top_k)
         if args.staff_command == "draft":
-            body = staff_draft_body(root, topic, rows)
+            material = ""
+            if getattr(args, "file", None):
+                path = Path(args.file).expanduser()
+                if not path.exists():
+                    print(f"staff draft file not found: {path}", file=sys.stderr)
+                    return 2
+                material = path.read_text(encoding="utf-8")
+            elif getattr(args, "material", None):
+                material = " ".join(args.material)
+            body = staff_material_draft_body(root, topic, material, rows) if material.strip() else staff_draft_body(root, topic, rows)
             title = f"盟参文稿素材：{topic}"
         elif args.staff_command == "history":
             body = staff_history_body(root, topic, rows)
@@ -4321,6 +4475,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_staff = staff_sub.add_parser("draft", help="/稿：文稿素材包")
     p_staff.add_argument("topic")
+    p_staff.add_argument("--material", nargs="*", default=None, help="粘贴活动/会议/人物材料，生成公众号初稿")
+    p_staff.add_argument("--file", default=None, help="从文本文件读取材料，生成公众号初稿")
     p_staff.add_argument("--top-k", type=int, default=12)
     p_staff.add_argument("--save", action="store_true")
     p_staff.set_defaults(func=command_staff)
