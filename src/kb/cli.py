@@ -1532,11 +1532,12 @@ ARTICLE_TYPE_RULES = [
     {"type": "meeting_report", "name": "会议报道", "keywords": ["会议", "全委", "常委会", "主委会议", "代表大会", "座谈会", "开题会", "推进会", "工作会", "学习交流会"]},
     {"type": "activity_report", "name": "活动报道", "keywords": ["活动", "举行", "举办", "开展", "走进", "启动", "参观", "调研", "培训班", "讲座", "比赛"]},
     {"type": "leadership_speech", "name": "领导讲话/工作部署", "keywords": ["讲话", "工作报告", "工作要点", "部署", "要求", "指出", "强调", "主委会议通过", "全会"]},
+    {"type": "member_achievement", "name": "盟员履职/成果荣誉", "keywords": ["荣获", "获评", "获奖", "喜获", "当选", "入选", "成果", "团队", "院士", "科学技术奖", "五一劳动奖章", "创新争先", "典型在身边", "履职风采"]},
     {"type": "person_profile", "name": "人物采访/人物风采", "keywords": ["人物", "采访", "风采", "盟员风采", "专访", "故事", "诞辰", "纪念", "先生"]},
     {"type": "history_commemoration", "name": "文史纪念", "keywords": ["盟史", "文史", "纪念", "先贤", "旧政协", "新政协", "五一口号", "李闻", "钩沉", "口述史", "传统教育基地"]},
     {"type": "history_research", "name": "盟史研究", "keywords": ["盟史研究", "民盟历史", "档案", "史料", "史实", "考证", "历史资料", "理论和盟史"]},
     {"type": "policy_advice", "name": "参政议政", "keywords": ["参政议政", "提案", "社情民意", "建言", "调研", "建议", "政协", "两会", "履职"]},
-    {"type": "theme_education", "name": "主题教育", "keywords": ["主题教育", "参政为公", "实干为民", "凝心铸魂", "学思想", "政治共识", "学习贯彻"]},
+    {"type": "theme_education", "name": "主题教育", "keywords": ["主题教育", "参政为公", "实干为民", "凝心铸魂", "学规定", "强作风", "树形象", "政治共识", "学习贯彻习近平", "学习贯彻中共"]},
     {"type": "organization_building", "name": "组织建设", "keywords": ["组织建设", "基层组织", "支部", "区委", "委员会", "换届", "盟员之家", "新盟员", "入盟"]},
     {"type": "social_service", "name": "社会服务", "keywords": ["社会服务", "帮扶", "乡村振兴", "烛光行动", "黄丝带", "公益", "医疗", "教育帮扶"]},
     {"type": "notice_info", "name": "通知公告/信息发布", "keywords": ["通知", "公告", "名单", "公示", "目录", "招聘", "征集", "报名", "结果出炉"]},
@@ -1802,6 +1803,177 @@ def history_corpus_markdown(labels: list[dict], created_at: str, limit: int = 12
 - 区分全国民盟史主线、上海地方史线索和公众号纪念性表述。
 - 有争议或高风险史实进入口径库和黑名单。
 """
+
+
+def load_article_labels(root: Path) -> list[dict]:
+    path = corpus_dir(root) / "article_labels.jsonl"
+    if not path.exists():
+        return [build_article_label(row) for row in article_rows_for_corpus(root)]
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def stable_sample(items: list[dict], limit: int) -> list[dict]:
+    if len(items) <= limit:
+        return items
+    if limit <= 0:
+        return []
+    step = max(1, len(items) // limit)
+    sampled = [items[i] for i in range(0, len(items), step)]
+    return sampled[:limit]
+
+
+def corpus_review_rows(labels: list[dict], per_type: int, low_confidence_limit: int, other_limit: int) -> list[dict]:
+    rows = []
+    by_type: dict[str, list[dict]] = {}
+    for label in sorted(labels, key=lambda item: (item["article_type_name"], item["published_at"] or "", item["article_id"])):
+        by_type.setdefault(label["article_type_name"], []).append(label)
+    for type_name, items in sorted(by_type.items()):
+        for item in stable_sample(items, per_type):
+            rows.append({**item, "review_bucket": f"按类型抽检:{type_name}"})
+    low_confidence = sorted(labels, key=lambda item: (item["classification_confidence"], item["published_at"] or "", item["article_id"]))
+    for item in low_confidence[:low_confidence_limit]:
+        rows.append({**item, "review_bucket": "低置信抽检"})
+    others = [item for item in low_confidence if item["article_type"] == "other"]
+    for item in others[:other_limit]:
+        rows.append({**item, "review_bucket": "其他/待判抽检"})
+    deduped = []
+    seen: set[tuple[int, str]] = set()
+    for row in rows:
+        key = (int(row["article_id"]), row["review_bucket"])
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(row)
+    return deduped
+
+
+def write_corpus_review_csv(path: Path, rows: list[dict]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fieldnames = [
+        "review_bucket",
+        "article_id",
+        "account",
+        "published_at",
+        "title",
+        "article_type_name",
+        "classification_confidence",
+        "matched_keywords",
+        "topic_tags",
+        "suggested_type",
+        "review_result",
+        "review_note",
+        "raw_path",
+    ]
+    with path.open("w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(
+                {
+                    "review_bucket": row["review_bucket"],
+                    "article_id": row["article_id"],
+                    "account": row["account"] or "",
+                    "published_at": row["published_at"] or "",
+                    "title": row["title"] or "",
+                    "article_type_name": row["article_type_name"],
+                    "classification_confidence": row["classification_confidence"],
+                    "matched_keywords": "、".join(row.get("matched_keywords") or []),
+                    "topic_tags": "、".join(row.get("topic_tags") or []),
+                    "suggested_type": "",
+                    "review_result": "",
+                    "review_note": "",
+                    "raw_path": row["raw_path"] or "",
+                }
+            )
+
+
+def corpus_review_markdown(rows: list[dict], created_at: str) -> str:
+    by_bucket = Counter(row["review_bucket"] for row in rows)
+    overview = markdown_table([["抽检桶", "篇数"]] + [[k, str(v)] for k, v in by_bucket.most_common()])
+    sections = []
+    for bucket in sorted(by_bucket):
+        bucket_rows = [row for row in rows if row["review_bucket"] == bucket]
+        table = [["日期", "账号", "当前类型", "置信度", "标题", "命中词", "raw 原文"]]
+        for row in bucket_rows[:80]:
+            table.append(
+                [
+                    row["published_at"] or "日期不详",
+                    row["account"] or "",
+                    row["article_type_name"],
+                    str(row["classification_confidence"]),
+                    f"《{row['title']}》",
+                    "、".join(row.get("matched_keywords") or []) or "无",
+                    f"`{row['raw_path']}`",
+                ]
+            )
+        sections.append(f"## {bucket}\n\n{markdown_table(table)}")
+    return f"""# 微信公众号文章分类抽检表
+
+生成时间：{created_at}
+
+本页用于人工校订第一版文章分类规则。抽检对象包括每个文章类型的代表样本、低置信样本和“其他/待判”样本。
+
+## 抽检规模
+
+{overview}
+
+## 校订方法
+
+1. 打开 raw 原文确认文章真实体裁。
+2. 在 `index/corpus/classification_review.csv` 中填写 `suggested_type`、`review_result`、`review_note`。
+3. 如果同类错误反复出现，优先修改 `ARTICLE_TYPE_RULES`，再运行 `kb corpus` 和 `kb corpus-audit`。
+4. 不确定的文章保留“其他/待判”，不要强行归类。
+
+{chr(10).join(sections)}
+"""
+
+
+def corpus_review_guide_markdown(created_at: str) -> str:
+    return f"""# 微信公众号语料库人工校订说明
+
+生成时间：{created_at}
+
+## 当前校订目标
+
+- 先提高文章主类型准确率，不急于做细颗粒实体抽取。
+- 优先校订上海民盟 2023 年以后写作样本。
+- 文史/盟史文章只做候选库，不把机器分类当作史实结论。
+
+## 字段说明
+
+- `suggested_type`：人工建议类型代码，如 `activity_report`、`meeting_report`。
+- `review_result`：填写 `正确`、`错误`、`不确定`。
+- `review_note`：说明误判原因或建议增加/删除的关键词。
+
+## 类型代码
+
+{markdown_table([["类型代码", "类型名称"]] + [[rule["type"], rule["name"]] for rule in ARTICLE_TYPE_RULES] + [["other", "其他/待判"]])}
+
+## 推荐流程
+
+1. 先看 `wiki/研究助手/微信公众号文章分类抽检表.md`，挑误判明显的类型。
+2. 再编辑 `classification_review.csv`，保留人工判断。
+3. 汇总高频误判词，修改分类规则。
+4. 重新运行 `.venv/bin/kb corpus && .venv/bin/kb corpus-audit`。
+"""
+
+
+def command_corpus_audit(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    labels = load_article_labels(root)
+    rows = corpus_review_rows(labels, args.per_type, args.low_confidence, args.other)
+    created_at = now_iso()
+    out_dir = corpus_dir(root)
+    reports = report_dir(root)
+    write_corpus_review_csv(out_dir / "classification_review.csv", rows)
+    (reports / "微信公众号文章分类抽检表.md").write_text(corpus_review_markdown(rows, created_at), encoding="utf-8")
+    (reports / "微信公众号语料库人工校订说明.md").write_text(corpus_review_guide_markdown(created_at), encoding="utf-8")
+    log_operation(root, "corpus-audit", "ok", f"review samples {len(rows)}", {"output": str(out_dir / "classification_review.csv")})
+    print(f"Review samples: {len(rows)}")
+    print(f"CSV: {out_dir / 'classification_review.csv'}")
+    print(f"Report: {reports / '微信公众号文章分类抽检表.md'}")
+    print(f"Guide: {reports / '微信公众号语料库人工校订说明.md'}")
+    return 0
 
 
 def command_corpus(args: argparse.Namespace) -> int:
@@ -3065,6 +3237,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("corpus", help="生成微信公众号语料库体检、分类标签和样本库")
     p.set_defaults(func=command_corpus)
+
+    p = sub.add_parser("corpus-audit", help="生成微信公众号文章分类人工抽检表")
+    p.add_argument("--per-type", type=int, default=20)
+    p.add_argument("--low-confidence", type=int, default=80)
+    p.add_argument("--other", type=int, default=80)
+    p.set_defaults(func=command_corpus_audit)
 
     p = sub.add_parser("compile")
     p.add_argument("--topic", default=None)

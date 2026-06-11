@@ -24,6 +24,7 @@
 
 - 文章增量用 `kb refresh`。
 - 微信公众号语料库体检、分类标签和样本库更新用 `kb corpus`。
+- 微信公众号文章分类抽检和人工校订表更新用 `kb corpus-audit`。
 - 盟参种子库位于 `index/formulations.jsonl`、`index/blacklist.csv`、`index/entities/*.jsonl`。
 - 种子库先保证可拦截高风险问题，再逐步扩展，不把未校订条目写成定论。
 
@@ -32,7 +33,9 @@
 当用户要求“先把微信文章做实”“语料库体检”“文章分类”“写作样本库”时，优先运行 `kb corpus`，并基于以下产物回答：
 
 - `index/corpus/article_labels.jsonl`
+- `index/corpus/classification_review.csv`
 - `wiki/研究助手/微信公众号语料库体检报告.md`
+- `wiki/研究助手/微信公众号文章分类抽检表.md`
 - `wiki/研究助手/上海民盟2023年以来写作样本库.md`
 - `wiki/研究助手/微信公众号文史盟史文章专题库.md`
 
