@@ -68,6 +68,9 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("[S1]", body)
             self.assertIn("raw 原文", body)
             self.assertIn("精选写作样本", body)
+            self.assertIn("体裁写作骨架", body)
+            self.assertIn("标题写法", body)
+            self.assertIn("导语写法", body)
         finally:
             shutil.rmtree(root)
 
@@ -107,6 +110,7 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("初步判断适用体裁：会议报道", body)
             self.assertIn("民盟上海市委召开十六届十四次常委", body)
             self.assertIn("/tmp/meeting.md", body)
+            self.assertIn("标题点明会议名称或核心任务", body)
         finally:
             shutil.rmtree(root)
 

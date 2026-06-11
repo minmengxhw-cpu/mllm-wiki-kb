@@ -1258,10 +1258,25 @@ def staff_curated_writing_samples(root: Path, topic: str, limit: int = 6) -> tup
     return article_type, markdown_table(rows)
 
 
+def staff_draft_structure_block(article_type: str) -> str:
+    guide = WRITING_STYLE_GUIDES.get(article_type)
+    if not guide:
+        return """- 标题：先点明对象和动作，避免空泛口号。
+- 导语：补齐时间、地点、主体、事项和核心主题。
+- 正文：按事实顺序展开，每段绑定材料或来源。
+- 结尾：落到下一步工作或现实意义，避免无来源拔高。"""
+    return f"""- 标题写法：{guide["title"]}
+- 导语写法：{guide["lead"]}
+- 正文骨架：{guide["structure"]}
+- 适用场景：{guide["use"]}
+- 体裁风险：{guide["risk"]}"""
+
+
 def staff_draft_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
     formulations = match_staff_items(load_formulations(root), topic)
     article_type, curated_samples = staff_curated_writing_samples(root, topic)
     type_name = ARTICLE_TYPE_NAMES.get(article_type, article_type)
+    structure_block = staff_draft_structure_block(article_type)
     return f"""# 盟参 /稿：{topic}
 
 ## 结论
@@ -1282,6 +1297,10 @@ def staff_draft_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
 ### 精选写作样本
 
 {curated_samples}
+
+### 体裁写作骨架
+
+{structure_block}
 
 ### 证据摘录
 
