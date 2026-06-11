@@ -1653,6 +1653,10 @@ def article_year(published_at: str | None) -> str:
     return "unknown"
 
 
+def year_at_least(year: str | None, minimum: str) -> bool:
+    return bool(year and re.match(r"^\d{4}$", year) and year >= minimum)
+
+
 def corpus_text_for_row(row: sqlite3.Row) -> str:
     return " ".join([str(row["title"] or ""), str(row["account"] or ""), str(row["sample_text"] or "")])
 
@@ -1736,7 +1740,7 @@ def build_article_label(row: sqlite3.Row) -> dict:
     topics = topic_tags_for_text(text)
     people = people_hits_for_text(text)
     is_history = article_type in {"history_commemoration", "history_research"} or "民盟史" in topics
-    is_writing_sample = row["account"] == "上海民盟" and year >= "2023" and article_type in {
+    is_writing_sample = row["account"] == "上海民盟" and year_at_least(year, "2023") and article_type in {
         "activity_report", "meeting_report", "person_profile", "history_commemoration",
         "policy_advice", "theme_education", "leadership_speech", "member_achievement",
         "organization_building", "social_service", "cultural_showcase",
@@ -1762,7 +1766,7 @@ def build_article_label(row: sqlite3.Row) -> dict:
         "people": people,
         "is_history": is_history,
         "is_writing_sample": is_writing_sample,
-        "can_be_formulation_source": row["account"] in {"上海民盟", "中国民主同盟"} and year >= "2023",
+        "can_be_formulation_source": row["account"] in {"上海民盟", "中国民主同盟"} and year_at_least(year, "2023"),
         "needs_metadata_review": bool(not row["published_at"] or not row["account"] or not row["raw_path"]),
     }
 
@@ -1788,7 +1792,7 @@ def corpus_audit_markdown(labels: list[dict], created_at: str) -> str:
     by_account = Counter(label["account"] or "unknown" for label in labels)
     by_year = Counter(label["year"] for label in labels)
     by_type = Counter(label["article_type_name"] for label in labels)
-    recent_sh = [label for label in labels if label["account"] == "上海民盟" and label["year"] >= "2023"]
+    recent_sh = [label for label in labels if label["account"] == "上海民盟" and year_at_least(label["year"], "2023")]
     history_count = sum(1 for label in labels if label["is_history"])
     writing_count = sum(1 for label in labels if label["is_writing_sample"])
     metadata_review = sum(1 for label in labels if label["needs_metadata_review"])
@@ -1857,7 +1861,7 @@ def type_system_markdown(created_at: str) -> str:
 
 
 def writing_samples_markdown(labels: list[dict], created_at: str, limit_per_type: int = 30) -> str:
-    samples = [label for label in labels if label["account"] == "上海民盟" and label["year"] >= "2023" and label["is_writing_sample"]]
+    samples = [label for label in labels if label["account"] == "上海民盟" and year_at_least(label["year"], "2023") and label["is_writing_sample"]]
     by_type: dict[str, list[dict]] = {}
     for label in sorted(samples, key=lambda item: item["published_at"] or "", reverse=True):
         by_type.setdefault(label["article_type_name"], []).append(label)
@@ -1889,8 +1893,118 @@ def writing_samples_markdown(labels: list[dict], created_at: str, limit_per_type
 """
 
 
+TYPE_SAMPLE_SIGNALS = {
+    "meeting_report": ["召开", "会议", "常委", "主委", "座谈会", "推进会", "专题协商"],
+    "activity_report": ["开展", "举行", "举办", "赴", "走进", "调研", "培训"],
+    "person_profile": ["专访", "这位盟员", "他说", "她", "故事", "面对面", "风采"],
+    "history_commemoration": ["盟史", "纪念", "先贤", "诞辰", "追思", "回望", "传统"],
+    "policy_advice": ["建言", "提案", "社情民意", "调研", "两会", "金点子", "履职"],
+    "theme_education": ["主题教育", "参政为公", "实干为民", "学规定", "强作风", "树形象", "凝心铸魂"],
+    "leadership_speech": ["工作要点", "讲话", "部署", "要求", "机关建设", "工作报告"],
+    "member_achievement": ["祝贺", "荣获", "获奖", "入选", "表彰", "当选", "捷报"],
+    "organization_building": ["基层组织", "换届", "支部", "盟员之家", "新盟员", "组织"],
+    "social_service": ["社会服务", "帮扶", "乡村振兴", "名医", "公益", "服务"],
+    "cultural_showcase": ["作品", "展", "书画", "画笔", "原创", "艺术", "非遗"],
+}
+
+
+def writing_sample_score(label: dict) -> tuple[int, list[str]]:
+    score = int(label.get("classification_confidence") or 0)
+    reasons = [f"置信度{score}"]
+    title = label.get("title") or ""
+    year = label.get("year") or ""
+    token_estimate = int(label.get("token_estimate") or 0)
+    if year_at_least(year, "2025"):
+        score += 12
+        reasons.append("近两年样本")
+    elif year_at_least(year, "2023"):
+        score += 6
+        reasons.append("2023年以来")
+    if 500 <= token_estimate <= 5000:
+        score += 10
+        reasons.append("篇幅适中")
+    elif token_estimate > 5000:
+        score += 4
+        reasons.append("长稿可拆解")
+    signals = [term for term in TYPE_SAMPLE_SIGNALS.get(label.get("article_type") or "", []) if term in title]
+    if signals:
+        score += min(18, len(signals) * 6)
+        reasons.append("标题体裁信号:" + "、".join(signals[:3]))
+    if any(term in title for term in ["预告", "通知", "公告", "名单", "公示", "节日快乐"]):
+        score -= 40
+        reasons.append("偏信息发布，降权")
+    return score, reasons
+
+
+def curated_writing_samples_markdown(labels: list[dict], created_at: str, limit_per_type: int = 8) -> str:
+    samples = [label for label in labels if label["account"] == "上海民盟" and year_at_least(label["year"], "2023") and label["is_writing_sample"]]
+    by_type: dict[str, list[dict]] = {}
+    scored_samples = []
+    for label in samples:
+        score, reasons = writing_sample_score(label)
+        scored = {**label, "sample_score": score, "sample_reasons": reasons}
+        scored_samples.append(scored)
+        by_type.setdefault(label["article_type"], []).append(scored)
+
+    sections = []
+    total_selected = 0
+    for type_code, guide in WRITING_STYLE_GUIDES.items():
+        items = sorted(by_type.get(type_code, []), key=lambda item: (-int(item["sample_score"]), item.get("published_at") or "", int(item["article_id"])))[:limit_per_type]
+        total_selected += len(items)
+        rows = [["分数", "日期", "标题", "入选理由", "raw 原文"]]
+        for item in items:
+            rows.append(
+                [
+                    str(item["sample_score"]),
+                    item["published_at"] or "日期不详",
+                    f"《{item['title']}》",
+                    "；".join(item["sample_reasons"][:4]),
+                    f"`{item['raw_path']}`",
+                ]
+            )
+        sections.append(
+            f"""## {ARTICLE_TYPE_NAMES.get(type_code, type_code)}
+
+- 样本用途：{guide["use"]}
+- 选样重点：优先选择标题体裁清楚、篇幅适中、2023 年以后且分类置信度较高的上海民盟文章。
+
+{markdown_table(rows) if items else '暂无精选样本。'}
+"""
+        )
+
+    return f"""# 上海民盟微信公众号精选写作样本
+
+生成时间：{created_at}
+
+本页从 `上海民盟2023年以来写作样本库.md` 中再筛一层，作为后续写稿时优先模仿的代表样本。它不是最终人工定稿清单，但比全量候选库更适合直接调用。
+
+## 总览
+
+- 候选样本：{len(samples)} 篇。
+- 精选样本：{total_selected} 篇。
+- 覆盖体裁：{sum(1 for items in by_type.values() if items)} 类。
+- 每类最多展示 {limit_per_type} 篇。
+
+## 选样规则
+
+- 优先上海民盟 2023 年以后文章。
+- 优先体裁信号明确、标题可借鉴、篇幅适中的文章。
+- 降权通知、预告、公示、节庆问候等不适合作为风格模板的文章。
+- 正式写稿仍需回 raw 原文核对事实、职务、数据和口径。
+
+{chr(10).join(sections)}
+
+## 使用办法
+
+1. 先判断你给的材料属于哪种体裁。
+2. 到本页对应体裁下选 3-5 篇 raw 原文作为风格参照。
+3. 再结合 `上海民盟微信公众号分体裁写作模板.md` 输出初稿。
+4. 最后用 `/核` 做事实、口径和错别字检查。
+"""
+
+
 def writing_style_templates_markdown(labels: list[dict], created_at: str, limit_per_type: int = 12) -> str:
-    samples = [label for label in labels if label["account"] == "上海民盟" and label["year"] >= "2023" and label["is_writing_sample"]]
+    samples = [label for label in labels if label["account"] == "上海民盟" and year_at_least(label["year"], "2023") and label["is_writing_sample"]]
     by_type: dict[str, list[dict]] = {}
     for label in sorted(samples, key=lambda item: item["published_at"] or "", reverse=True):
         by_type.setdefault(label["article_type"], []).append(label)
@@ -2049,7 +2163,7 @@ def history_corpus_markdown(labels: list[dict], created_at: str, limit: int = 12
 
 def corpus_dashboard_markdown(labels: list[dict], created_at: str) -> str:
     total = len(labels)
-    shanghai_recent = [label for label in labels if label["account"] == "上海民盟" and label["year"] >= "2023"]
+    shanghai_recent = [label for label in labels if label["account"] == "上海民盟" and year_at_least(label["year"], "2023")]
     writing_samples = [label for label in labels if label["is_writing_sample"]]
     history_items = [label for label in labels if label["is_history"]]
     formulation_sources = [label for label in labels if label["can_be_formulation_source"]]
@@ -2148,7 +2262,7 @@ def corpus_dashboard_markdown(labels: list[dict], created_at: str) -> str:
 
 ## 使用路线
 
-1. 写上海民盟公众号文章：先看 `上海民盟微信公众号分体裁写作模板.md`，再从本页确认该体裁样本是否充足。
+1. 写上海民盟公众号文章：先看 `上海民盟微信公众号精选写作样本.md` 和 `上海民盟微信公众号分体裁写作模板.md`，再从本页确认该体裁样本是否充足。
 2. 做盟史研究：先看 `微信公众号文史盟史研究入口清单.md`、核心人物档案和核心事件档案，再回 raw 原文核验。
 3. 做口径核验：先查 `index/blacklist.csv` 和 `index/formulations.jsonl`，再用 `/核` 输出问题清单。
 4. 做分类校订：优先处理本页 Top 20，再看 `微信公众号分类优先校订清单.md` 和 CSV。
@@ -2287,7 +2401,7 @@ def corpus_priority_review_rows(labels: list[dict], limit: int = 100) -> list[di
         if suggested and suggested != label.get("article_type"):
             score += 35
             reasons.append(f"建议复核为:{ARTICLE_TYPE_NAMES.get(suggested, suggested)}")
-        if label.get("account") == "上海民盟" and label.get("year") >= "2023":
+        if label.get("account") == "上海民盟" and year_at_least(label.get("year"), "2023"):
             score += 15
             reasons.append("上海民盟近年样本优先")
         if label.get("is_history"):
@@ -2569,6 +2683,7 @@ def command_corpus(args: argparse.Namespace) -> int:
     (reports / "微信公众号分类质量诊断报告.md").write_text(corpus_quality_diagnostic_markdown(labels, created_at), encoding="utf-8")
     (reports / "微信公众号语料库工作台.md").write_text(corpus_dashboard_markdown(labels, created_at), encoding="utf-8")
     (reports / "上海民盟2023年以来写作样本库.md").write_text(writing_samples_markdown(labels, created_at), encoding="utf-8")
+    (reports / "上海民盟微信公众号精选写作样本.md").write_text(curated_writing_samples_markdown(labels, created_at), encoding="utf-8")
     (reports / "上海民盟微信公众号分体裁写作模板.md").write_text(writing_style_templates_markdown(labels, created_at), encoding="utf-8")
     (reports / "微信公众号文史盟史文章专题库.md").write_text(history_corpus_markdown(labels, created_at), encoding="utf-8")
     (reports / "微信公众号文史盟史研究入口清单.md").write_text(history_research_entry_markdown(labels, created_at), encoding="utf-8")
@@ -2586,11 +2701,14 @@ def command_corpus_style(args: argparse.Namespace) -> int:
     created_at = now_iso()
     reports = report_dir(root)
     style_path = reports / "上海民盟微信公众号分体裁写作模板.md"
+    curated_path = reports / "上海民盟微信公众号精选写作样本.md"
     history_path = reports / "微信公众号文史盟史研究入口清单.md"
     style_path.write_text(writing_style_templates_markdown(labels, created_at), encoding="utf-8")
+    curated_path.write_text(curated_writing_samples_markdown(labels, created_at), encoding="utf-8")
     history_path.write_text(history_research_entry_markdown(labels, created_at), encoding="utf-8")
-    log_operation(root, "corpus-style", "ok", "writing style and history research entries updated", {"style": str(style_path), "history": str(history_path)})
+    log_operation(root, "corpus-style", "ok", "writing style and history research entries updated", {"style": str(style_path), "curated": str(curated_path), "history": str(history_path)})
     print(f"Style templates: {style_path}")
+    print(f"Curated samples: {curated_path}")
     print(f"History entries: {history_path}")
     return 0
 

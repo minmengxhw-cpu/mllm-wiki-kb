@@ -17,6 +17,7 @@ from kb.cli import (  # noqa: E402
     corpus_priority_review_rows,
     corpus_review_rows,
     corpus_dashboard_markdown,
+    curated_writing_samples_markdown,
     dict_to_row,
     event_research_dossier_body,
     history_research_entry_markdown,
@@ -59,6 +60,29 @@ class CorpusCommandTests(unittest.TestCase):
         self.assertEqual(label["year"], "2025")
         self.assertTrue(label["is_writing_sample"])
         self.assertIn("主题教育", label["topic_tags"])
+
+    def test_unknown_year_does_not_become_recent_sample(self) -> None:
+        row = dict_to_row(
+            {
+                "id": 1,
+                "title": "申康中心、仪电系统、上海电机学院三个民盟基层组织完成换届",
+                "account": "上海民盟",
+                "author": "",
+                "published_at": "",
+                "source_url": "https://example.test",
+                "raw_path": "/tmp/raw.md",
+                "content_hash": "abc",
+                "file_type": "md",
+                "status": "imported",
+                "chunk_count": 1,
+                "token_estimate": 1000,
+                "sample_text": "基层组织 完成换届",
+            }
+        )
+        label = build_article_label(row)
+        self.assertEqual(label["year"], "unknown")
+        self.assertFalse(label["is_writing_sample"])
+        self.assertFalse(label["can_be_formulation_source"])
 
     def test_corpus_audit_markdown_contains_core_sections(self) -> None:
         labels = [
@@ -348,6 +372,51 @@ class CorpusCommandTests(unittest.TestCase):
         self.assertIn("体裁层", body)
         self.assertIn("优先校订清单 Top 20", body)
         self.assertIn("预告 | 周末盟史讲座报名开启", body)
+
+    def test_curated_writing_samples_include_scores_and_sources(self) -> None:
+        labels = [
+            {
+                "article_id": 1,
+                "title": "民盟上海市委召开十六届四十八次主委会议",
+                "account": "上海民盟",
+                "published_at": "2026-05-21",
+                "year": "2026",
+                "article_type": "meeting_report",
+                "article_type_name": "会议报道",
+                "classification_confidence": 90,
+                "matched_keywords": ["会议"],
+                "topic_tags": ["上海民盟"],
+                "people": [],
+                "raw_path": "/tmp/meeting.md",
+                "token_estimate": 1200,
+                "is_history": False,
+                "is_writing_sample": True,
+                "can_be_formulation_source": True,
+            },
+            {
+                "article_id": 2,
+                "title": "民盟市委机关举行“参政为公、实干为民”主题教育专题交流会",
+                "account": "上海民盟",
+                "published_at": "2026-06-01",
+                "year": "2026",
+                "article_type": "theme_education",
+                "article_type_name": "主题教育",
+                "classification_confidence": 95,
+                "matched_keywords": ["主题教育"],
+                "topic_tags": ["主题教育"],
+                "people": [],
+                "raw_path": "/tmp/theme.md",
+                "token_estimate": 1500,
+                "is_history": False,
+                "is_writing_sample": True,
+                "can_be_formulation_source": True,
+            },
+        ]
+        body = curated_writing_samples_markdown(labels, "2026-06-11T00:00:00", limit_per_type=3)
+        self.assertIn("上海民盟微信公众号精选写作样本", body)
+        self.assertIn("入选理由", body)
+        self.assertIn("篇幅适中", body)
+        self.assertIn("/tmp/theme.md", body)
 
     def test_person_research_dossier_contains_research_sections(self) -> None:
         rows = [
