@@ -1,0 +1,356 @@
+# Obsidian 同步日志
+
+
+## 2026-06-08T18:49:59
+
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/index.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/00-总索引/首页.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/log.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/00-总索引/操作日志.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟历史类文章汇总.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/40-盟史/上海民盟历史类文章汇总.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟中央与上海民盟文史知识合并底座.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/40-盟史/民盟中央与上海民盟文史知识合并底座.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/思想宣传/双Agent使用手册.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/60-思想宣传/双Agent使用手册.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟微信公众号写作规范.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/91-文稿素材/上海民盟微信公众号写作规范.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟成稿材料清单.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/91-文稿素材/上海民盟成稿材料清单.md`
+
+## 2026-06-08T18:57:35
+
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/index.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/00-总索引/首页.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/log.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/00-总索引/操作日志.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟历史类文章汇总.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/40-盟史/上海民盟历史类文章汇总.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟盟史独立专题.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/40-盟史/上海民盟盟史独立专题.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟中央与上海民盟文史知识合并底座.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/40-盟史/民盟中央与上海民盟文史知识合并底座.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟盟史资源总览.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/40-盟史/民盟盟史资源总览.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/参政议政/参政议政写作素材.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/50-参政议政/参政议政写作素材.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/思想宣传/双Agent使用手册.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/60-思想宣传/双Agent使用手册.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/主题教育/主题教育专题素材.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/80-主题教育/主题教育专题素材.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟微信公众号写作规范.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/91-文稿素材/上海民盟微信公众号写作规范.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟成稿材料清单.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/91-文稿素材/上海民盟成稿材料清单.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/人物类采访写法.md` -> `/Users/cheer/Documents/Obsidian/MllmWiki/91-文稿素材/人物类采访写法.md`
+
+## 2026-06-08T19:01:49
+
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/index.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/首页.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/log.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/操作日志.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟历史类文章汇总.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟历史类文章汇总.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟盟史独立专题.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟盟史独立专题.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟中央与上海民盟文史知识合并底座.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟中央与上海民盟文史知识合并底座.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟盟史资源总览.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟盟史资源总览.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/参政议政/参政议政写作素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/50-参政议政/参政议政写作素材.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/思想宣传/双Agent使用手册.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/60-思想宣传/双Agent使用手册.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/主题教育/主题教育专题素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/80-主题教育/主题教育专题素材.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟微信公众号写作规范.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/上海民盟微信公众号写作规范.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟成稿材料清单.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/上海民盟成稿材料清单.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/人物类采访写法.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/人物类采访写法.md`
+
+## 2026-06-08T19:27:38
+
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/index.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/首页.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/log.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/操作日志.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/史良.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/史良.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/张澜.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/张澜.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/李公朴.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/李公朴.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/梁漱溟.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/梁漱溟.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/沈钧儒.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/沈钧儒.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/谷超豪.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/谷超豪.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/费孝通.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/费孝通.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/钱伟长.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/钱伟长.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/闻一多.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/闻一多.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/陈望道.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/陈望道.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/陶行知.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/陶行知.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/黄炎培.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/黄炎培.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/上海李闻追悼大会.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/上海李闻追悼大会.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/中国民主政团同盟成立.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/中国民主政团同盟成立.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/五一口号.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/五一口号.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/新政协.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/新政协.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/旧政协.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/旧政协.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/李闻事件.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/李闻事件.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/民盟一届三中全会.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/民盟一届三中全会.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/民盟被迫解散.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/民盟被迫解散.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟历史类文章汇总.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟历史类文章汇总.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟盟史独立专题.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟盟史独立专题.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟盟史资源活化.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟盟史资源活化.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟中央与上海民盟文史知识合并底座.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟中央与上海民盟文史知识合并底座.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟盟史资源总览.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟盟史资源总览.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/参政议政/参政议政写作素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/50-参政议政/参政议政写作素材.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/思想宣传/双Agent使用手册.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/60-思想宣传/双Agent使用手册.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/主题教育/主题教育专题素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/80-主题教育/主题教育专题素材.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/主题教育/主题教育基层落实机制.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/80-主题教育/主题教育基层落实机制.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海市档案馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海市档案馆.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海民盟传统教育基地.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海民盟传统教育基地.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/国府路300号.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/国府路300号.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/太平胡同.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/太平胡同.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/特园.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/特园.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/钱伟长纪念馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/钱伟长纪念馆.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/陶行知纪念馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/陶行知纪念馆.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/香港光明报.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/香港光明报.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟微信公众号写作规范.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/上海民盟微信公众号写作规范.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟成稿材料清单.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/上海民盟成稿材料清单.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/人物类采访写法.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/人物类采访写法.md`
+
+## 2026-06-08T19:39:45
+
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/index.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/首页.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/log.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/操作日志.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/主题教育研究：主题教育基层落实机制.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/主题教育研究：主题教育基层落实机制.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/参政议政研究：参政议政写作素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/参政议政研究：参政议政写作素材.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/微信公众号写作：上海民盟微信公众号人物采访写法.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/微信公众号写作：上海民盟微信公众号人物采访写法.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/民盟研究助手首页.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/民盟研究助手首页.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/盟史研究：上海民盟盟史资源有哪些.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/盟史研究：上海民盟盟史资源有哪些.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/盟史研究：五一口号在民盟史上的意义.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/盟史研究：五一口号在民盟史上的意义.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/史良.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/史良.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/张澜.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/张澜.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/李公朴.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/李公朴.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/梁漱溟.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/梁漱溟.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/沈钧儒.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/沈钧儒.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/谷超豪.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/谷超豪.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/费孝通.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/费孝通.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/钱伟长.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/钱伟长.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/闻一多.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/闻一多.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/陈望道.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/陈望道.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/陶行知.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/陶行知.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/黄炎培.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/黄炎培.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/上海李闻追悼大会.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/上海李闻追悼大会.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/中国民主政团同盟成立.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/中国民主政团同盟成立.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/五一口号.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/五一口号.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/新政协.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/新政协.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/旧政协.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/旧政协.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/李闻事件.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/李闻事件.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/民盟一届三中全会.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/民盟一届三中全会.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/民盟被迫解散.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/民盟被迫解散.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟历史类文章汇总.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟历史类文章汇总.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟盟史独立专题.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟盟史独立专题.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟盟史资源活化.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟盟史资源活化.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟中央与上海民盟文史知识合并底座.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟中央与上海民盟文史知识合并底座.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟盟史资源总览.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟盟史资源总览.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/参政议政/参政议政写作素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/50-参政议政/参政议政写作素材.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/思想宣传/双Agent使用手册.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/60-思想宣传/双Agent使用手册.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/主题教育/主题教育专题素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/80-主题教育/主题教育专题素材.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/主题教育/主题教育基层落实机制.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/80-主题教育/主题教育基层落实机制.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海市档案馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海市档案馆.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海民盟传统教育基地.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海民盟传统教育基地.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/国府路300号.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/国府路300号.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/太平胡同.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/太平胡同.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/特园.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/特园.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/钱伟长纪念馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/钱伟长纪念馆.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/陶行知纪念馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/陶行知纪念馆.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/香港光明报.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/香港光明报.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟微信公众号写作规范.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/上海民盟微信公众号写作规范.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟成稿材料清单.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/上海民盟成稿材料清单.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/人物类采访写法.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/人物类采访写法.md`
+
+## 2026-06-08T20:30:21
+
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/index.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/首页.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/log.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/操作日志.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/主题教育研究：主题教育基层落实机制.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/主题教育研究：主题教育基层落实机制.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/参政议政研究：参政议政写作素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/参政议政研究：参政议政写作素材.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/微信公众号写作：上海民盟微信公众号人物采访写法.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/微信公众号写作：上海民盟微信公众号人物采访写法.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/民盟研究助手首页.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/民盟研究助手首页.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/盟史研究：上海民盟盟史资源有哪些.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/盟史研究：上海民盟盟史资源有哪些.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/盟史研究：五一口号在民盟史上的意义.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/盟史研究：五一口号在民盟史上的意义.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/史良.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/史良.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/张澜.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/张澜.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/李公朴.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/李公朴.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/梁漱溟.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/梁漱溟.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/沈钧儒.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/沈钧儒.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/谷超豪.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/谷超豪.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/费孝通.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/费孝通.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/钱伟长.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/钱伟长.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/闻一多.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/闻一多.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/陈望道.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/陈望道.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/陶行知.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/陶行知.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/黄炎培.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/黄炎培.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/上海李闻追悼大会.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/上海李闻追悼大会.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/中国民主政团同盟成立.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/中国民主政团同盟成立.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/五一口号.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/五一口号.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/新政协.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/新政协.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/旧政协.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/旧政协.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/李闻事件.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/李闻事件.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/民盟一届三中全会.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/民盟一届三中全会.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/民盟被迫解散.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/民盟被迫解散.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟历史类文章汇总.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟历史类文章汇总.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟盟史独立专题.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟盟史独立专题.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟盟史资源活化.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟盟史资源活化.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟中央与上海民盟文史知识合并底座.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟中央与上海民盟文史知识合并底座.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟盟史资源总览.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟盟史资源总览.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/参政议政/参政议政写作素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/50-参政议政/参政议政写作素材.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/思想宣传/双Agent使用手册.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/60-思想宣传/双Agent使用手册.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/主题教育/主题教育专题素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/80-主题教育/主题教育专题素材.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/主题教育/主题教育基层落实机制.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/80-主题教育/主题教育基层落实机制.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海市档案馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海市档案馆.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海民盟传统教育基地.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海民盟传统教育基地.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/国府路300号.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/国府路300号.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/太平胡同.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/太平胡同.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/特园.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/特园.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/钱伟长纪念馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/钱伟长纪念馆.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/陶行知纪念馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/陶行知纪念馆.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/香港光明报.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/香港光明报.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟微信公众号写作规范.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/上海民盟微信公众号写作规范.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟成稿材料清单.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/上海民盟成稿材料清单.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/人物类采访写法.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/人物类采访写法.md`
+
+## 2026-06-08T20:54:26
+
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/index.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/首页.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/log.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/操作日志.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/主题教育研究：主题教育基层落实机制.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/主题教育研究：主题教育基层落实机制.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/参政议政研究：参政议政写作素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/参政议政研究：参政议政写作素材.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/微信公众号写作：上海民盟微信公众号人物采访写法.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/微信公众号写作：上海民盟微信公众号人物采访写法.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/民盟研究助手首页.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/民盟研究助手首页.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/盟史研究：上海民盟盟史资源有哪些.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/盟史研究：上海民盟盟史资源有哪些.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/盟史研究：五一口号在民盟史上的意义.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/盟史研究：五一口号在民盟史上的意义.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/全增嘏.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/全增嘏.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/刘王立明.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/刘王立明.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/史良.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/史良.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/周谷城.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/周谷城.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/张澜.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/张澜.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/徐中玉.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/徐中玉.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/戚雅仙.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/戚雅仙.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/朱东润.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/朱东润.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/李公朴.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/李公朴.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/李国豪.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/李国豪.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/杨村彬.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/杨村彬.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/梁漱溟.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/梁漱溟.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/沈钧儒.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/沈钧儒.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/王中.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/王中.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/王元美.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/王元美.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/童芷苓.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/童芷苓.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/胡和生.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/胡和生.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/苏步青.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/苏步青.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/蒋学模.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/蒋学模.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/谈家桢.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/谈家桢.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/谷超豪.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/谷超豪.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/费孝通.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/费孝通.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/钱伟长.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/钱伟长.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/闻一多.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/闻一多.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/陈望道.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/陈望道.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/陶行知.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/陶行知.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/黄炎培.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/黄炎培.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/上海李闻追悼大会.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/上海李闻追悼大会.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/上海民盟组织建立.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/上海民盟组织建立.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/中国民主政团同盟成立.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/中国民主政团同盟成立.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/五一口号.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/五一口号.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/六二三事件.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/六二三事件.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/新政协.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/新政协.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/旧政协.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/旧政协.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/李闻事件.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/李闻事件.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/民盟一届三中全会.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/民盟一届三中全会.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/民盟一届二中全会.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/民盟一届二中全会.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/民盟被迫解散.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/民盟被迫解散.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟历史类文章汇总.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟历史类文章汇总.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟盟史独立专题.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟盟史独立专题.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟盟史资源活化.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟盟史资源活化.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟中央与上海民盟文史知识合并底座.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟中央与上海民盟文史知识合并底座.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟盟史资源总览.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟盟史资源总览.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/参政议政/参政议政写作素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/50-参政议政/参政议政写作素材.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/思想宣传/双Agent使用手册.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/60-思想宣传/双Agent使用手册.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/主题教育/主题教育专题素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/80-主题教育/主题教育专题素材.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/主题教育/主题教育基层落实机制.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/80-主题教育/主题教育基层落实机制.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海大学.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海大学.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海市档案馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海市档案馆.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海市行知中学.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海市行知中学.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海民主党派大厦.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海民主党派大厦.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海民盟传统教育基地.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海民盟传统教育基地.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海清华同学会.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海清华同学会.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/周公馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/周公馆.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/国府路300号.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/国府路300号.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/复旦大学.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/复旦大学.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/太平胡同.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/太平胡同.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/特园.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/特园.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/福寿园.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/福寿园.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/虹桥疗养院.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/虹桥疗养院.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/钱伟长纪念馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/钱伟长纪念馆.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/陶行知纪念馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/陶行知纪念馆.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/香港光明报.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/香港光明报.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/龙华烈士陵园.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/龙华烈士陵园.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟微信公众号写作规范.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/上海民盟微信公众号写作规范.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟成稿材料清单.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/上海民盟成稿材料清单.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/人物类采访写法.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/人物类采访写法.md`
+
+## 2026-06-10T15:40:13
+
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/index.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/首页.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/log.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/操作日志.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/主题教育研究：主题教育基层落实机制.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/主题教育研究：主题教育基层落实机制.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/参政议政研究：参政议政写作素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/参政议政研究：参政议政写作素材.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/微信公众号写作：上海民盟微信公众号人物采访写法.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/微信公众号写作：上海民盟微信公众号人物采访写法.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/民盟研究助手首页.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/民盟研究助手首页.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/盟史研究：上海民盟盟史资源有哪些.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/盟史研究：上海民盟盟史资源有哪些.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/研究助手/盟史研究：五一口号在民盟史上的意义.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/盟史研究：五一口号在民盟史上的意义.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/全增嘏.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/全增嘏.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/刘王立明.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/刘王立明.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/史良.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/史良.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/周谷城.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/周谷城.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/张澜.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/张澜.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/徐中玉.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/徐中玉.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/戚雅仙.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/戚雅仙.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/朱东润.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/朱东润.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/李公朴.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/李公朴.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/李国豪.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/李国豪.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/杨村彬.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/杨村彬.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/梁漱溟.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/梁漱溟.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/沈钧儒.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/沈钧儒.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/王中.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/王中.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/王元美.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/王元美.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/童芷苓.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/童芷苓.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/胡和生.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/胡和生.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/苏步青.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/苏步青.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/蒋学模.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/蒋学模.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/谈家桢.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/谈家桢.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/谷超豪.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/谷超豪.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/费孝通.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/费孝通.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/钱伟长.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/钱伟长.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/闻一多.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/闻一多.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/陈望道.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/陈望道.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/陶行知.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/陶行知.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/人物/黄炎培.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/10-人物/黄炎培.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/上海李闻追悼大会.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/上海李闻追悼大会.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/上海民盟组织建立.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/上海民盟组织建立.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/中国民主政团同盟成立.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/中国民主政团同盟成立.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/五一口号.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/五一口号.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/六二三事件.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/六二三事件.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/新政协.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/新政协.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/旧政协.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/旧政协.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/李闻事件.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/李闻事件.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/民盟一届三中全会.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/民盟一届三中全会.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/民盟一届二中全会.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/民盟一届二中全会.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/事件/民盟被迫解散.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/30-事件会议/民盟被迫解散.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟传统教育基地.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟传统教育基地.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟历史类文章汇总.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟历史类文章汇总.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟盟史独立专题.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟盟史独立专题.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟盟史资源活化.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟盟史资源活化.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/上海民盟组织建立与早期发展.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/上海民盟组织建立与早期发展.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟与五一口号.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟与五一口号.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟与人民政协.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟与人民政协.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟中央与上海民盟文史知识合并底座.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟中央与上海民盟文史知识合并底座.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟先贤与上海.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟先贤与上海.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/盟史/民盟盟史资源总览.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/40-盟史/民盟盟史资源总览.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/参政议政/参政议政写作素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/50-参政议政/参政议政写作素材.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/参政议政/参政议政写作素材库.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/50-参政议政/参政议政写作素材库.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/思想宣传/双Agent使用手册.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/60-思想宣传/双Agent使用手册.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/主题教育/主题教育专题素材.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/80-主题教育/主题教育专题素材.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/主题教育/主题教育基层落实机制.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/80-主题教育/主题教育基层落实机制.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海大学.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海大学.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海市档案馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海市档案馆.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海市行知中学.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海市行知中学.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海民主党派大厦.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海民主党派大厦.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海民盟传统教育基地.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海民盟传统教育基地.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/上海清华同学会.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/上海清华同学会.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/周公馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/周公馆.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/国府路300号.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/国府路300号.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/复旦大学.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/复旦大学.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/太平胡同.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/太平胡同.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/特园.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/特园.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/福寿园.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/福寿园.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/虹桥疗养院.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/虹桥疗养院.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/钱伟长纪念馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/钱伟长纪念馆.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/陶行知纪念馆.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/陶行知纪念馆.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/香港光明报.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/香港光明报.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/传统教育基地/龙华烈士陵园.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/90-传统教育基地/龙华烈士陵园.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟微信公众号写作规范.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/上海民盟微信公众号写作规范.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/上海民盟成稿材料清单.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/上海民盟成稿材料清单.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/主题教育报道.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/主题教育报道.md`
+- update: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/人物类采访写法.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/人物类采访写法.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/人物采访人物风采.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/人物采访人物风采.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/参政议政报道.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/参政议政报道.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/文史纪念文章.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/文史纪念文章.md`
+- create: `/Users/cheer/Documents/mllm-wiki-kb/wiki/文稿素材/活动会议报道.md` -> `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/91-文稿素材/活动会议报道.md`

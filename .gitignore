@@ -1,0 +1,14 @@
+.DS_Store
+__pycache__/
+*.pyc
+*.bak-*
+*.egg-info/
+.venv/
+.env
+index/kb.sqlite
+index/kb.sqlite-*
+index/chroma/
+data/raw/
+data/quarantine/
+data/attachments/
+exports/
