@@ -1130,6 +1130,7 @@ def staff_query(mode: str, topic: str) -> str:
         "draft": "上海民盟 微信 写作 报道 讲话 纪念 活动",
         "history": "民盟 盟史 历史 人物 事件 上海",
         "topic": "盟史 选题 课堂 历史",
+        "info": "参政议政 社情民意 调研 建议 提案 问题 对策 履职",
         "check": "上海民盟 民盟 盟史 口径 核验",
     }
     return f"{topic} {extras.get(mode, '')}".strip()
@@ -1770,6 +1771,63 @@ def staff_topic_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
 """
 
 
+def staff_info_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
+    formulations = match_staff_items(load_formulations(root), topic)
+    external_refs = external_reference_block(root, topic)
+    return f"""# 盟参 /信：{topic}
+
+## 结论
+
+- 本次为“信息/参政议政素材包”，已检索到 {len(rows)} 条片段，覆盖 {len({int(row['article_id']) for row in rows}) if rows else 0} 篇来源文章。
+- 输出用于起草统战信息、社情民意、调研综述或参政议政报道的前期资料，不是最终建议稿。
+- 可以先按“问题发现 -> 调研依据 -> 对策建议 -> 履职价值 -> 风险核验”组织材料。
+- 具体数据、政策表述、办理结果和对策可行性必须另行核验，无法证明的内容标 `[待核]`。
+
+## 素材
+
+### 同题历史材料
+
+| 编号 | 公众号 | 日期 | 标题 | raw 原文 |
+|---|---|---|---|---|
+{citation_table(rows)}
+
+### Drive 外部参考层
+
+{external_refs}
+
+### 证据摘录
+
+{cited_excerpts(rows, 10)}
+
+### 问题发现素材
+
+- 从来源中提取真实问题、对象范围、场景和影响，不把活动报道直接改写成问题判断。
+- 优先寻找“调研、提案、社情民意、建议、办理、成效、反馈”等明确履职线索。
+- 如果只有会议或活动报道，可作为背景材料，不能直接推出政策建议。[待核]
+
+### 对策建议骨架
+
+- 建议一：围绕机制、流程、资源配置或协同治理提出可操作建议。[待按材料核]
+- 建议二：围绕试点、评估、数据共享、人才支撑或服务保障提出延展建议。[待按材料核]
+- 建议三：围绕民主党派履职、专家资源和基层观察提出民盟特色角度。[待按材料核]
+
+### 写作结构
+
+- 标题：点明问题对象或建议方向，避免空泛口号。
+- 开头：交代调研背景、问题来源或现实场景。
+- 主体：按“问题表现、原因分析、已有做法、对策建议”展开。
+- 结尾：落到服务中心大局、提升治理效能或发挥民盟界别优势。
+
+### 口径要点
+
+{staff_formulation_lines(formulations)}
+
+## 风险提示
+
+{staff_risk_lines(root, topic, rows)}
+"""
+
+
 def draft_has_citation(text: str) -> bool:
     return bool(re.search(r"\[[SM]\d+\]|raw:|raw 原文|来源|出处", text))
 
@@ -1905,6 +1963,9 @@ def command_staff(args: argparse.Namespace) -> int:
         elif args.staff_command == "topic":
             body = staff_topic_body(root, topic, rows)
             title = f"盟参选题查重：{topic}"
+        elif args.staff_command == "info":
+            body = staff_info_body(root, topic, rows)
+            title = f"盟参信息素材：{topic}"
         else:
             print(f"unknown staff command: {args.staff_command}", file=sys.stderr)
             return 2
@@ -4748,6 +4809,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_staff = staff_sub.add_parser("topic", help="/题：选题查重")
     p_staff.add_argument("topic")
     p_staff.add_argument("--top-k", type=int, default=20)
+    p_staff.add_argument("--save", action="store_true")
+    p_staff.set_defaults(func=command_staff)
+
+    p_staff = staff_sub.add_parser("info", help="/信：统战信息/参政议政素材包")
+    p_staff.add_argument("topic")
+    p_staff.add_argument("--top-k", type=int, default=12)
     p_staff.add_argument("--save", action="store_true")
     p_staff.set_defaults(func=command_staff)
 

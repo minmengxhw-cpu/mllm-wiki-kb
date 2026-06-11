@@ -18,6 +18,7 @@ from kb.cli import (  # noqa: E402
     staff_check_issues,
     staff_draft_body,
     staff_history_body,
+    staff_info_body,
     staff_material_draft_body,
 )
 
@@ -41,6 +42,12 @@ class StaffCommandTests(unittest.TestCase):
         self.assertEqual(args.staff_command, "draft")
         self.assertEqual(args.topic, "会议报道")
         self.assertEqual(args.material, ["2026年6月1日召开会议"])
+
+    def test_parser_accepts_staff_info(self) -> None:
+        args = build_parser().parse_args(["staff", "info", "科技创新人才"])
+        self.assertEqual(args.command, "staff")
+        self.assertEqual(args.staff_command, "info")
+        self.assertEqual(args.topic, "科技创新人才")
 
     def test_staff_check_flags_blacklist_and_missing_citation(self) -> None:
         root = self.make_root()
@@ -237,6 +244,29 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("Drive 外部参考层", body)
             self.assertIn("谷超豪.md", body)
             self.assertIn("外部参考，适合人物研究补充", body)
+        finally:
+            shutil.rmtree(root)
+
+    def test_staff_info_body_uses_problem_solution_structure(self) -> None:
+        root = self.make_root()
+        try:
+            row = dict_to_row(
+                {
+                    "article_id": 1,
+                    "chunk_id": 1,
+                    "title": "民盟市委围绕科技创新开展调研",
+                    "account": "上海民盟",
+                    "published_at": "2025-01-02",
+                    "raw_path": "/tmp/info.md",
+                    "snippet": "调研聚焦科技创新人才发展，提出建议。",
+                    "score": 0,
+                }
+            )
+            body = staff_info_body(root, "科技创新人才", [row])
+            self.assertIn("盟参 /信", body)
+            self.assertIn("问题发现素材", body)
+            self.assertIn("对策建议骨架", body)
+            self.assertIn("[S1]", body)
         finally:
             shutil.rmtree(root)
 

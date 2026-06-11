@@ -195,6 +195,7 @@ kb staff draft "主题教育会议报道" --material "这里粘贴活动材料"
 kb staff draft "主题教育会议报道" --file ~/Desktop/material.txt
 kb staff history "沈钧儒" --top-k 12
 kb staff topic "午间盟史课堂：费孝通与江村" --top-k 20
+kb staff info "科技创新人才" --top-k 12
 kb staff check "这里粘贴需要核稿的正文"
 kb staff check --file ~/Desktop/draft.txt
 ```
