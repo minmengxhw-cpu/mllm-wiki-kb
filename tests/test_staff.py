@@ -122,6 +122,38 @@ class StaffCommandTests(unittest.TestCase):
         finally:
             shutil.rmtree(root)
 
+    def test_staff_draft_body_links_drive_external_reference(self) -> None:
+        root = self.make_root()
+        try:
+            external_dir = root / "index" / "external_sources"
+            external_dir.mkdir(parents=True)
+            (external_dir / "google_drive_inventory.jsonl").write_text(
+                (
+                    '{"source":"研究室知识库","layer":"wiki","path":"wiki/体例范式/先贤诞辰纪念致辞.md",'
+                    '"title":"先贤诞辰纪念致辞.md","url":"https://drive.example/file",'
+                    '"import_decision":"外部参考，适合文史纪念讲话体例参考"}\n'
+                ),
+                encoding="utf-8",
+            )
+            row = dict_to_row(
+                {
+                    "article_id": 1,
+                    "chunk_id": 1,
+                    "title": "民盟先贤纪念活动",
+                    "account": "上海民盟",
+                    "published_at": "2025-05-01",
+                    "raw_path": "/tmp/raw.md",
+                    "snippet": "活动纪念民盟先贤。",
+                    "score": 0,
+                }
+            )
+            body = staff_draft_body(root, "先贤诞辰纪念致辞", [row])
+            self.assertIn("Drive 外部参考层", body)
+            self.assertIn("先贤诞辰纪念致辞.md", body)
+            self.assertIn("外部参考，适合文史纪念讲话体例参考", body)
+        finally:
+            shutil.rmtree(root)
+
     def test_staff_material_draft_body_generates_article_draft(self) -> None:
         root = self.make_root()
         try:
@@ -172,6 +204,38 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("沈钧儒", body)
             self.assertIn("研究路线", body)
             self.assertIn("待人工核验", body)
+        finally:
+            shutil.rmtree(root)
+
+    def test_staff_history_body_links_drive_external_reference(self) -> None:
+        root = self.make_root()
+        try:
+            external_dir = root / "index" / "external_sources"
+            external_dir.mkdir(parents=True)
+            (external_dir / "google_drive_inventory.jsonl").write_text(
+                (
+                    '{"source":"研究室知识库","layer":"wiki","path":"wiki/先贤/谷超豪.md",'
+                    '"title":"谷超豪.md","url":"https://drive.example/gu",'
+                    '"import_decision":"外部参考，适合人物研究补充"}\n'
+                ),
+                encoding="utf-8",
+            )
+            row = dict_to_row(
+                {
+                    "article_id": 1,
+                    "chunk_id": 1,
+                    "title": "谷超豪与民盟",
+                    "account": "上海民盟",
+                    "published_at": "2025-01-02",
+                    "raw_path": "/tmp/gu.md",
+                    "snippet": "谷超豪相关材料。",
+                    "score": 0,
+                }
+            )
+            body = staff_history_body(root, "谷超豪", [row])
+            self.assertIn("Drive 外部参考层", body)
+            self.assertIn("谷超豪.md", body)
+            self.assertIn("外部参考，适合人物研究补充", body)
         finally:
             shutil.rmtree(root)
 

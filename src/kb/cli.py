@@ -1005,6 +1005,10 @@ def load_formulations(root: Path) -> list[dict]:
     return load_jsonl(staff_index_dir(root) / "formulations.jsonl")
 
 
+def load_external_inventory(root: Path) -> list[dict]:
+    return load_jsonl(staff_index_dir(root) / "external_sources" / "google_drive_inventory.jsonl")
+
+
 def load_blacklist(root: Path) -> list[dict]:
     path = staff_index_dir(root) / "blacklist.csv"
     if not path.exists():
@@ -1216,6 +1220,37 @@ def staff_cards_block(root: Path, topic: str) -> str:
     )
 
 
+def external_reference_matches(root: Path, topic: str, limit: int = 6) -> list[dict]:
+    matches = []
+    for item in load_external_inventory(root):
+        haystack = "\n".join(
+            str(item.get(key) or "")
+            for key in ["title", "path", "source", "import_decision", "role"]
+        )
+        if topic and topic in haystack:
+            matches.append(item)
+        if len(matches) >= limit:
+            break
+    return matches
+
+
+def external_reference_block(root: Path, topic: str) -> str:
+    matches = external_reference_matches(root, topic)
+    if not matches:
+        return "- 未命中 Drive 外部参考层；当前输出仍以微信公众号主语料为准。"
+    rows = [["材料", "来源层", "导入判断", "链接"]]
+    for item in matches:
+        rows.append(
+            [
+                str(item.get("title") or ""),
+                f"{item.get('source') or ''}/{item.get('layer') or ''}",
+                str(item.get("import_decision") or "外部参考"),
+                f"[打开]({item.get('url') or ''})",
+            ]
+        )
+    return markdown_table(rows)
+
+
 def research_dossier_matches(root: Path, topic: str, limit: int = 6) -> list[Path]:
     dirs = [
         root / "wiki" / "研究助手" / "核心人物研究档案",
@@ -1392,6 +1427,7 @@ def staff_material_draft_body(root: Path, topic: str, material: str, rows: list[
     article_type, curated_samples = staff_curated_writing_samples(root, topic)
     type_name = ARTICLE_TYPE_NAMES.get(article_type, article_type)
     structure_block = staff_draft_structure_block(article_type)
+    external_refs = external_reference_block(root, topic)
     material_issues = staff_check_issues(root, material)
     titles = title_suggestions(topic, article_type)
     paragraphs = draft_paragraphs_from_material(topic, article_type, material)
@@ -1428,6 +1464,10 @@ def staff_material_draft_body(root: Path, topic: str, material: str, rows: list[
 ### 精选写作样本
 
 {curated_samples}
+
+### Drive 外部参考层
+
+{external_refs}
 
 ### 体裁写作骨架
 
@@ -1472,6 +1512,7 @@ def staff_draft_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
     article_type, curated_samples = staff_curated_writing_samples(root, topic)
     type_name = ARTICLE_TYPE_NAMES.get(article_type, article_type)
     structure_block = staff_draft_structure_block(article_type)
+    external_refs = external_reference_block(root, topic)
     return f"""# 盟参 /稿：{topic}
 
 ## 结论
@@ -1492,6 +1533,10 @@ def staff_draft_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
 ### 精选写作样本
 
 {curated_samples}
+
+### Drive 外部参考层
+
+{external_refs}
 
 ### 体裁写作骨架
 
@@ -1521,6 +1566,7 @@ def staff_history_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
     formulations = match_staff_items(load_formulations(root), topic)
     entities = match_staff_items(load_staff_entities(root), topic)
     dossiers = research_dossier_block(root, topic)
+    external_refs = external_reference_block(root, topic)
     route = staff_history_research_route(topic)
     return f"""# 盟参 /史：{topic}
 
@@ -1544,6 +1590,10 @@ def staff_history_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
 ### 种子实体库
 
 {staff_entity_lines(entities)}
+
+### Drive 外部参考层
+
+{external_refs}
 
 ### 来源文章
 
