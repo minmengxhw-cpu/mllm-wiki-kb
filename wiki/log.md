@@ -121,6 +121,9 @@ needs_review: false
 
 - 2026-06-11T22:14:52 生成 Drive 外部参考层状态：wiki/研究助手/Google Drive外部参考层状态.md
 
+
+- 2026-06-11T22:22:57 安装民盟研究助手首页：wiki/研究助手/民盟研究助手首页.md
+
 <!-- KB-GENERATED:END -->
 <!-- HUMAN-NOTES:START -->
 
