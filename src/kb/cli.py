@@ -1349,11 +1349,12 @@ def staff_material_draft_body(root: Path, topic: str, material: str, rows: list[
     article_type, curated_samples = staff_curated_writing_samples(root, topic)
     type_name = ARTICLE_TYPE_NAMES.get(article_type, article_type)
     structure_block = staff_draft_structure_block(article_type)
-    issues = staff_check_issues(root, material)
+    material_issues = staff_check_issues(root, material)
     titles = title_suggestions(topic, article_type)
     paragraphs = draft_paragraphs_from_material(topic, article_type, material)
     title_lines = "\n".join(f"- {title}" for title in titles)
     draft_text = "\n\n".join(paragraphs)
+    draft_issues = staff_check_issues(root, draft_text)
     material_table = "\n".join(f"| M{idx} | {clean_snippet(point, 140)} |" for idx, point in enumerate(material_points(material, 10), 1))
     return f"""# 盟参 /稿：{topic}
 
@@ -1405,11 +1406,17 @@ def staff_material_draft_body(root: Path, topic: str, material: str, rows: list[
 
 ## 风险提示
 
-### 自动核验提示
+### 用户材料核验
 
 | 编号 | 严重度 | 类型 | 命中内容 | 建议处理 |
 |---|---|---|---|---|
-{issue_table(issues)}
+{issue_table(material_issues)}
+
+### 初稿核验
+
+| 编号 | 严重度 | 类型 | 命中内容 | 建议处理 |
+|---|---|---|---|---|
+{issue_table(draft_issues)}
 
 ### 其他风险
 
@@ -1600,7 +1607,7 @@ def staff_topic_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
 
 
 def draft_has_citation(text: str) -> bool:
-    return bool(re.search(r"\[S\d+\]|raw:|raw 原文|来源|出处", text))
+    return bool(re.search(r"\[[SM]\d+\]|raw:|raw 原文|来源|出处", text))
 
 
 def staff_check_issues(root: Path, text: str) -> list[dict]:

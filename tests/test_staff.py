@@ -142,7 +142,8 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("标题备选", body)
             self.assertIn("正文初稿", body)
             self.assertIn("[M1]", body)
-            self.assertIn("自动核验提示", body)
+            self.assertIn("用户材料核验", body)
+            self.assertIn("初稿核验", body)
             self.assertIn("民盟上海市委召开会议", body)
         finally:
             shutil.rmtree(root)
