@@ -1532,15 +1532,16 @@ ARTICLE_TYPE_RULES = [
     {"type": "meeting_report", "name": "会议报道", "keywords": ["会议", "全委", "常委会", "主委会议", "代表大会", "座谈会", "开题会", "推进会", "工作会", "学习交流会"]},
     {"type": "activity_report", "name": "活动报道", "keywords": ["活动", "举行", "举办", "开展", "走进", "启动", "参观", "调研", "培训班", "讲座", "比赛"]},
     {"type": "leadership_speech", "name": "领导讲话/工作部署", "keywords": ["讲话", "工作报告", "工作要点", "部署", "要求", "指出", "强调", "主委会议通过", "全会"]},
-    {"type": "member_achievement", "name": "盟员履职/成果荣誉", "keywords": ["祝贺", "荣获", "获得", "获评", "获奖", "获颁", "获表彰", "表彰", "提名奖", "喜获", "当选", "入选", "成果", "团队", "院士", "科学技术奖", "五一劳动奖章", "创新争先", "典型在身边", "履职风采"]},
-    {"type": "person_profile", "name": "人物采访/人物风采", "keywords": ["人物", "采访", "风采", "盟员风采", "专访", "故事", "诞辰", "纪念", "先生"]},
+    {"type": "member_achievement", "name": "盟员履职/成果荣誉", "keywords": ["祝贺", "荣获", "获得", "获", "获评", "获奖", "获颁", "获表彰", "表彰", "提名奖", "喜获", "当选", "入选", "成果", "团队", "院士", "科学技术奖", "五一劳动奖章", "创新争先", "典型在身边", "履职风采"]},
+    {"type": "cultural_showcase", "name": "文化作品/展示传播", "keywords": ["盟员美术", "美术大师", "美术家", "作品集萃", "作品赏析", "书画作品", "笔下", "原创歌曲", "MV", "夜听", "劳动最光荣", "歌声", "共唱", "词曲", "主唱", "线上展", "以笔寄愿", "我和我的祖国", "我和我的民盟", "接力送祝福"]},
+    {"type": "person_profile", "name": "人物采访/人物风采", "keywords": ["人物", "采访", "风采", "盟员风采", "专访", "故事", "诞辰", "纪念", "先生", "代表访谈微视频", "科考记", "被央视报道", "这位盟员", "盟员教师", "盟员医生"]},
     {"type": "history_commemoration", "name": "文史纪念", "keywords": ["盟史", "文史", "纪念", "先贤", "旧政协", "新政协", "五一口号", "李闻", "钩沉", "口述史", "传统教育基地"]},
     {"type": "history_research", "name": "盟史研究", "keywords": ["盟史研究", "民盟历史", "档案", "史料", "史实", "考证", "历史资料", "理论和盟史"]},
     {"type": "policy_advice", "name": "参政议政", "keywords": ["参政议政", "提案", "社情民意", "建言", "调研", "建议", "政协", "两会", "履职"]},
     {"type": "theme_education", "name": "主题教育", "keywords": ["主题教育", "主题教育进行时", "参政为公", "实干为民", "凝心铸魂", "学规定", "强作风", "树形象", "政治共识", "学习贯彻习近平", "学习贯彻中共"]},
     {"type": "organization_building", "name": "组织建设", "keywords": ["组织建设", "基层组织", "支部", "区委", "委员会", "换届", "盟员之家", "新盟员", "入盟"]},
-    {"type": "social_service", "name": "社会服务", "keywords": ["社会服务", "帮扶", "乡村振兴", "烛光行动", "黄丝带", "公益", "医疗", "教育帮扶"]},
-    {"type": "notice_info", "name": "通知公告/信息发布", "keywords": ["通知", "公告", "预告", "名单", "公示", "目录", "招聘", "征集", "报名", "结果出炉", "节日快乐", "新年快乐", "拜年", "中秋快乐", "国庆", "迎春", "祝广大盟员"]},
+    {"type": "social_service", "name": "社会服务", "keywords": ["社会服务", "帮扶", "乡村振兴", "烛光行动", "黄丝带", "公益", "医疗", "教育帮扶", "抗疫", "战“疫”", "疫灾", "驰援", "小黄人"]},
+    {"type": "notice_info", "name": "通知公告/信息发布", "keywords": ["通知", "公告", "预告", "名单", "公示", "目录", "招聘", "征集", "报名", "结果出炉", "倒计时", "正式上线", "节日快乐", "节日祝福", "新年快乐", "元宵节快乐", "拜年", "中秋快乐", "中秋佳节", "国庆", "迎春", "祝广大盟员"]},
     {"type": "commentary_theory", "name": "评论综述/理论文章", "keywords": ["综述", "理论", "评论", "学习体会", "心得", "观察", "解读", "述评"]},
 ]
 
@@ -1567,6 +1568,13 @@ WRITING_STYLE_GUIDES = {
         "title": "常见标题会用人物姓名加身份、贡献或一句代表性表述，增强识别度。",
         "lead": "导语可用一个典型细节引入，但必须尽快交代人物与民盟、上海或主题的关系。",
         "risk": "生卒年、职务、入盟时间、历史评价和引语必须有出处；避免把文学化描写写成史实。",
+    },
+    "cultural_showcase": {
+        "use": "适合作品赏析、书画展、原创歌曲、视频展播、节庆征集和文化传播类稿件。",
+        "structure": "标题突出作品形态或传播主题；导语说明作品来源、作者或活动背景；主体介绍作品内容、人物身份、创作背景和传播效果；结尾落到文化凝聚或民盟特色。",
+        "title": "常见标题会出现“作品”“笔下”“夜听”“原创歌曲”“我和我的祖国”等提示，风格可比会议报道更活泼。",
+        "lead": "导语要先交代作品或展播对象，不宜只写情绪性祝福。",
+        "risk": "作品作者、版权、奖项、展览名称和人物身份要核对；节庆问候类不宜误写成人物专访。",
     },
     "policy_advice": {
         "use": "适合参政议政、社情民意、提案建议、调研成果和履职综述。",
@@ -1659,13 +1667,19 @@ def classify_article(title: str, account: str | None, text: str) -> tuple[str, i
             score = len(matched) + title_hits
             if rule["type"] == "member_achievement" and any(kw in title for kw in ["祝贺", "获", "入选", "表彰", "当选"]):
                 score += 6
+            if rule["type"] == "cultural_showcase" and any(kw in title for kw in ["盟员美术", "美术大师", "美术家", "作品", "笔下", "原创歌曲", "MV", "夜听", "劳动最光荣", "我和我的祖国", "我和我的民盟", "共唱", "词曲", "主唱"]):
+                score += 6
+            if rule["type"] == "person_profile" and any(kw in title for kw in ["代表访谈微视频", "科考记", "这位盟员", "盟员教师", "盟员医生", "被央视报道"]):
+                score += 6
+            if rule["type"] == "social_service" and any(kw in title for kw in ["抗疫", "战“疫”", "疫灾", "驰援", "小黄人"]):
+                score += 6
             if rule["type"] == "theme_education" and any(kw in title for kw in ["主题教育", "凝心铸魂", "参政为公", "实干为民", "学规定", "强作风"]):
                 score += 6
             if rule["type"] == "history_commemoration" and any(kw in title for kw in ["盟史钩沉", "民盟先贤", "五一口号", "诞辰", "旧政协", "新政协"]):
                 score += 6
             if rule["type"] == "notice_info" and (
                 title.startswith(("预告", "通知", "公告", "名单", "公示"))
-                or any(kw in title for kw in ["节日快乐", "新年快乐", "拜年", "中秋快乐", "国庆", "迎春"])
+                or any(kw in title for kw in ["节日快乐", "节日祝福", "新年快乐", "元宵节快乐", "拜年", "中秋快乐", "中秋佳节", "国庆", "迎春", "倒计时", "正式上线"])
             ):
                 score += 6
             scored.append((score, -index, rule["type"], matched))
@@ -1715,7 +1729,7 @@ def build_article_label(row: sqlite3.Row) -> dict:
     is_writing_sample = row["account"] == "上海民盟" and year >= "2023" and article_type in {
         "activity_report", "meeting_report", "person_profile", "history_commemoration",
         "policy_advice", "theme_education", "leadership_speech", "member_achievement",
-        "organization_building", "social_service",
+        "organization_building", "social_service", "cultural_showcase",
     }
     return {
         "article_id": int(row["id"]),
@@ -2111,15 +2125,19 @@ def suggested_review_type(label: dict) -> tuple[str, list[str]]:
     suggestions: list[tuple[str, str]] = []
     if title.startswith(("预告", "通知", "公告", "名单", "公示")):
         suggestions.append(("notice_info", "标题为通知预告类"))
-    if any(term in title for term in ["节日快乐", "新年快乐", "拜年", "中秋快乐", "国庆", "迎春"]):
+    if any(term in title for term in ["节日快乐", "节日祝福", "新年快乐", "元宵节快乐", "拜年", "中秋快乐", "中秋佳节", "国庆", "迎春", "倒计时", "正式上线"]):
         suggestions.append(("notice_info", "标题为节庆问候/信息发布类"))
     if any(term in title for term in ["祝贺", "荣获", "获得", "获评", "获奖", "获颁", "入选", "表彰", "当选", "提名奖"]):
         suggestions.append(("member_achievement", "标题含获奖/入选/表彰信号"))
+    if any(term in title for term in ["盟员美术", "美术大师", "美术家", "作品集萃", "作品赏析", "书画作品", "笔下", "原创歌曲", "MV", "夜听", "劳动最光荣", "我和我的祖国", "我和我的民盟", "以笔寄愿", "共唱", "词曲", "主唱"]):
+        suggestions.append(("cultural_showcase", "标题含文化作品/展示传播信号"))
+    if any(term in title for term in ["抗疫", "战“疫”", "疫灾", "驰援", "小黄人"]):
+        suggestions.append(("social_service", "标题含抗疫/服务行动信号"))
     if any(term in title for term in ["主题教育", "凝心铸魂", "参政为公", "实干为民", "学规定", "强作风"]):
         suggestions.append(("theme_education", "标题含主题教育信号"))
     if any(term in title for term in ["盟史钩沉", "民盟先贤", "五一口号", "旧政协", "新政协", "诞辰"]):
         suggestions.append(("history_commemoration", "标题含文史纪念信号"))
-    if current == "other" and not suggestions and any(term in title for term in ["盟员", "先生", "人物", "风采", "访谈", "专访"]):
+    if current == "other" and not suggestions and any(term in title for term in ["盟员", "先生", "人物", "风采", "访谈", "专访", "代表访谈微视频", "科考记"]):
         suggestions.append(("person_profile", "其他/待判中疑似人物文章"))
     if not suggestions:
         return "", []

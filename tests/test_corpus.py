@@ -147,6 +147,19 @@ class CorpusCommandTests(unittest.TestCase):
         self.assertEqual(article_type, "history_commemoration")
         self.assertIn("先贤", matched)
 
+    def test_cultural_profile_and_service_title_priority(self) -> None:
+        article_type, _, matched = classify_article("代表访谈微视频 | 民盟上海市委主委陈群", "中国民主同盟", "")
+        self.assertEqual(article_type, "person_profile")
+        self.assertIn("代表访谈微视频", matched)
+
+        article_type, _, matched = classify_article("盟员美术展集萃（馆藏作品）", "中国民主同盟", "")
+        self.assertEqual(article_type, "cultural_showcase")
+        self.assertIn("盟员美术", matched)
+
+        article_type, _, matched = classify_article("致敬！115位盟员医卫工作者逆向而行，驰援湖北抗疫一线！", "中国民主同盟", "")
+        self.assertEqual(article_type, "social_service")
+        self.assertIn("抗疫", matched)
+
     def test_style_and_history_markdown_have_core_sections(self) -> None:
         labels = [
             {
