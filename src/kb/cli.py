@@ -1663,6 +1663,12 @@ def classify_article(title: str, account: str | None, text: str) -> tuple[str, i
         return "notice_info", 95, ["预告" if "预告" in title[:6] else title[:2]]
     if "《史良》连载" in title:
         return "history_commemoration", 95, ["《史良》连载"]
+    theme_title_terms = ["主题教育", "学规定", "强作风", "树形象", "参政为公", "实干为民", "不忘合作初心", "政治交接主题教育"]
+    if any(term in title for term in theme_title_terms):
+        return "theme_education", 95, [term for term in theme_title_terms if term in title][:3]
+    history_title_terms = ["盟史", "民盟先贤", "先贤", "纪念", "诞辰", "五一口号", "旧政协", "新政协", "传统教育基地"]
+    if any(term in title for term in history_title_terms):
+        return "history_commemoration", 95, [term for term in history_title_terms if term in title][:3]
     scored = []
     for index, rule in enumerate(ARTICLE_TYPE_RULES):
         matched = [kw for kw in rule["keywords"] if kw in haystack]

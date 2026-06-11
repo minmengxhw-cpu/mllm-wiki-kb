@@ -179,6 +179,23 @@ class CorpusCommandTests(unittest.TestCase):
         self.assertEqual(article_type, "history_commemoration")
         self.assertIn("先贤", matched)
 
+    def test_theme_and_history_override_activity_keywords(self) -> None:
+        article_type, _, matched = classify_article(
+            "以学风强作风！民盟市委主题教育启动后的首个培训班举办",
+            "上海民盟",
+            "培训班举办，现场开展活动。",
+        )
+        self.assertEqual(article_type, "theme_education")
+        self.assertIn("主题教育", matched)
+
+        article_type, _, matched = classify_article(
+            "民盟中央副主席徐辉出席“纪念钱伟长诞辰110周年活动”并在沪调研盟务工作",
+            "上海民盟",
+            "活动举办，现场调研。",
+        )
+        self.assertEqual(article_type, "history_commemoration")
+        self.assertIn("纪念", matched)
+
     def test_cultural_profile_and_service_title_priority(self) -> None:
         article_type, _, matched = classify_article("代表访谈微视频 | 民盟上海市委主委陈群", "中国民主同盟", "")
         self.assertEqual(article_type, "person_profile")
