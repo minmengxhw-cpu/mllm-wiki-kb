@@ -16,6 +16,7 @@ from kb.cli import (  # noqa: E402
     normalized_similarity,
     staff_check_issues,
     staff_draft_body,
+    staff_history_body,
     staff_material_draft_body,
 )
 
@@ -145,6 +146,32 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("用户材料核验", body)
             self.assertIn("初稿核验", body)
             self.assertIn("民盟上海市委召开会议", body)
+        finally:
+            shutil.rmtree(root)
+
+    def test_staff_history_body_links_core_dossier(self) -> None:
+        root = self.make_root()
+        try:
+            dossier_dir = root / "wiki" / "研究助手" / "核心人物研究档案"
+            dossier_dir.mkdir(parents=True)
+            (dossier_dir / "沈钧儒.md").write_text("# 沈钧儒研究档案\n\n- 结论状态：待人工核验\n", encoding="utf-8")
+            row = dict_to_row(
+                {
+                    "article_id": 1,
+                    "chunk_id": 1,
+                    "title": "沈钧儒与人民政协制度的创建",
+                    "account": "中国民主同盟",
+                    "published_at": "2025-01-02",
+                    "raw_path": "/tmp/shen.md",
+                    "snippet": "沈钧儒参与新政协筹备。",
+                    "score": 0,
+                }
+            )
+            body = staff_history_body(root, "沈钧儒", [row])
+            self.assertIn("核心研究档案", body)
+            self.assertIn("沈钧儒", body)
+            self.assertIn("研究路线", body)
+            self.assertIn("待人工核验", body)
         finally:
             shutil.rmtree(root)
 

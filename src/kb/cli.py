@@ -1186,6 +1186,8 @@ def staff_search_rows(root: Path, mode: str, topic: str, top_k: int) -> list[sql
 
 
 def staff_card_matches(root: Path, topic: str, limit: int = 8) -> list[sqlite3.Row]:
+    if not (root / "schema.sql").exists():
+        return []
     init_db(root)
     conn = connect_db(root)
     try:
@@ -1212,6 +1214,47 @@ def staff_cards_block(root: Path, topic: str) -> str:
         f"- {row['title']}（{row['page_type']}，来源 {row['source_count']}，{row['review_status']}）：`{row['path']}`"
         for row in rows
     )
+
+
+def research_dossier_matches(root: Path, topic: str, limit: int = 6) -> list[Path]:
+    dirs = [
+        root / "wiki" / "研究助手" / "核心人物研究档案",
+        root / "wiki" / "研究助手" / "核心事件研究档案",
+    ]
+    matches = []
+    for directory in dirs:
+        if not directory.exists():
+            continue
+        for path in sorted(directory.glob("*.md")):
+            if path.stem == "索引":
+                continue
+            if topic in path.stem or path.stem in topic:
+                matches.append(path)
+    return matches[:limit]
+
+
+def research_dossier_block(root: Path, topic: str) -> str:
+    matches = research_dossier_matches(root, topic)
+    if not matches:
+        return "- 未命中核心人物/事件研究档案；可先用 `kb build-research-dossiers --set core-people` 或 `--set core-events` 补建。"
+    rows = [["档案", "类型", "路径", "结论状态"]]
+    for path in matches:
+        dossier_type = "人物" if "核心人物研究档案" in str(path) else "事件"
+        status = "待人工核验"
+        text = path.read_text(encoding="utf-8")
+        status_match = re.search(r"结论状态：([^\n]+)", text)
+        if status_match:
+            status = status_match.group(1).strip()
+        rows.append([path.stem, dossier_type, f"`{path}`", status])
+    return markdown_table(rows)
+
+
+def staff_history_research_route(topic: str) -> str:
+    return f"""- 第一步：先打开命中的核心研究档案，确认来源分布、主题线索和待核字段。
+- 第二步：按“时间线、人物关系、组织关系、上海地方线索、争议风险”五栏摘录证据。
+- 第三步：所有年份、会议名称、职务、组织名称、地点和历史评价逐条回 raw 原文核验。
+- 第四步：正式写作时区分全国民盟史主线、上海民盟地方史线索和公众号纪念性表达。
+- 第五步：无法由当前语料证明的判断，一律写作 `[待核]`，不要替代权威档案结论。"""
 
 
 def staff_draft_article_type(topic: str) -> str:
@@ -1477,15 +1520,22 @@ def staff_draft_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
 def staff_history_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
     formulations = match_staff_items(load_formulations(root), topic)
     entities = match_staff_items(load_staff_entities(root), topic)
+    dossiers = research_dossier_block(root, topic)
+    route = staff_history_research_route(topic)
     return f"""# 盟参 /史：{topic}
 
 ## 结论
 
 - 本次为“史实卡片/研究入口”，已检索到 {len(rows)} 条片段，覆盖 {len({int(row['article_id']) for row in rows}) if rows else 0} 篇来源文章。
+- 若命中核心研究档案，应优先以研究档案作为入口，再回 raw 原文核验。
 - 当前输出只能作为研究线索；涉及年份、会议、职务、组织名称和地点，必须打开 raw 原文和权威资料复核。
 - 若来源不足或存在争议，相关表述一律按 [待核] 处理。
 
 ## 素材
+
+### 核心研究档案
+
+{dossiers}
 
 ### 已有卡片
 
@@ -1512,6 +1562,10 @@ def staff_history_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
 ### 口径/争议线索
 
 {staff_formulation_lines(formulations)}
+
+### 研究路线
+
+{route}
 
 ## 风险提示
 
