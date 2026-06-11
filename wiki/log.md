@@ -115,6 +115,9 @@ needs_review: false
 
 - 2026-06-11T15:36:44 生成核心人物研究档案：9 个
 
+
+- 2026-06-11T15:40:40 生成核心事件研究档案：9 个
+
 <!-- KB-GENERATED:END -->
 <!-- HUMAN-NOTES:START -->
 

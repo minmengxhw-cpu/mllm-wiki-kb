@@ -271,9 +271,10 @@ kb build-cards --set shanghai-history-people --top-k 15
 
 ```bash
 kb build-research-dossiers --set core-people --top-k 24
+kb build-research-dossiers --set core-events --top-k 24
 ```
 
-研究档案会写入 `wiki/研究助手/核心人物研究档案/`，用于把核心人物的来源分布、主题线索、时间线线索、证据摘录和待核字段集中到一个研究入口。它不替代 `wiki/人物/` 下的自动人物卡，而是面向盟史研究和写作核验。
+研究档案会写入 `wiki/研究助手/核心人物研究档案/` 和 `wiki/研究助手/核心事件研究档案/`，用于把核心人物、核心事件的来源分布、主题线索、时间线线索、证据摘录和待核字段集中到一个研究入口。它不替代 `wiki/人物/`、`wiki/事件/` 下的自动卡，而是面向盟史研究和写作核验。
 
 ## 研究卡校订状态
 

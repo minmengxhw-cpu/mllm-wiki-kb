@@ -17,6 +17,7 @@ from kb.cli import (  # noqa: E402
     corpus_priority_review_rows,
     corpus_review_rows,
     dict_to_row,
+    event_research_dossier_body,
     history_research_entry_markdown,
     person_research_dossier_body,
     writing_style_templates_markdown,
@@ -277,6 +278,28 @@ class CorpusCommandTests(unittest.TestCase):
         self.assertIn("主题线索", body)
         self.assertIn("待核字段", body)
         self.assertIn("来源表", body)
+
+    def test_event_research_dossier_contains_research_sections(self) -> None:
+        rows = [
+            dict_to_row(
+                {
+                    "article_id": 1,
+                    "chunk_id": 1,
+                    "title": "民盟响应中共中央“五一口号”",
+                    "account": "中国民主同盟",
+                    "published_at": "2022-04-30",
+                    "raw_path": "/tmp/mayday.md",
+                    "snippet": "张澜、沈钧儒等民盟先贤响应五一口号，推动新政协进程。",
+                    "score": 0,
+                }
+            )
+        ]
+        body = event_research_dossier_body("五一口号", rows, "2026-06-11T00:00:00")
+        self.assertIn("五一口号研究档案", body)
+        self.assertIn("事件定位", body)
+        self.assertIn("相关人物线索", body)
+        self.assertIn("待核字段", body)
+        self.assertIn("沈钧儒", body)
 
 
 if __name__ == "__main__":

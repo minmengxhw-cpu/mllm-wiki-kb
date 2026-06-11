@@ -3069,6 +3069,7 @@ TOPIC_PACKS = [
 RESEARCH_DOSSIER_SETS = {
     "core-people": ["沈钧儒", "史良", "张澜", "黄炎培", "费孝通", "李公朴", "闻一多", "陶行知", "钱伟长"],
     "founding-people": ["沈钧儒", "张澜", "黄炎培", "史良", "李公朴", "闻一多"],
+    "core-events": ["五一口号", "旧政协", "新政协", "李闻事件", "民盟一届二中全会", "民盟一届三中全会", "民盟被迫解散", "中国民主政团同盟成立", "上海民盟组织建立"],
 }
 
 PERSON_RESEARCH_THEMES = {
@@ -3077,6 +3078,15 @@ PERSON_RESEARCH_THEMES = {
     "上海地方线索": ["上海", "上海民盟", "沪", "周公馆", "福寿园", "虹桥"],
     "文史纪念传播": ["纪念", "先贤", "诞辰", "传统教育", "盟史钩沉"],
     "参政议政线索": ["参政议政", "提案", "社情民意", "建言", "履职"],
+}
+
+EVENT_RESEARCH_THEMES = {
+    "事件事实链": ["时间", "地点", "召开", "发表", "宣布", "成立", "响应", "解散"],
+    "相关人物": ["张澜", "沈钧儒", "黄炎培", "史良", "李公朴", "闻一多", "章伯钧"],
+    "民盟组织线索": ["民盟", "中国民主同盟", "民主政团同盟", "总部", "中央", "上海民盟"],
+    "多党合作线索": ["中国共产党", "多党合作", "统一战线", "政协", "新政协", "旧政协"],
+    "上海地方线索": ["上海", "沪", "周公馆", "虹桥", "福寿园", "上海民盟"],
+    "争议与口径风险": ["争议", "考证", "档案", "史料", "被迫", "非法", "惨案"],
 }
 
 WRITING_WORKFLOWS = {
@@ -3376,6 +3386,10 @@ def dossier_dir(root: Path) -> Path:
     return root / "wiki" / "研究助手" / "核心人物研究档案"
 
 
+def event_dossier_dir(root: Path) -> Path:
+    return root / "wiki" / "研究助手" / "核心事件研究档案"
+
+
 def row_text(row: sqlite3.Row) -> str:
     return " ".join(str(row[key] or "") for key in ("title", "account", "published_at", "snippet", "raw_path"))
 
@@ -3384,21 +3398,26 @@ def rows_matching_keywords(rows: list[sqlite3.Row], keywords: list[str]) -> list
     return [row for row in rows if any(keyword in row_text(row) for keyword in keywords)]
 
 
-def person_research_dossier_body(name: str, rows: list[sqlite3.Row], created_at: str) -> str:
-    sources = unique_source_rows(rows, 18)
-    by_account = Counter(row["account"] or "unknown" for row in sources)
-    by_year = Counter((row["published_at"] or "日期不详")[:4] for row in sources)
+def dossier_theme_sections(sources: list[sqlite3.Row], themes: dict[str, list[str]]) -> tuple[list[list[str]], list[str]]:
     theme_rows = []
     theme_sections = []
-    for theme, keywords in PERSON_RESEARCH_THEMES.items():
+    for theme, keywords in themes.items():
         matched = rows_matching_keywords(sources, keywords)
-        theme_rows.append([theme, str(len(matched)), "、".join(keywords[:6])])
+        theme_rows.append([theme, str(len(matched)), "、".join(keywords[:8])])
         if matched:
             table = [["编号", "日期", "账号", "标题", "raw 原文"]]
             for row in matched[:6]:
                 idx = sources.index(row) + 1 if row in sources else 0
                 table.append([f"S{idx}", row["published_at"] or "日期不详", row["account"] or "", f"《{row['title']}》", f"`{row['raw_path']}`"])
             theme_sections.append(f"### {theme}\n\n{markdown_table(table)}")
+    return theme_rows, theme_sections
+
+
+def person_research_dossier_body(name: str, rows: list[sqlite3.Row], created_at: str) -> str:
+    sources = unique_source_rows(rows, 18)
+    by_account = Counter(row["account"] or "unknown" for row in sources)
+    by_year = Counter((row["published_at"] or "日期不详")[:4] for row in sources)
+    theme_rows, theme_sections = dossier_theme_sections(sources, PERSON_RESEARCH_THEMES)
 
     evidence_rows = [["编号", "日期", "账号", "标题", "证据摘录"]]
     for idx, row in enumerate(sources[:12], 1):
@@ -3463,10 +3482,97 @@ def person_research_dossier_body(name: str, rows: list[sqlite3.Row], created_at:
 """
 
 
+def event_research_dossier_body(name: str, rows: list[sqlite3.Row], created_at: str) -> str:
+    sources = unique_source_rows(rows, 20)
+    by_account = Counter(row["account"] or "unknown" for row in sources)
+    by_year = Counter((row["published_at"] or "日期不详")[:4] for row in sources)
+    theme_rows, theme_sections = dossier_theme_sections(sources, EVENT_RESEARCH_THEMES)
+    related_people = Counter()
+    for row in sources:
+        related_people.update(people_hits_for_text(row_text(row)))
+
+    evidence_rows = [["编号", "日期", "账号", "标题", "证据摘录"]]
+    for idx, row in enumerate(sources[:12], 1):
+        evidence_rows.append([f"S{idx}", row["published_at"] or "日期不详", row["account"] or "", f"《{row['title']}》", clean_snippet(row["snippet"], 180)])
+
+    source_table = [["编号", "账号", "日期", "标题", "raw 原文"]]
+    for idx, row in enumerate(sources, 1):
+        source_table.append([f"S{idx}", row["account"] or "", row["published_at"] or "日期不详", f"《{row['title']}》", f"`{row['raw_path']}`"])
+
+    people_table = [["人物", "命中来源数"]]
+    people_table.extend([[person, str(count)] for person, count in related_people.most_common(12)])
+
+    return f"""# {name}研究档案
+
+生成时间：{created_at}
+
+本档案是“盟参”研究型知识库的事件入口页，依据本地微信公众号语料自动生成。它只整理可追溯线索，不把机器摘录写成最终史实结论。
+
+## 事件定位
+
+- 事件：{name}
+- 档案性质：核心事件研究入口
+- 命中片段：{len(rows)} 条
+- 去重来源文章：{len(sources)} 篇
+- 结论状态：待人工核验
+
+## 来源分布
+
+{markdown_table([["账号", "来源篇数"]] + [[k, str(v)] for k, v in by_account.most_common()])}
+
+{markdown_table([["年份", "来源篇数"]] + [[k, str(v)] for k, v in sorted(by_year.items(), reverse=True)])}
+
+## 主题线索
+
+{markdown_table([["主题", "命中来源数", "识别词"]] + theme_rows)}
+
+{chr(10).join(theme_sections) if theme_sections else '暂无明显主题线索。'}
+
+## 相关人物线索
+
+{markdown_table(people_table) if len(people_table) > 1 else '待从原文中继续抽取。'}
+
+## 时间线线索
+
+{timeline_candidates(sources, 14)}
+
+## 证据摘录
+
+{markdown_table(evidence_rows)}
+
+## 待核字段
+
+- 事件准确名称、发生日期、地点、相关组织和参与人物。
+- 不同文章对事件阶段、因果关系、历史评价的表述是否一致。
+- 是否存在纪念性表达、宣传性概括、转载材料和权威史料之间的层级差异。
+- 上海地方线索与全国民盟史主线是否需要分开叙述。
+- 涉及争议、称谓、日期、会议届次、组织名称时，必须回 raw 原文和权威档案核验。
+
+## 写作与研究用法
+
+- 写盟史课堂：先从“时间线线索”确定事件顺序，再选取一条可讲述的主线。
+- 写文史纪念文章：围绕具体人物、地点或关键文献展开，避免泛化口号。
+- 写领导讲话素材：只提炼可由来源支撑的历史意义和现实启示。
+- 做口径核验：事件名称、日期、参与人物和组织关系必须逐条溯源。
+
+## 来源表
+
+{markdown_table(source_table)}
+"""
+
+
 def write_person_research_dossier(root: Path, name: str, rows: list[sqlite3.Row], created_at: str) -> Path:
     path = dossier_dir(root) / f"{name}.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     body = person_research_dossier_body(name, rows, created_at)
+    path.write_text(body, encoding="utf-8")
+    return path
+
+
+def write_event_research_dossier(root: Path, name: str, rows: list[sqlite3.Row], created_at: str) -> Path:
+    path = event_dossier_dir(root) / f"{name}.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    body = event_research_dossier_body(name, rows, created_at)
     path.write_text(body, encoding="utf-8")
     return path
 
@@ -3479,6 +3585,26 @@ def person_dossier_rows(root: Path, name: str, top_k: int) -> list[sqlite3.Row]:
         seen = {int(row["chunk_id"]) for row in focused if row["chunk_id"] is not None}
         for row in broad:
             if name not in row_text(row):
+                continue
+            chunk_id = int(row["chunk_id"])
+            if chunk_id in seen:
+                continue
+            focused.append(row)
+            seen.add(chunk_id)
+            if len(focused) >= top_k:
+                break
+    return focused[:top_k]
+
+
+def event_dossier_rows(root: Path, name: str, top_k: int) -> list[sqlite3.Row]:
+    query = CARD_QUERY_OVERRIDES.get(name, name)
+    rows = search_rows(root, query, top_k * 3)
+    focused = [row for row in rows if any(term in row_text(row) for term in query_terms(query) + [name])]
+    if len(focused) < top_k:
+        broad = search_rows(root, f"{query} 民盟 盟史 上海", top_k * 2)
+        seen = {int(row["chunk_id"]) for row in focused if row["chunk_id"] is not None}
+        for row in broad:
+            if not any(term in row_text(row) for term in query_terms(query) + [name]):
                 continue
             chunk_id = int(row["chunk_id"])
             if chunk_id in seen:
@@ -3510,17 +3636,45 @@ def research_dossier_index_body(created: list[Path], created_at: str) -> str:
 """
 
 
+def event_research_dossier_index_body(created: list[Path], created_at: str) -> str:
+    rows = [["事件", "档案路径"]]
+    for path in created:
+        rows.append([path.stem, f"`{path}`"])
+    return f"""# 核心事件研究档案索引
+
+生成时间：{created_at}
+
+本页汇总“盟参”当前已生成的核心事件研究档案。事件档案用于盟史研究、文史纪念写作、讲话素材、口径核验和后续人工校订。
+
+{markdown_table(rows)}
+
+## 使用原则
+
+- 档案中的事件线索必须回到 raw 原文核验后使用。
+- 事件日期、会议名称、组织关系和人物职务不得只凭机器摘录定稿。
+- 全国民盟史主线、上海地方史线索和纪念性报道应分别整理。
+"""
+
+
 def command_build_research_dossiers(args: argparse.Namespace) -> int:
     root = project_root_from_args(args.project_root)
     names = RESEARCH_DOSSIER_SETS[args.set]
     created_at = now_iso()
     created: list[Path] = []
+    is_event_set = args.set == "core-events"
     for name in names[: args.limit or None]:
-        rows = person_dossier_rows(root, name, args.top_k)
-        created.append(write_person_research_dossier(root, name, rows, created_at))
-    index_path = dossier_dir(root) / "索引.md"
-    index_path.write_text(research_dossier_index_body(created, created_at), encoding="utf-8")
-    append_wiki_log(root, f"生成核心人物研究档案：{len(created)} 个")
+        if is_event_set:
+            rows = event_dossier_rows(root, name, args.top_k)
+            created.append(write_event_research_dossier(root, name, rows, created_at))
+        else:
+            rows = person_dossier_rows(root, name, args.top_k)
+            created.append(write_person_research_dossier(root, name, rows, created_at))
+    index_path = (event_dossier_dir(root) if is_event_set else dossier_dir(root)) / "索引.md"
+    index_path.write_text(
+        event_research_dossier_index_body(created, created_at) if is_event_set else research_dossier_index_body(created, created_at),
+        encoding="utf-8",
+    )
+    append_wiki_log(root, f"生成{'核心事件' if is_event_set else '核心人物'}研究档案：{len(created)} 个")
     log_operation(root, "build-research-dossiers", "ok", f"{len(created)} dossiers", {"set": args.set})
     print(f"Created/updated research dossiers: {len(created)}")
     print(index_path)
