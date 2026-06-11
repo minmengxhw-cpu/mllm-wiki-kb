@@ -213,6 +213,25 @@ kb staff check --file ~/Desktop/draft.txt
 
 需要保存一次盟参输出时，加 `--save`，系统会写入 `wiki/研究助手/`。
 
+## 微信公众号语料库建设
+
+```bash
+kb corpus
+```
+
+如果当前 shell 里没有全局 `kb` 命令，可在项目目录使用 `.venv/bin/kb corpus`。
+
+`corpus` 会基于当前 SQLite 中的微信公众号文章生成：
+
+- `index/corpus/article_labels.jsonl`：9368 篇文章的账号、年份、类型、主题词、人物、是否文史类、是否写作样本等标签。
+- `index/corpus/article_types.json`：文章分类体系。
+- `wiki/研究助手/微信公众号语料库体检报告.md`：全库体检。
+- `wiki/研究助手/微信公众号文章分类体系.md`：分类说明。
+- `wiki/研究助手/上海民盟2023年以来写作样本库.md`：近期上海民盟写作体例样本候选。
+- `wiki/研究助手/微信公众号文史盟史文章专题库.md`：文史/盟史文章候选库。
+
+这一步不修改微信公众号原文，也不把 SQLite 数据库提交到 GitHub。
+
 ## 自动编译 wiki 页面
 
 ```bash
@@ -301,6 +320,7 @@ kb export --path wiki/人物/沈钧儒.md --format markdown --format docx
 - `kb ask`（带来源引用的抽取式问答）
 - `kb assistant`（民盟研究助手入口）
 - `kb staff`（盟参首席参谋入口：/稿 /史 /题 /核）
+- `kb corpus`（微信公众号语料库体检、分类标签和样本库）
 - `kb compile`（自动编译带来源 wiki 页面）
 - `kb build-cards`（生成人物/事件/地点卡）
 - `kb curate-cards`（标记重点待校订卡）

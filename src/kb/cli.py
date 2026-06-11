@@ -14,6 +14,7 @@ import sqlite3
 import sys
 import textwrap
 import zipfile
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -1527,6 +1528,304 @@ def command_staff(args: argparse.Namespace) -> int:
     return 0
 
 
+ARTICLE_TYPE_RULES = [
+    {"type": "meeting_report", "name": "会议报道", "keywords": ["会议", "全委", "常委会", "主委会议", "代表大会", "座谈会", "开题会", "推进会", "工作会", "学习交流会"]},
+    {"type": "activity_report", "name": "活动报道", "keywords": ["活动", "举行", "举办", "开展", "走进", "启动", "参观", "调研", "培训班", "讲座", "比赛"]},
+    {"type": "leadership_speech", "name": "领导讲话/工作部署", "keywords": ["讲话", "工作报告", "工作要点", "部署", "要求", "指出", "强调", "主委会议通过", "全会"]},
+    {"type": "person_profile", "name": "人物采访/人物风采", "keywords": ["人物", "采访", "风采", "盟员风采", "专访", "故事", "诞辰", "纪念", "先生"]},
+    {"type": "history_commemoration", "name": "文史纪念", "keywords": ["盟史", "文史", "纪念", "先贤", "旧政协", "新政协", "五一口号", "李闻", "钩沉", "口述史", "传统教育基地"]},
+    {"type": "history_research", "name": "盟史研究", "keywords": ["盟史研究", "民盟历史", "档案", "史料", "史实", "考证", "历史资料", "理论和盟史"]},
+    {"type": "policy_advice", "name": "参政议政", "keywords": ["参政议政", "提案", "社情民意", "建言", "调研", "建议", "政协", "两会", "履职"]},
+    {"type": "theme_education", "name": "主题教育", "keywords": ["主题教育", "参政为公", "实干为民", "凝心铸魂", "学思想", "政治共识", "学习贯彻"]},
+    {"type": "organization_building", "name": "组织建设", "keywords": ["组织建设", "基层组织", "支部", "区委", "委员会", "换届", "盟员之家", "新盟员", "入盟"]},
+    {"type": "social_service", "name": "社会服务", "keywords": ["社会服务", "帮扶", "乡村振兴", "烛光行动", "黄丝带", "公益", "医疗", "教育帮扶"]},
+    {"type": "notice_info", "name": "通知公告/信息发布", "keywords": ["通知", "公告", "名单", "公示", "目录", "招聘", "征集", "报名", "结果出炉"]},
+    {"type": "commentary_theory", "name": "评论综述/理论文章", "keywords": ["综述", "理论", "评论", "学习体会", "心得", "观察", "解读", "述评"]},
+]
+
+ARTICLE_TYPE_NAMES = {item["type"]: item["name"] for item in ARTICLE_TYPE_RULES} | {"other": "其他/待判"}
+
+TOPIC_KEYWORDS = {
+    "民盟史": ["盟史", "中国民主政团同盟", "旧政协", "新政协", "五一口号", "李闻", "民盟先贤", "传统教育基地"],
+    "上海民盟": ["上海民盟", "民盟市委", "民盟上海市委", "上海"],
+    "80周年": ["八十", "80周年", "80华诞", "八秩", "华诞"],
+    "参政议政": ["参政议政", "提案", "社情民意", "建言", "政协", "履职"],
+    "主题教育": ["主题教育", "参政为公", "实干为民", "凝心铸魂"],
+    "组织建设": ["组织建设", "基层组织", "支部", "盟员之家", "入盟", "换届"],
+    "社会服务": ["社会服务", "帮扶", "乡村振兴", "烛光行动", "黄丝带"],
+    "宣传写作": ["宣传", "微信公众号", "上海盟讯", "报道", "讲述者", "讲解员"],
+}
+
+
+def corpus_dir(root: Path) -> Path:
+    return root / "index" / "corpus"
+
+
+def report_dir(root: Path) -> Path:
+    return root / "wiki" / "研究助手"
+
+
+def article_year(published_at: str | None) -> str:
+    if published_at and re.match(r"^\d{4}", published_at):
+        return published_at[:4]
+    return "unknown"
+
+
+def corpus_text_for_row(row: sqlite3.Row) -> str:
+    return " ".join([str(row["title"] or ""), str(row["account"] or ""), str(row["sample_text"] or "")])
+
+
+def classify_article(title: str, account: str | None, text: str) -> tuple[str, int, list[str]]:
+    haystack = f"{title}\n{account or ''}\n{text[:1600]}"
+    scored = []
+    for rule in ARTICLE_TYPE_RULES:
+        matched = [kw for kw in rule["keywords"] if kw in haystack]
+        if matched:
+            title_hits = sum(2 for kw in matched if kw in title)
+            scored.append((len(matched) + title_hits, rule["type"], matched))
+    if not scored:
+        return "other", 0, []
+    scored.sort(key=lambda item: item[0], reverse=True)
+    score, article_type, matched = scored[0]
+    return article_type, min(95, 50 + score * 8), matched[:8]
+
+
+def topic_tags_for_text(text: str) -> list[str]:
+    return [tag for tag, keywords in TOPIC_KEYWORDS.items() if any(keyword in text for keyword in keywords)]
+
+
+def people_hits_for_text(text: str) -> list[str]:
+    people = ["张澜", "沈钧儒", "黄炎培", "史良", "李公朴", "闻一多", "陶行知", "费孝通", "钱伟长", "陈望道", "苏步青", "谈家桢"]
+    return [name for name in people if name in text]
+
+
+def article_rows_for_corpus(root: Path) -> list[sqlite3.Row]:
+    conn = connect_db(root)
+    try:
+        return conn.execute(
+            """
+            SELECT a.id, a.title, a.account, a.author, a.published_at, a.source_url, a.raw_path,
+                   a.content_hash, a.file_type, a.status,
+                   COUNT(c.id) AS chunk_count,
+                   COALESCE(SUM(c.token_estimate), 0) AS token_estimate,
+                   substr(group_concat(c.content, '\n'), 1, 2400) AS sample_text
+            FROM articles a
+            LEFT JOIN article_chunks c ON c.article_id = a.id
+            GROUP BY a.id
+            ORDER BY a.published_at DESC, a.id
+            """
+        ).fetchall()
+    finally:
+        conn.close()
+
+
+def build_article_label(row: sqlite3.Row) -> dict:
+    text = corpus_text_for_row(row)
+    article_type, confidence, matched = classify_article(str(row["title"] or ""), row["account"], str(row["sample_text"] or ""))
+    year = article_year(row["published_at"])
+    topics = topic_tags_for_text(text)
+    people = people_hits_for_text(text)
+    is_history = article_type in {"history_commemoration", "history_research"} or "民盟史" in topics
+    is_writing_sample = row["account"] == "上海民盟" and year >= "2023" and article_type in {
+        "activity_report", "meeting_report", "person_profile", "history_commemoration",
+        "policy_advice", "theme_education", "leadership_speech",
+    }
+    return {
+        "article_id": int(row["id"]),
+        "title": row["title"],
+        "account": row["account"],
+        "author": row["author"],
+        "published_at": row["published_at"],
+        "year": year,
+        "source_url": row["source_url"],
+        "raw_path": row["raw_path"],
+        "content_hash": row["content_hash"],
+        "file_type": row["file_type"],
+        "chunk_count": int(row["chunk_count"] or 0),
+        "token_estimate": int(row["token_estimate"] or 0),
+        "article_type": article_type,
+        "article_type_name": ARTICLE_TYPE_NAMES[article_type],
+        "classification_confidence": confidence,
+        "matched_keywords": matched,
+        "topic_tags": topics,
+        "people": people,
+        "is_history": is_history,
+        "is_writing_sample": is_writing_sample,
+        "can_be_formulation_source": row["account"] in {"上海民盟", "中国民主同盟"} and year >= "2023",
+        "needs_metadata_review": bool(not row["published_at"] or not row["account"] or not row["raw_path"]),
+    }
+
+
+def write_jsonl(path: Path, items: list[dict]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "\n".join(json.dumps(item, ensure_ascii=False, separators=(",", ":")) for item in items) + "\n",
+        encoding="utf-8",
+    )
+
+
+def markdown_table(rows: list[list[str]]) -> str:
+    if not rows:
+        return ""
+    lines = ["| " + " | ".join(rows[0]) + " |", "| " + " | ".join(["---"] * len(rows[0])) + " |"]
+    lines.extend("| " + " | ".join(str(cell) for cell in row) + " |" for row in rows[1:])
+    return "\n".join(lines)
+
+
+def corpus_audit_markdown(labels: list[dict], created_at: str) -> str:
+    total = len(labels)
+    by_account = Counter(label["account"] or "unknown" for label in labels)
+    by_year = Counter(label["year"] for label in labels)
+    by_type = Counter(label["article_type_name"] for label in labels)
+    recent_sh = [label for label in labels if label["account"] == "上海民盟" and label["year"] >= "2023"]
+    history_count = sum(1 for label in labels if label["is_history"])
+    writing_count = sum(1 for label in labels if label["is_writing_sample"])
+    metadata_review = sum(1 for label in labels if label["needs_metadata_review"])
+    missing_url = sum(1 for label in labels if not label.get("source_url"))
+    return f"""# 微信公众号语料库体检报告
+
+生成时间：{created_at}
+
+## 总体结论
+
+- 当前微信公众号语料库共有 {total} 篇文章。
+- 2023 年以后上海民盟文章共有 {len(recent_sh)} 篇，是后续写作体例学习的第一优先层。
+- 初步识别文史/盟史相关文章 {history_count} 篇，写作样本候选 {writing_count} 篇。
+- 需要元数据复核的文章 {metadata_review} 篇；缺少原文链接的文章 {missing_url} 篇。
+
+## 按账号分布
+
+{markdown_table([["账号", "文章数"]] + [[k, str(v)] for k, v in by_account.most_common()])}
+
+## 按年份分布
+
+{markdown_table([["年份", "文章数"]] + [[k, str(v)] for k, v in sorted(by_year.items(), reverse=True)])}
+
+## 按文章类型分布
+
+{markdown_table([["类型", "文章数"]] + [[k, str(v)] for k, v in by_type.most_common()])}
+
+## 数据质量
+
+- 日期缺失或异常：{sum(1 for label in labels if label['year'] == 'unknown')} 篇。
+- 账号缺失：{sum(1 for label in labels if not label.get('account'))} 篇。
+- raw 原文路径缺失：{sum(1 for label in labels if not label.get('raw_path'))} 篇。
+- source_url 缺失：{missing_url} 篇。
+
+## 下一步
+
+1. 人工抽检每类文章各 20 篇，修正关键词规则。
+2. 把 2023 年以后上海民盟写作样本按类型精选。
+3. 将文史/盟史文章升级为人物、事件、地点、组织四类研究入口。
+4. 将高可信文章沉淀为口径库来源，供 `/核` 和 `/稿` 调用。
+"""
+
+
+def type_system_markdown(created_at: str) -> str:
+    rows = [["类型代码", "类型名称", "主要识别词"]]
+    for rule in ARTICLE_TYPE_RULES:
+        rows.append([rule["type"], rule["name"], "、".join(rule["keywords"][:12])])
+    return f"""# 微信公众号文章分类体系 v0.1
+
+生成时间：{created_at}
+
+本分类体系服务于民盟微信公众号语料库，优先解决“文章是什么、可用于什么任务、是否可作为写作样本或口径来源”的问题。
+
+## 类型表
+
+{markdown_table(rows)}
+
+## 使用原则
+
+- 第一版采用可解释规则分类，所有标签都允许后续人工修订。
+- 一篇文章先给一个主类型，同时保留主题词、人物、是否文史类、是否写作样本等辅助标签。
+- 上海民盟 2023 年以后文章优先进入写作体例样本库。
+- 中国民主同盟、群言杂志的文史类文章优先进入盟史研究和事实核验参考层。
+- 正式口径仍以红头文件、内部口径和人工终审为准。
+"""
+
+
+def writing_samples_markdown(labels: list[dict], created_at: str, limit_per_type: int = 30) -> str:
+    samples = [label for label in labels if label["account"] == "上海民盟" and label["year"] >= "2023" and label["is_writing_sample"]]
+    by_type: dict[str, list[dict]] = {}
+    for label in sorted(samples, key=lambda item: item["published_at"] or "", reverse=True):
+        by_type.setdefault(label["article_type_name"], []).append(label)
+    sections = []
+    for type_name, items in sorted(by_type.items()):
+        rows = [["日期", "标题", "主题词", "raw 原文"]]
+        for item in items[:limit_per_type]:
+            rows.append([item["published_at"] or "日期不详", f"《{item['title']}》", "、".join(item["topic_tags"][:4]) or "待补", f"`{item['raw_path']}`"])
+        sections.append(f"## {type_name}\n\n{markdown_table(rows)}")
+    return f"""# 上海民盟 2023 年以后写作样本库
+
+生成时间：{created_at}
+
+本页从上海民盟 2023 年以后的微信公众号文章中自动抽取写作样本候选。它用于后续提炼标题、导语、结构、常用表达和风险点。
+
+## 总览
+
+- 样本候选：{len(samples)} 篇。
+- 覆盖类型：{len(by_type)} 类。
+- 每类最多展示 {limit_per_type} 篇；完整标签见 `index/corpus/article_labels.jsonl`。
+
+{chr(10).join(sections) if sections else '暂无样本。'}
+
+## 后续人工校订
+
+- 每类先精选 20 篇高质量样本。
+- 标注标题方式、导语方式、段落结构、结尾落点和可复用表达。
+- 将不适合作为风格样本的短讯、通知、转载类文章剔除。
+"""
+
+
+def history_corpus_markdown(labels: list[dict], created_at: str, limit: int = 120) -> str:
+    items = [label for label in labels if label["is_history"]]
+    rows = [["日期", "账号", "类型", "标题", "人物", "raw 原文"]]
+    for item in sorted(items, key=lambda label: label["published_at"] or "", reverse=True)[:limit]:
+        rows.append([item["published_at"] or "日期不详", item["account"] or "", item["article_type_name"], f"《{item['title']}》", "、".join(item["people"][:4]) or "待抽取", f"`{item['raw_path']}`"])
+    return f"""# 微信公众号文史盟史文章专题库
+
+生成时间：{created_at}
+
+本页汇总由规则初筛出的文史/盟史相关文章。当前为候选库，适合后续升级为人物、事件、地点、组织研究卡。
+
+## 总览
+
+- 候选文章：{len(items)} 篇。
+- 本页展示最近 {min(limit, len(items))} 篇。
+
+{markdown_table(rows)}
+
+## 后续处理
+
+- 对核心人物、事件、地点做二次实体标注。
+- 区分全国民盟史主线、上海地方史线索和公众号纪念性表述。
+- 有争议或高风险史实进入口径库和黑名单。
+"""
+
+
+def command_corpus(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    labels = [build_article_label(row) for row in article_rows_for_corpus(root)]
+    created_at = now_iso()
+    out_dir = corpus_dir(root)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    write_jsonl(out_dir / "article_labels.jsonl", labels)
+    (out_dir / "article_types.json").write_text(json.dumps(ARTICLE_TYPE_RULES, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    reports = report_dir(root)
+    reports.mkdir(parents=True, exist_ok=True)
+    (reports / "微信公众号语料库体检报告.md").write_text(corpus_audit_markdown(labels, created_at), encoding="utf-8")
+    (reports / "微信公众号文章分类体系.md").write_text(type_system_markdown(created_at), encoding="utf-8")
+    (reports / "上海民盟2023年以来写作样本库.md").write_text(writing_samples_markdown(labels, created_at), encoding="utf-8")
+    (reports / "微信公众号文史盟史文章专题库.md").write_text(history_corpus_markdown(labels, created_at), encoding="utf-8")
+    log_operation(root, "corpus", "ok", f"labeled {len(labels)} articles", {"output": str(out_dir)})
+    print(f"Articles labeled: {len(labels)}")
+    print(f"Labels: {out_dir / 'article_labels.jsonl'}")
+    print(f"Types: {out_dir / 'article_types.json'}")
+    print(f"Reports: {reports}")
+    return 0
+
+
 def source_title_list(rows: list[sqlite3.Row], limit: int = 12) -> str:
     lines = []
     seen: set[int] = set()
@@ -2763,6 +3062,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_staff.add_argument("--top-k", type=int, default=8)
     p_staff.add_argument("--save", action="store_true")
     p_staff.set_defaults(func=command_staff)
+
+    p = sub.add_parser("corpus", help="生成微信公众号语料库体检、分类标签和样本库")
+    p.set_defaults(func=command_corpus)
 
     p = sub.add_parser("compile")
     p.add_argument("--topic", default=None)
