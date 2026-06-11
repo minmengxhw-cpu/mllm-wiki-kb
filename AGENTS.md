@@ -49,5 +49,6 @@
 - `wiki/研究助手/微信公众号文史盟史研究入口清单.md`
 - `wiki/研究助手/核心人物研究档案/索引.md`
 - `wiki/研究助手/核心事件研究档案/索引.md`
+- `wiki/研究助手/Google Drive工作资料接入清单.md`
 
-Google Drive 工作材料暂作为外部参考层，不直接混入微信公众号主语料层。
+Google Drive 工作材料暂作为外部参考层，不直接混入微信公众号主语料层。已登记入口见 `index/external_sources/google_drive_folders.jsonl`；处理时先做文件级清单，再判断是否可进入公开公众号语料。

@@ -255,6 +255,18 @@ kb corpus-style
 
 这一步不修改微信公众号原文，也不把 SQLite 数据库提交到 GitHub。
 
+## Google Drive 工作资料层
+
+当前已登记三个 Drive 工作知识库：
+
+- 宣传部知识库
+- 研究室知识库
+- 办公室知识库
+
+登记文件为 `index/external_sources/google_drive_folders.jsonl`，说明页为 `wiki/研究助手/Google Drive工作资料接入清单.md`。
+
+这些材料先作为外部参考层，不直接并入微信公众号主语料。后续接入时应先做文件级清单，再区分公开文章、工作材料、研究报告、讲话稿、公文事务和附件；只有确认可作为公开语料复用的内容，才进入微信公众号主语料层。
+
 ## 自动编译 wiki 页面
 
 ```bash
