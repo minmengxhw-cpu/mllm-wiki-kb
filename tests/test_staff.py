@@ -97,6 +97,20 @@ class StaffCommandTests(unittest.TestCase):
         finally:
             shutil.rmtree(root)
 
+    def test_staff_check_flags_expanded_seed_risks(self) -> None:
+        root = self.make_root()
+        try:
+            text = "上海民盟市委纪念80周年就是民盟成立80周年，张兰参加五一号召相关活动。"
+            issues = staff_check_issues(root, text)
+            patterns = {item["pattern"] for item in issues}
+            suggestions = {item["suggestion"] for item in issues}
+            self.assertIn("上海民盟市委", patterns)
+            self.assertIn("张兰", patterns)
+            self.assertIn("五一号召", patterns)
+            self.assertIn("80周年相关文稿应先核定纪念对象、组织沿革、活动层级和正式口径，再组织历史叙事与现实工作", suggestions)
+        finally:
+            shutil.rmtree(root)
+
     def test_staff_draft_body_uses_three_part_structure_and_citation(self) -> None:
         root = self.make_root()
         try:

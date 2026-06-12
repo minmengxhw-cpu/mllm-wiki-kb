@@ -148,6 +148,12 @@ needs_review: false
 
 - 2026-06-12T11:44:04 生成 Obsidian 同步状态：wiki/研究助手/Obsidian同步状态.md
 
+
+- 2026-06-12T11:48:20 生成 Obsidian 同步状态：wiki/研究助手/Obsidian同步状态.md
+
+
+- 2026-06-12T11:48:24 生成盟参系统可用性验收报告：wiki/研究助手/盟参系统可用性验收报告.md
+
 <!-- KB-GENERATED:END -->
 <!-- HUMAN-NOTES:START -->
 
