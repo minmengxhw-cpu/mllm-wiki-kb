@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}检索{% if q %}：{{ q }}{% endif %} · 民盟知识库{% endblock %}
+{% block content %}
+<h1 class="page-h1">检索</h1>
+<form class="search-form" action="{{ url_for('search') }}" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="人物、事件、提法、盟史关键词…" autofocus>
+  <button type="submit">检索</button>
+</form>
+
+{% if q %}
+  <p class="search-stat">「{{ q }}」共 {{ results|length }} 条结果{% if results|length >= 50 %}（仅显示前 50）{% endif %}</p>
+  <ul class="search-list">
+    {% for p, snippet in results %}
+    <li>
+      <a class="sr-title" href="{{ url_for('page', slug=p.slug) }}">{{ p.title }}</a>
+      <span class="sr-cat">{{ p.category }}</span>
+      <p class="sr-snippet">…{{ snippet | hl(q) | safe }}…</p>
+    </li>
+    {% endfor %}
+  </ul>
+  {% if not results %}<p class="empty">没有匹配的页面，换个关键词试试。</p>{% endif %}
+{% endif %}
+{% endblock %}

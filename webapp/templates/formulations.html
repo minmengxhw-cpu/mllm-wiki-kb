@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}提法库 · 民盟知识库{% endblock %}
+{% block content %}
+<h1 class="page-h1">提法库 · 口径护栏</h1>
+<p class="page-lede">规范提法、变体与现行状态。涉及正式政治概念（如"章程"等）严格按权威口径，基层共建/协作文件用中性低位阶命名。</p>
+
+<div class="formu-list">
+  {% for f in rows %}
+  <div class="formu-card">
+    <div class="fc-head">
+      <span class="fc-term">{{ f.term }}</span>
+      {% if f.status %}<span class="fc-status s-{{ f.status }}">{{ f.status }}</span>{% endif %}
+    </div>
+    {% if f.canonical %}<p class="fc-canon"><b>规范表述：</b>{{ f.canonical }}</p>{% endif %}
+    {% if f.variants %}<p class="fc-var"><b>变体：</b>{% for v in f.variants %}<span class="var-chip">{{ v }}</span>{% endfor %}</p>{% endif %}
+    <p class="fc-meta">
+      {% if f.first_seen %}首见 {{ f.first_seen }}{% endif %}
+      {% if f.latest_source %} · 来源 {{ f.latest_source }}{% endif %}
+    </p>
+    {% if f.note %}<p class="fc-note">{{ f.note }}</p>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

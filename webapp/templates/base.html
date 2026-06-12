@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1b3a6b">
+  <title>{% block title %}民盟知识库{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="bar-inner">
+      <a class="brand" href="{{ url_for('home') }}">
+        <span class="brand-mark">盟</span>
+        <span class="brand-text">民盟知识库</span>
+      </a>
+      <form class="searchbox" action="{{ url_for('search') }}" method="get">
+        <input type="search" name="q" placeholder="检索人物、事件、提法、盟史…" value="{{ request.args.get('q','') }}">
+      </form>
+      <nav class="topnav">
+        <a href="{{ url_for('entities') }}">实体</a>
+        <a href="{{ url_for('formulations') }}">提法</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <p class="side-head">知识分类</p>
+      <ul class="cat-list">
+        {% for c in CATEGORY_ORDER %}
+          {% if cat_counts.get(c) %}
+          <li>
+            <a href="{{ url_for('category', category=c) }}"
+               class="{{ 'active' if request.path == url_for('category', category=c) else '' }}">
+              <span>{{ c }}</span><span class="cat-n">{{ cat_counts.get(c, 0) }}</span>
+            </a>
+          </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      <p class="side-head">专题视图</p>
+      <ul class="cat-list">
+        <li><a href="{{ url_for('entities') }}"><span>人物·事件·机构·地点</span><span class="cat-n">{{ total_persons + total_events }}</span></a></li>
+        <li><a href="{{ url_for('formulations') }}"><span>提法库 / 口径护栏</span><span class="cat-n">{{ total_formulations }}</span></a></li>
+      </ul>
+    </aside>
+
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <footer class="foot">
+    <span>民盟知识库 · 共 {{ total_pages }} 页结构化知识</span>
+    <span class="dot">·</span>
+    <span>仅供盟内研究与素材起草参考，二手信息需回原文核验</span>
+  </footer>
+
+  <nav class="mobile-nav">
+    <a href="{{ url_for('home') }}">首页</a>
+    <a href="{{ url_for('search') }}">检索</a>
+    <a href="{{ url_for('entities') }}">实体</a>
+    <a href="{{ url_for('formulations') }}">提法</a>
+  </nav>
+</body>
+</html>

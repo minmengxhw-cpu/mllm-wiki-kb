@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}实体库 · 民盟知识库{% endblock %}
+{% block content %}
+<h1 class="page-h1">实体库</h1>
+<p class="page-lede">从语料抽取的核心人物、事件、机构、地点。带争议/待核标记的条目需回原文与权威资料核对。</p>
+
+{% set kinds = [('persons','核心人物'),('events','重要事件'),('orgs','机构组织'),('places','地点')] %}
+{% for key, label in kinds %}
+  {% if ents[key] %}
+  <section class="block">
+    <h2>{{ label }} <span class="h1-n">{{ ents[key]|length }}</span></h2>
+    <div class="ent-grid">
+      {% for e in ents[key] %}
+      <div class="ent-card">
+        <div class="ent-name">{{ e.name }}{% if e.aliases %}<span class="ent-alias">{{ e.aliases | join(' · ') }}</span>{% endif %}</div>
+        {% if e.summary %}<p class="ent-sum">{{ e.summary }}</p>{% endif %}
+        {% if e.disputes %}<p class="ent-disp">⚠ {{ e.disputes }}</p>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+{% endfor %}
+{% endblock %}

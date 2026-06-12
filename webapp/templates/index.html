@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>民盟知识库</h1>
+  <p class="hero-sub">面向民盟、上海民盟、统一战线与盟史研究的结构化知识底座——人物、事件、盟史、履职素材、公众号写法，皆可检索追溯。</p>
+  <div class="hero-stats">
+    <a class="stat" href="{{ url_for('entities') }}"><b>{{ total_persons }}</b><span>核心人物</span></a>
+    <a class="stat" href="{{ url_for('entities') }}"><b>{{ total_events }}</b><span>重要事件</span></a>
+    <a class="stat" href="{{ url_for('formulations') }}"><b>{{ total_formulations }}</b><span>提法 / 口径</span></a>
+    <span class="stat"><b>{{ total_pages }}</b><span>知识页</span></span>
+  </div>
+</section>
+
+<section class="block">
+  <h2>知识分类</h2>
+  <div class="cat-grid">
+    {% for c in CATEGORY_ORDER %}
+      {% if cat_counts.get(c) %}
+      <a class="cat-card" href="{{ url_for('category', category=c) }}">
+        <div class="cc-top"><span class="cc-name">{{ c }}</span><span class="cc-n">{{ cat_counts.get(c) }}</span></div>
+        <p class="cc-desc">{{ CATEGORY_DESC.get(c, '') }}</p>
+      </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+<section class="block">
+  <h2>最近编译</h2>
+  <ul class="recent-list">
+    {% for p in recent %}
+    <li>
+      <a href="{{ url_for('page', slug=p.slug) }}">{{ p.title }}</a>
+      <span class="rl-meta">{{ p.category }}{% if p.last_compiled %} · {{ p.last_compiled }}{% endif %}{% if p.needs_review %} · <span class="badge-review">待校订</span>{% endif %}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

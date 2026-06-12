@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ category }} · 民盟知识库{% endblock %}
+{% block content %}
+<nav class="crumb"><a href="{{ url_for('home') }}">首页</a> / {{ category }}</nav>
+<h1 class="page-h1">{{ category }} <span class="h1-n">{{ count }} 页</span></h1>
+<p class="page-lede">{{ CATEGORY_DESC.get(category, '') }}</p>
+
+{% for sub, items in groups.items() %}
+  {% if sub %}<h3 class="sub-head">{{ sub }}</h3>{% endif %}
+  <ul class="page-list">
+    {% for p in items %}
+    <li>
+      <a href="{{ url_for('page', slug=p.slug) }}">{{ p.title }}</a>
+      <span class="pl-meta">
+        {% if p.needs_review %}<span class="badge-review">待校订</span>{% endif %}
+        {% if p.confidence %}<span class="badge-conf c-{{ p.confidence }}">{{ p.confidence }}</span>{% endif %}
+        {% if p.source_count %}<span class="pl-src">{{ p.source_count }} 源</span>{% endif %}
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+{% endfor %}
+{% endblock %}

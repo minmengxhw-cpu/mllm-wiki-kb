@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ p.title }} · 民盟知识库{% endblock %}
+{% block content %}
+<nav class="crumb">
+  <a href="{{ url_for('home') }}">首页</a> /
+  <a href="{{ url_for('category', category=p.category) }}">{{ p.category }}</a>
+  {% if p.subdir %} / {{ p.subdir }}{% endif %}
+</nav>
+
+<article class="doc">
+  <div class="doc-badges">
+    {% if p.needs_review %}<span class="badge-review">待校订</span>{% endif %}
+    {% if p.confidence %}<span class="badge-conf c-{{ p.confidence }}">置信 {{ p.confidence }}</span>{% endif %}
+    {% if p.source_count %}<span class="badge-soft">{{ p.source_count }} 篇来源</span>{% endif %}
+    {% if p.last_compiled %}<span class="badge-soft">编译 {{ p.last_compiled }}</span>{% endif %}
+  </div>
+
+  {% if p.tags %}
+  <div class="doc-tags">{% for t in p.tags %}<span class="tag">{{ t }}</span>{% endfor %}</div>
+  {% endif %}
+
+  <div class="doc-body">
+    {{ body_html | safe }}
+  </div>
+</article>
+{% endblock %}
