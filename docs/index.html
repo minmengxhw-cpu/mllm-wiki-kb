@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#A47864">
+  <title>民盟知识库</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 口令门 -->
+  <div id="gate" class="gate">
+    <div class="gate-card">
+      <svg class="swirl gate-swirl" width="48" height="48" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 3 A13 13 0 0 1 29 16 A10 10 0 0 1 16 26 A7 7 0 0 1 9 16 A4.2 4.2 0 0 1 16 11.8"/>
+      </svg>
+      <h1 class="gate-title">民盟知识库</h1>
+      <p class="gate-sub">盟内研究资料 · 请输入访问口令</p>
+      <form id="gateForm" class="gate-form" autocomplete="off">
+        <input id="gatePw" type="password" placeholder="访问口令" autocomplete="current-password" autofocus>
+        <button id="gateBtn" type="submit">进入</button>
+      </form>
+      <p id="gateErr" class="gate-err" hidden>口令不正确，请重试。</p>
+      <p class="gate-note">内容经端到端加密，无口令无法读取。</p>
+    </div>
+  </div>
+
+  <!-- 应用主体（解密后显示） -->
+  <div id="app" hidden>
+    <header class="topbar">
+      <div class="bar-inner">
+        <a class="brand" href="#/">
+          <svg class="swirl" width="26" height="26" viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M16 3 A13 13 0 0 1 29 16 A10 10 0 0 1 16 26 A7 7 0 0 1 9 16 A4.2 4.2 0 0 1 16 11.8"/>
+          </svg>
+          <span class="brand-text">民盟知识库</span>
+        </a>
+        <form class="searchbox" id="searchForm">
+          <input id="searchInput" type="search" placeholder="检索人物、事件、提法、盟史…">
+        </form>
+        <nav class="topnav">
+          <a href="#/entities">实体</a>
+          <a href="#/formulations">提法</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="content" id="view"></main>
+    </div>
+
+    <footer class="foot">
+      <span id="footMeta"></span>
+      <span class="dot">·</span>
+      <span>仅供盟内研究与素材起草参考，二手信息需回原文核验</span>
+    </footer>
+
+    <nav class="mobile-nav">
+      <a href="#/">首页</a>
+      <a href="#/search">检索</a>
+      <a href="#/entities">实体</a>
+      <a href="#/formulations">提法</a>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
