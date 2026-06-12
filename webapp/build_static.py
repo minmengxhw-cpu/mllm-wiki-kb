@@ -60,16 +60,16 @@ def encrypt(plaintext: bytes, passphrase: str) -> str:
 
 
 def main():
+    public = os.environ.get("KB_PUBLIC") == "1"
     pw = os.environ.get("KB_PASSPHRASE")
-    if not pw:
-        print("ERROR: 需设置环境变量 KB_PASSPHRASE", file=sys.stderr)
+    if not public and not pw:
+        print("ERROR: 加密模式需设置环境变量 KB_PASSPHRASE（或用 KB_PUBLIC=1 走公开明文模式）", file=sys.stderr)
         sys.exit(1)
 
     content = build_content()
     raw = json.dumps(content, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     os.makedirs(DOCS, exist_ok=True)
 
-    public = os.environ.get("KB_PUBLIC") == "1"
     if public:
         # 公开模式：明文内容包，无需口令
         with open(os.path.join(DOCS, "content.json"), "w", encoding="utf-8") as f:
