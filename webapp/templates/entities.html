@@ -8,7 +8,7 @@
 {% for key, label in kinds %}
   {% if ents[key] %}
   <section class="block">
-    <h2>{{ label }} <span class="h1-n">{{ ents[key]|length }}</span></h2>
+    <div class="sec-title"><h2>{{ label }} <span class="h1-n">{{ ents[key]|length }}</span></h2><span class="sec-rule"></span></div>
     <div class="ent-grid">
       {% for e in ents[key] %}
       <div class="ent-card">

@@ -1,18 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="hero">
+  <svg class="swirl hero-swirl" width="260" height="260" viewBox="0 0 32 32" aria-hidden="true">
+    <path d="M16 3 A13 13 0 0 1 29 16 A10 10 0 0 1 16 26 A7 7 0 0 1 9 16 A4.2 4.2 0 0 1 16 11.8"/>
+  </svg>
+  <p class="eyebrow">上海民盟 · 研究知识底座</p>
   <h1>民盟知识库</h1>
   <p class="hero-sub">面向民盟、上海民盟、统一战线与盟史研究的结构化知识底座——人物、事件、盟史、履职素材、公众号写法，皆可检索追溯。</p>
   <div class="hero-stats">
-    <a class="stat" href="{{ url_for('entities') }}"><b>{{ total_persons }}</b><span>核心人物</span></a>
-    <a class="stat" href="{{ url_for('entities') }}"><b>{{ total_events }}</b><span>重要事件</span></a>
-    <a class="stat" href="{{ url_for('formulations') }}"><b>{{ total_formulations }}</b><span>提法 / 口径</span></a>
-    <span class="stat"><b>{{ total_pages }}</b><span>知识页</span></span>
+    <a class="stat" href="{{ url_for('entities') }}"><span class="s-num">{{ total_persons }}</span><span class="s-lab">核心人物</span></a>
+    <a class="stat" href="{{ url_for('entities') }}"><span class="s-num">{{ total_events }}</span><span class="s-lab">重要事件</span></a>
+    <a class="stat" href="{{ url_for('formulations') }}"><span class="s-num">{{ total_formulations }}</span><span class="s-lab">提法 / 口径</span></a>
+    <span class="stat"><span class="s-num">{{ total_pages }}</span><span class="s-lab">知识页</span></span>
   </div>
 </section>
 
 <section class="block">
-  <h2>知识分类</h2>
+  <div class="sec-title"><h2>知识分类</h2><span class="sec-rule"></span></div>
   <div class="cat-grid">
     {% for c in CATEGORY_ORDER %}
       {% if cat_counts.get(c) %}
@@ -26,7 +30,7 @@
 </section>
 
 <section class="block">
-  <h2>最近编译</h2>
+  <div class="sec-title"><h2>最近编译</h2><span class="sec-rule"></span></div>
   <ul class="recent-list">
     {% for p in recent %}
     <li>
