@@ -10,32 +10,6 @@
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   const SWIRL = '<svg class="swirl hero-swirl" width="260" height="260" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 A13 13 0 0 1 29 16 A10 10 0 0 1 16 26 A7 7 0 0 1 9 16 A4.2 4.2 0 0 1 16 11.8"/></svg>';
 
-  /* ---------- 解密 ---------- */
-  function b64ToBytes(b64) {
-    const bin = atob(b64.trim());
-    const arr = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-    return arr;
-  }
-
-  async function decrypt(passphrase) {
-    const [encTxt, meta] = await Promise.all([
-      fetch("content.enc").then((r) => r.text()),
-      fetch("meta.json").then((r) => r.json()),
-    ]);
-    const blob = b64ToBytes(encTxt);
-    const salt = blob.slice(0, 16);
-    const iv = blob.slice(16, 28);
-    const ct = blob.slice(28);
-    const baseKey = await crypto.subtle.importKey("raw", new TextEncoder().encode(passphrase), "PBKDF2", false, ["deriveKey"]);
-    const key = await crypto.subtle.deriveKey(
-      { name: "PBKDF2", salt, iterations: meta.iters || 200000, hash: "SHA-256" },
-      baseKey, { name: "AES-GCM", length: 256 }, false, ["decrypt"]
-    );
-    const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ct);
-    return JSON.parse(new TextDecoder().decode(plain));
-  }
-
   /* ---------- 启动 ---------- */
   function boot() {
     CAT_COUNTS = {};
@@ -43,7 +17,6 @@
     renderSidebar();
     $("#footMeta").textContent = `民盟知识库 · 共 ${DATA.generated_pages} 页结构化知识`;
     $("#app").hidden = false;
-    $("#gate").remove();
     window.addEventListener("hashchange", route);
     $("#searchForm").addEventListener("submit", (e) => {
       e.preventDefault();
@@ -235,25 +208,11 @@
       <div class="formu-list">${cards}</div>`;
   }
 
-  /* ---------- 口令门 ---------- */
-  function initGate() {
-    const form = $("#gateForm"), pw = $("#gatePw"), btn = $("#gateBtn"), err = $("#gateErr");
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      err.hidden = true; btn.disabled = true; btn.textContent = "解密中…";
-      try {
-        DATA = await decrypt(pw.value);
-        boot();
-      } catch (ex) {
-        err.hidden = false; btn.disabled = false; btn.textContent = "进入";
-        pw.value = ""; pw.focus();
-      }
+  /* ---------- 加载明文内容包 ---------- */
+  fetch("content.json")
+    .then((r) => r.json())
+    .then((data) => { DATA = data; boot(); })
+    .catch(() => {
+      document.body.innerHTML = '<p style="padding:40px;font-family:sans-serif">内容加载失败，请刷新重试。</p>';
     });
-  }
-
-  if (!window.crypto || !window.crypto.subtle) {
-    document.body.innerHTML = '<p style="padding:40px;font-family:sans-serif">当前浏览器不支持解密（需 HTTPS + 现代浏览器）。</p>';
-  } else {
-    initGate();
-  }
 })();

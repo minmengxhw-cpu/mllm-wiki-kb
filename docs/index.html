@@ -8,24 +8,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- 口令门 -->
-  <div id="gate" class="gate">
-    <div class="gate-card">
-      <svg class="swirl gate-swirl" width="48" height="48" viewBox="0 0 32 32" aria-hidden="true">
-        <path d="M16 3 A13 13 0 0 1 29 16 A10 10 0 0 1 16 26 A7 7 0 0 1 9 16 A4.2 4.2 0 0 1 16 11.8"/>
-      </svg>
-      <h1 class="gate-title">民盟知识库</h1>
-      <p class="gate-sub">盟内研究资料 · 请输入访问口令</p>
-      <form id="gateForm" class="gate-form" autocomplete="off">
-        <input id="gatePw" type="password" placeholder="访问口令" autocomplete="current-password" autofocus>
-        <button id="gateBtn" type="submit">进入</button>
-      </form>
-      <p id="gateErr" class="gate-err" hidden>口令不正确，请重试。</p>
-      <p class="gate-note">内容经端到端加密，无口令无法读取。</p>
-    </div>
-  </div>
-
-  <!-- 应用主体（解密后显示） -->
+  <!-- 应用主体（内容加载后显示） -->
   <div id="app" hidden>
     <header class="topbar">
       <div class="bar-inner">

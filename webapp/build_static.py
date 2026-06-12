@@ -67,22 +67,32 @@ def main():
 
     content = build_content()
     raw = json.dumps(content, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-    enc = encrypt(raw, pw)
-
     os.makedirs(DOCS, exist_ok=True)
-    # 加密内容包
-    with open(os.path.join(DOCS, "content.enc"), "w", encoding="utf-8") as f:
-        f.write(enc)
-    # 元信息（非敏感）：仅页数与 KDF 参数
-    with open(os.path.join(DOCS, "meta.json"), "w", encoding="utf-8") as f:
-        json.dump({"iters": PBKDF2_ITERS, "pages": content["generated_pages"]}, f)
-    # 禁用 Jekyll
-    open(os.path.join(DOCS, ".nojekyll"), "w").close()
-    # 拷贝样式
-    shutil.copy(os.path.join(HERE, "static", "style.css"), os.path.join(DOCS, "style.css"))
 
-    size_kb = len(enc) / 1024
-    print(f"✓ 构建完成：{content['generated_pages']} 页，密文 {size_kb:.0f} KB → docs/")
+    public = os.environ.get("KB_PUBLIC") == "1"
+    if public:
+        # 公开模式：明文内容包，无需口令
+        with open(os.path.join(DOCS, "content.json"), "w", encoding="utf-8") as f:
+            f.write(raw.decode("utf-8"))
+        # 清理旧加密产物
+        for fn in ("content.enc", "meta.json"):
+            p = os.path.join(DOCS, fn)
+            if os.path.exists(p):
+                os.remove(p)
+        mode = "公开明文"
+        size_kb = len(raw) / 1024
+    else:
+        enc = encrypt(raw, pw)
+        with open(os.path.join(DOCS, "content.enc"), "w", encoding="utf-8") as f:
+            f.write(enc)
+        with open(os.path.join(DOCS, "meta.json"), "w", encoding="utf-8") as f:
+            json.dump({"iters": PBKDF2_ITERS, "pages": content["generated_pages"]}, f)
+        mode = "口令加密"
+        size_kb = len(enc) / 1024
+
+    open(os.path.join(DOCS, ".nojekyll"), "w").close()
+    shutil.copy(os.path.join(HERE, "static", "style.css"), os.path.join(DOCS, "style.css"))
+    print(f"✓ 构建完成（{mode}）：{content['generated_pages']} 页，{size_kb:.0f} KB → docs/")
 
 
 if __name__ == "__main__":
