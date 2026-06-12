@@ -104,12 +104,21 @@ kb obsidian-sync --vault ~/Documents/Obsidian/MllmWiki --dry-run
 kb obsidian-sync --vault ~/Documents/Obsidian/MllmWiki
 ```
 
+同步状态检查：
+
+```bash
+kb obsidian-status --vault ~/Documents/Obsidian/MllmWiki
+kb obsidian-status --vault ~/Documents/Obsidian/MllmWiki --save
+```
+
 同步规则：
 
 - 只同步 `wiki/`
 - 更新目标文件时只替换 `KB-GENERATED` 区
 - 保留 `HUMAN-NOTES` 区
 - 覆盖前会生成 `.bak-时间戳` 备份
+- 状态检查只核对系统生成区，不会把人工笔记区误判为冲突
+- `--save` 会生成 `wiki/研究助手/Obsidian同步状态.md` 和 `obsidian/vault_manifest.json`
 
 ## 状态检查
 
@@ -152,6 +161,7 @@ kb refresh
 - 更新 Google Drive 外部参考层状态、研究助手首页和系统可用性验收报告
 - 标记重点研究卡
 - 同步到 iCloud Obsidian
+- 更新 Obsidian 同步状态页和同步清单
 
 ## 检索
 

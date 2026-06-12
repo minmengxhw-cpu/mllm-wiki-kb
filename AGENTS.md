@@ -14,6 +14,7 @@
 - `/核 文稿全文`：运行 `kb staff check "文稿全文"`；长文优先保存成临时文本后用 `kb staff check --file 文件路径`。
 
 需要保存到 Obsidian 工作流时，给命令加 `--save`，再按需运行 `kb obsidian-sync`。
+需要确认电脑端 Obsidian/iCloud Vault 是否已同步到位时，运行 `kb obsidian-status --save`。
 
 ## 输出规则
 
@@ -25,6 +26,7 @@
 ## 数据维护
 
 - 文章增量用 `kb refresh`。
+- 同步状态用 `kb obsidian-status`；它只核对系统生成区，保留人工笔记区。
 - 微信公众号语料库体检、分类标签和样本库更新用 `kb corpus`。
 - 微信公众号文章分类抽检和人工校订表更新用 `kb corpus-audit`。
 - 上海民盟分体裁写作模板和文史盟史研究入口更新用 `kb corpus-style`。

@@ -1,20 +1,11 @@
 {
-  "vault": "~/Documents/Obsidian/MllmWiki",
-  "mappings": {
-    "wiki/index.md": "00-总索引/首页.md",
-    "wiki/log.md": "00-总索引/操作日志.md",
-    "wiki/人物": "10-人物",
-    "wiki/组织": "20-组织",
-    "wiki/事件": "30-事件会议",
-    "wiki/会议": "30-事件会议",
-    "wiki/盟史": "40-盟史",
-    "wiki/参政议政": "50-参政议政",
-    "wiki/思想宣传": "60-思想宣传",
-    "wiki/社会服务": "70-社会服务",
-    "wiki/主题教育": "80-主题教育",
-    "wiki/传统教育基地": "90-传统教育基地",
-    "wiki/文稿素材": "91-文稿素材",
-    "wiki/口述史": "92-口述史"
-  }
+  "created_at": "2026-06-12T11:44:25",
+  "vault": "/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki",
+  "vault_exists": true,
+  "source_files": 124,
+  "checked_files": 123,
+  "current": 123,
+  "missing": 0,
+  "stale": 0,
+  "ready": true
 }
-

@@ -20,6 +20,8 @@ from kb.cli import (  # noqa: E402
     dict_to_row,
     external_sources_report_markdown,
     normalized_similarity,
+    obsidian_status_markdown,
+    obsidian_sync_status,
     staff_check_issues,
     staff_draft_body,
     staff_history_body,
@@ -399,6 +401,37 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("Drive 外部参考记录", body)
         finally:
             shutil.rmtree(root)
+
+    def test_obsidian_status_detects_missing_and_stale_files(self) -> None:
+        root = self.make_root()
+        vault = root / "vault"
+        try:
+            (root / "wiki" / "研究助手").mkdir(parents=True)
+            (root / "wiki" / "index.md").parent.mkdir(parents=True, exist_ok=True)
+            (root / "wiki" / "index.md").write_text("首页", encoding="utf-8")
+            (root / "wiki" / "研究助手" / "A.md").write_text("A", encoding="utf-8")
+            (root / "wiki" / "研究助手" / "B.md").write_text("B", encoding="utf-8")
+            (vault / "00-总索引").mkdir(parents=True)
+            (vault / "01-研究助手").mkdir(parents=True)
+            (vault / "00-总索引" / "首页.md").write_text("首页", encoding="utf-8")
+            (vault / "01-研究助手" / "A.md").write_text("旧A", encoding="utf-8")
+
+            status = obsidian_sync_status(root, vault)
+            self.assertEqual(status["current"], 1)
+            self.assertEqual(len(status["stale"]), 1)
+            self.assertEqual(len(status["missing"]), 1)
+
+            body = obsidian_status_markdown(root, vault, "2026-06-12T00:00:00")
+            self.assertIn("Obsidian 同步状态", body)
+            self.assertIn("需更新", body)
+            self.assertIn("缺失", body)
+        finally:
+            shutil.rmtree(root)
+
+    def test_parser_accepts_obsidian_status(self) -> None:
+        args = build_parser().parse_args(["obsidian-status", "--save"])
+        self.assertEqual(args.command, "obsidian-status")
+        self.assertTrue(args.save)
 
     def test_refresh_dry_run_mentions_full_refresh_chain(self) -> None:
         root = self.make_root()

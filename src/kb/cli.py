@@ -55,6 +55,8 @@ OBSIDIAN_MAPPINGS = {
     "wiki/口述史": "92-口述史",
 }
 
+DEFAULT_OBSIDIAN_VAULT = "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki"
+
 SUPPORTED_EXTS = {".md", ".txt", ".html", ".htm", ".json"}
 NOISE_PATTERNS = [
     r"点击上方.*?关注我们",
@@ -566,26 +568,133 @@ def sync_file(src: Path, dest: Path, dry_run: bool) -> str:
     return action
 
 
-def command_obsidian_sync(args: argparse.Namespace) -> int:
-    root = project_root_from_args(args.project_root)
-    vault = Path(args.vault).expanduser().resolve()
-    actions = []
+def obsidian_sync_pairs(root: Path, vault: Path) -> list[tuple[Path, Path]]:
+    pairs = []
     for src_rel, dest_rel in OBSIDIAN_MAPPINGS.items():
         src = root / src_rel
         dest_base = vault / dest_rel
         if src.is_file():
-            actions.append((src, dest_base, sync_file(src, dest_base, args.dry_run)))
+            pairs.append((src, dest_base))
         elif src.is_dir():
             for md in sorted(src.rglob("*.md")):
                 rel = md.relative_to(src)
-                dest = dest_base / rel
-                actions.append((md, dest, sync_file(md, dest, args.dry_run)))
+                pairs.append((md, dest_base / rel))
+    return pairs
+
+
+def file_digest(path: Path) -> str:
+    try:
+        content = path.read_text(encoding="utf-8")
+        payload = generated_region(content).encode("utf-8")
+    except UnicodeDecodeError:
+        payload = path.read_bytes()
+    return hashlib.sha256(payload).hexdigest()
+
+
+def obsidian_sync_status(root: Path, vault: Path) -> dict:
+    pairs = obsidian_sync_pairs(root, vault)
+    missing = []
+    stale = []
+    current = 0
+    checked = 0
+    for src, dest in pairs:
+        if src.relative_to(root).as_posix() == "wiki/研究助手/Obsidian同步状态.md":
+            continue
+        checked += 1
+        if not dest.exists():
+            missing.append((src, dest))
+            continue
+        if file_digest(src) == file_digest(dest):
+            current += 1
+        else:
+            stale.append((src, dest))
+    return {
+        "vault": str(vault),
+        "vault_exists": vault.exists(),
+        "source_files": len(pairs),
+        "checked_files": checked,
+        "current": current,
+        "missing": missing,
+        "stale": stale,
+        "ready": bool(pairs) and vault.exists() and not missing and not stale,
+    }
+
+
+def write_obsidian_manifest(root: Path, status: dict) -> Path:
+    manifest = root / "obsidian" / "vault_manifest.json"
+    manifest.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "created_at": now_iso(),
+        "vault": status["vault"],
+        "vault_exists": status["vault_exists"],
+        "source_files": status["source_files"],
+        "checked_files": status["checked_files"],
+        "current": status["current"],
+        "missing": len(status["missing"]),
+        "stale": len(status["stale"]),
+        "ready": status["ready"],
+    }
+    manifest.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return manifest
+
+
+def obsidian_status_markdown(root: Path, vault: Path, created_at: str) -> str:
+    status = obsidian_sync_status(root, vault)
+    rows = [
+        ["项目", "结果"],
+        ["Vault", f"`{status['vault']}`"],
+        ["Vault 存在", status_label(status["vault_exists"])],
+        ["源文件", str(status["source_files"])],
+        ["参与核对", str(status["checked_files"])],
+        ["已一致", str(status["current"])],
+        ["缺失", str(len(status["missing"]))],
+        ["需更新", str(len(status["stale"]))],
+        ["整体状态", status_label(status["ready"])],
+    ]
+    issue_rows = [["类型", "源文件", "目标文件"]]
+    for src, dest in (status["missing"] + status["stale"])[:30]:
+        issue_type = "缺失" if not dest.exists() else "需更新"
+        issue_rows.append([issue_type, f"`{src.relative_to(root)}`", f"`{dest}`"])
+    if len(issue_rows) == 1:
+        issue_rows.append(["无", "已同步", "已同步"])
+    return f"""# Obsidian 同步状态
+
+生成时间：{created_at}
+
+## 总体判断
+
+- 当前状态：{status_label(status["ready"])}。
+- 本检查只核对本机知识库到 Obsidian Vault 的文件一致性；手机端是否完成 iCloud 云端下载，还需以手机 Obsidian 实际可见为准。
+
+## 同步概览
+
+{markdown_table(rows)}
+
+## 需要处理的文件
+
+{markdown_table(issue_rows)}
+
+## 使用建议
+
+1. 若存在缺失或需更新，运行 `kb obsidian-sync --vault {status['vault']}`。
+2. 同步后再运行 `kb obsidian-status --vault {status['vault']} --save` 复核。
+3. 手机端以打开 Obsidian 后能看到 `01-研究助手/民盟研究助手首页.md` 为最终确认。
+"""
+
+
+def command_obsidian_sync(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    vault = Path(args.vault).expanduser().resolve()
+    actions = []
+    for src, dest in obsidian_sync_pairs(root, vault):
+        actions.append((src, dest, sync_file(src, dest, args.dry_run)))
     if not args.dry_run:
         sync_log = root / "obsidian" / "sync_log.md"
         with sync_log.open("a", encoding="utf-8") as f:
             f.write(f"\n## {now_iso()}\n\n")
             for src, dest, action in actions:
                 f.write(f"- {action}: `{src}` -> `{dest}`\n")
+        write_obsidian_manifest(root, obsidian_sync_status(root, vault))
     status = "dry-run" if args.dry_run else "ok"
     log_operation(root, "obsidian-sync", status, f"{len(actions)} files", {"vault": str(vault), "dry_run": args.dry_run})
     print(f"Vault: {vault}")
@@ -593,6 +702,25 @@ def command_obsidian_sync(args: argparse.Namespace) -> int:
     print(f"Files: {len(actions)}")
     for src, dest, action in actions[:30]:
         print(f"  {action}: {src.relative_to(root)} -> {dest}")
+    return 0
+
+
+def command_obsidian_status(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    vault = Path(args.vault).expanduser().resolve()
+    body = obsidian_status_markdown(root, vault, now_iso())
+    status = obsidian_sync_status(root, vault)
+    if args.save:
+        path = report_dir(root) / "Obsidian同步状态.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(body, encoding="utf-8")
+        write_obsidian_manifest(root, status)
+        append_wiki_log(root, f"生成 Obsidian 同步状态：{path.relative_to(root)}")
+        log_operation(root, "obsidian-status", "ok", "report saved", {"output": str(path), "vault": str(vault)})
+        print(path)
+    else:
+        print(body)
+        log_operation(root, "obsidian-status", "ok", "checked", {"vault": str(vault), "ready": status["ready"]})
     return 0
 
 
@@ -3488,6 +3616,7 @@ def verify_report_markdown(root: Path, created_at: str) -> str:
         "wiki/研究助手/微信公众号参政议政素材主题库.md",
         "wiki/研究助手/微信公众号文史盟史研究入口清单.md",
         "wiki/研究助手/Google Drive外部参考层状态.md",
+        "wiki/研究助手/Obsidian同步状态.md",
         "index/corpus/article_labels.jsonl",
         "index/formulations.jsonl",
         "index/blacklist.csv",
@@ -3507,6 +3636,14 @@ def verify_report_markdown(root: Path, created_at: str) -> str:
     people_dossiers = len(list((root / "wiki" / "研究助手" / "核心人物研究档案").glob("*.md")))
     event_dossiers = len(list((root / "wiki" / "研究助手" / "核心事件研究档案").glob("*.md")))
     external_items = len(load_external_inventory(root))
+    obsidian_manifest = root / "obsidian" / "vault_manifest.json"
+    obsidian_note = "未生成"
+    if obsidian_manifest.exists():
+        try:
+            manifest = json.loads(obsidian_manifest.read_text(encoding="utf-8"))
+            obsidian_note = f"{manifest.get('current', 0)}/{manifest.get('source_files', 0)} 已一致，缺失 {manifest.get('missing', 0)}，需更新 {manifest.get('stale', 0)}"
+        except json.JSONDecodeError:
+            obsidian_note = "清单损坏，需重新运行 kb obsidian-status --save"
     ready = bool(article_count and labels and fts_count and all((root / rel).exists() for rel in core_files))
     return f"""# 盟参系统可用性验收报告
 
@@ -3530,6 +3667,7 @@ def verify_report_markdown(root: Path, created_at: str) -> str:
 | 核心人物研究档案 | {people_dossiers} |
 | 核心事件研究档案 | {event_dossiers} |
 | Drive 外部参考记录 | {external_items} |
+| Obsidian 同步清单 | {obsidian_note} |
 
 ## 关键产物
 
@@ -4943,7 +5081,7 @@ def command_refresh(args: argparse.Namespace) -> int:
     print(f"Duplicate articles: {duplicate_count}")
     print(f"Failed preview: {failed}")
     if args.dry_run:
-        print("Would import, rebuild indexes, refresh cards, corpus reports, writing/style/history/policy materials, research dossiers, external-source status, verification report, and Obsidian sync.")
+        print("Would import, rebuild indexes, refresh cards, corpus reports, writing/style/history/policy materials, research dossiers, external-source status, verification report, Obsidian sync, and Obsidian status.")
         log_operation(root, "refresh", "dry-run", f"new={new_count} duplicate={duplicate_count} failed={failed}")
         return 0
 
@@ -4980,6 +5118,9 @@ def command_refresh(args: argparse.Namespace) -> int:
         sync_args = argparse.Namespace(project_root=args.project_root, vault=args.vault, dry_run=False)
         sync_code = command_obsidian_sync(sync_args)
         sync_count = 0 if sync_code else len(list((Path(args.vault).expanduser()).rglob("*.md")))
+        command_obsidian_status(argparse.Namespace(project_root=args.project_root, vault=args.vault, save=True))
+        command_verify(argparse.Namespace(project_root=args.project_root, save=True))
+        command_obsidian_sync(sync_args)
     conn = connect_db(root)
     after_articles = conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0]
     conn.close()
@@ -5141,6 +5282,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--dry-run", action="store_true")
     p.set_defaults(func=command_obsidian_sync)
 
+    p = sub.add_parser("obsidian-status")
+    p.add_argument("--vault", default=DEFAULT_OBSIDIAN_VAULT)
+    p.add_argument("--save", action="store_true")
+    p.set_defaults(func=command_obsidian_status)
+
     p = sub.add_parser("log")
     p.add_argument("--limit", type=int, default=20)
     p.set_defaults(func=command_log)
@@ -5150,7 +5296,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("refresh")
     p.add_argument("--input", default="~/Downloads/微信公众号")
-    p.add_argument("--vault", default="~/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki")
+    p.add_argument("--vault", default=DEFAULT_OBSIDIAN_VAULT)
     p.add_argument("--limit", type=int, default=999999)
     p.add_argument("--top-k", type=int, default=15)
     p.add_argument("--dry-run", action="store_true")
