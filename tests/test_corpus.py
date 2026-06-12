@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -10,8 +11,12 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from kb.cli import (  # noqa: E402
     build_article_label,
+    build_parser,
     classify_article,
+    apply_review_decisions_to_labels,
+    collect_review_decisions,
     corpus_audit_markdown,
+    corpus_review_apply_markdown,
     corpus_quality_diagnostic_markdown,
     corpus_priority_review_markdown,
     corpus_priority_review_rows,
@@ -24,6 +29,7 @@ from kb.cli import (  # noqa: E402
     person_research_dossier_body,
     policy_advice_material_index_markdown,
     shanghai_style_rule_card_markdown,
+    write_corpus_review_csv,
     writing_style_templates_markdown,
 )
 
@@ -136,6 +142,113 @@ class CorpusCommandTests(unittest.TestCase):
         self.assertIn("按类型抽检:会议报道", buckets)
         self.assertIn("低置信抽检", buckets)
         self.assertIn("其他/待判抽检", buckets)
+
+    def test_apply_review_decisions_updates_wrong_labels_only(self) -> None:
+        labels = [
+            {
+                "article_id": 1,
+                "title": "人物风采",
+                "article_type": "other",
+                "article_type_name": "其他/待判",
+                "classification_confidence": 0,
+            },
+            {
+                "article_id": 2,
+                "title": "会议报道",
+                "article_type": "meeting_report",
+                "article_type_name": "会议报道",
+                "classification_confidence": 80,
+            },
+        ]
+        decisions = {
+            1: {
+                "article_id": 1,
+                "review_result": "错误",
+                "suggested_type": "person_profile",
+                "review_note": "人物文章",
+                "review_source": "classification_review.csv",
+            },
+            2: {
+                "article_id": 2,
+                "review_result": "正确",
+                "suggested_type": "",
+                "review_note": "分类正确",
+                "review_source": "classification_review.csv",
+            },
+        }
+        updated, applied = apply_review_decisions_to_labels(labels, decisions)
+        self.assertEqual(updated[0]["article_type"], "person_profile")
+        self.assertEqual(updated[0]["classification_review_status"], "人工已改")
+        self.assertEqual(updated[1]["article_type"], "meeting_report")
+        self.assertEqual(updated[1]["classification_review_status"], "人工确认")
+        self.assertEqual(len(applied), 2)
+
+    def test_write_review_csv_preserves_manual_columns(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "classification_review.csv"
+            path.write_text(
+                "review_bucket,article_id,account,published_at,title,article_type_name,classification_confidence,matched_keywords,topic_tags,suggested_type,review_result,review_note,raw_path\n"
+                "旧抽检,1,上海民盟,2025-01-01,旧标题,其他/待判,0,,,person_profile,错误,人物文章,/tmp/old.md\n",
+                encoding="utf-8-sig",
+            )
+            write_corpus_review_csv(
+                path,
+                [
+                    {
+                        "review_bucket": "新抽检",
+                        "article_id": 1,
+                        "account": "上海民盟",
+                        "published_at": "2025-01-01",
+                        "title": "新标题",
+                        "article_type_name": "其他/待判",
+                        "classification_confidence": 0,
+                        "matched_keywords": [],
+                        "topic_tags": [],
+                        "raw_path": "/tmp/new.md",
+                    }
+                ],
+            )
+            text = path.read_text(encoding="utf-8-sig")
+            self.assertIn("person_profile", text)
+            self.assertIn("错误", text)
+            self.assertIn("人物文章", text)
+
+    def test_collect_review_decisions_ignores_machine_suggestion_without_manual_result(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            corpus = root / "index" / "corpus"
+            corpus.mkdir(parents=True)
+            (corpus / "classification_priority_review.csv").write_text(
+                "priority_score,article_id,account,published_at,title,current_type,classification_confidence,suggested_type,suggested_type_name,priority_reasons,matched_keywords,topic_tags,review_result,review_note,raw_path\n"
+                "105,1,上海民盟,2025-01-01,机器建议,其他/待判,0,person_profile,人物采访/人物风采,建议复核,,,,,/tmp/1.md\n",
+                encoding="utf-8-sig",
+            )
+            decisions, warnings = collect_review_decisions(root)
+            self.assertEqual(decisions, {})
+            self.assertEqual(warnings, [])
+
+    def test_review_apply_markdown_contains_summary(self) -> None:
+        body = corpus_review_apply_markdown(
+            [
+                {
+                    "article_id": 1,
+                    "title": "人物风采",
+                    "before_type": "other",
+                    "after_type": "person_profile",
+                    "review_status": "人工已改",
+                    "review_note": "人物文章",
+                }
+            ],
+            [],
+            "2026-06-12T00:00:00",
+        )
+        self.assertIn("分类人工校订应用报告", body)
+        self.assertIn("改分类：1 条", body)
+
+    def test_parser_accepts_corpus_apply_reviews(self) -> None:
+        args = build_parser().parse_args(["corpus-apply-reviews", "--save"])
+        self.assertEqual(args.command, "corpus-apply-reviews")
+        self.assertTrue(args.save)
 
     def test_theme_education_does_not_match_scientific_thought(self) -> None:
         article_type, _, matched = classify_article("田刚院士：科学思想的力量", "上海民盟", "")

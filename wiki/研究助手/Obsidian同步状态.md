@@ -1,10 +1,10 @@
 # Obsidian 同步状态
 
-生成时间：2026-06-12T11:54:14
+生成时间：2026-06-12T15:53:51
 
 ## 总体判断
 
-- 当前状态：缺失。
+- 当前状态：可用。
 - 本检查只核对本机知识库到 Obsidian Vault 的文件一致性；手机端是否完成 iCloud 云端下载，还需以手机 Obsidian 实际可见为准。
 
 ## 同步概览
@@ -13,20 +13,18 @@
 | --- | --- |
 | Vault | `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki` |
 | Vault 存在 | 可用 |
-| 源文件 | 125 |
-| 参与核对 | 124 |
-| 已一致 | 121 |
-| 缺失 | 1 |
-| 需更新 | 2 |
-| 整体状态 | 缺失 |
+| 源文件 | 126 |
+| 参与核对 | 125 |
+| 已一致 | 125 |
+| 缺失 | 0 |
+| 需更新 | 0 |
+| 整体状态 | 可用 |
 
 ## 需要处理的文件
 
 | 类型 | 源文件 | 目标文件 |
 | --- | --- | --- |
-| 缺失 | `wiki/研究助手/口径风险清单.md` | `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/口径风险清单.md` |
-| 需更新 | `wiki/log.md` | `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/操作日志.md` |
-| 需更新 | `wiki/研究助手/盟参系统可用性验收报告.md` | `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/盟参系统可用性验收报告.md` |
+| 无 | 已同步 | 已同步 |
 
 ## 使用建议
 

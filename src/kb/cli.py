@@ -3152,6 +3152,11 @@ def corpus_review_rows(labels: list[dict], per_type: int, low_confidence_limit: 
 
 def write_corpus_review_csv(path: Path, rows: list[dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    existing = {
+        (row.get("article_id") or "").strip(): row
+        for row in read_review_csv(path)
+        if (row.get("article_id") or "").strip()
+    }
     fieldnames = [
         "review_bucket",
         "article_id",
@@ -3171,6 +3176,7 @@ def write_corpus_review_csv(path: Path, rows: list[dict]) -> None:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for row in rows:
+            saved = existing.get(str(row["article_id"]), {})
             writer.writerow(
                 {
                     "review_bucket": row["review_bucket"],
@@ -3182,9 +3188,9 @@ def write_corpus_review_csv(path: Path, rows: list[dict]) -> None:
                     "classification_confidence": row["classification_confidence"],
                     "matched_keywords": "、".join(row.get("matched_keywords") or []),
                     "topic_tags": "、".join(row.get("topic_tags") or []),
-                    "suggested_type": "",
-                    "review_result": "",
-                    "review_note": "",
+                    "suggested_type": saved.get("suggested_type") or "",
+                    "review_result": saved.get("review_result") or "",
+                    "review_note": saved.get("review_note") or "",
                     "raw_path": row["raw_path"] or "",
                 }
             )
@@ -3262,6 +3268,11 @@ def corpus_priority_review_rows(labels: list[dict], limit: int = 100) -> list[di
 
 def write_corpus_priority_review_csv(path: Path, rows: list[dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    existing = {
+        (row.get("article_id") or "").strip(): row
+        for row in read_review_csv(path)
+        if (row.get("article_id") or "").strip()
+    }
     fieldnames = [
         "priority_score",
         "article_id",
@@ -3283,6 +3294,7 @@ def write_corpus_priority_review_csv(path: Path, rows: list[dict]) -> None:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for row in rows:
+            saved = existing.get(str(row["article_id"]), {})
             writer.writerow(
                 {
                     "priority_score": row["priority_score"],
@@ -3297,11 +3309,161 @@ def write_corpus_priority_review_csv(path: Path, rows: list[dict]) -> None:
                     "priority_reasons": "；".join(row.get("priority_reasons") or []),
                     "matched_keywords": "、".join(row.get("matched_keywords") or []),
                     "topic_tags": "、".join(row.get("topic_tags") or []),
-                    "review_result": "",
-                    "review_note": "",
+                    "review_result": saved.get("review_result") or "",
+                    "review_note": saved.get("review_note") or "",
                     "raw_path": row.get("raw_path") or "",
                 }
             )
+
+
+def read_review_csv(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    with path.open("r", encoding="utf-8-sig", newline="") as f:
+        return [dict(row) for row in csv.DictReader(f)]
+
+
+def normalized_review_result(value: str | None) -> str:
+    value = (value or "").strip()
+    mapping = {
+        "正确": "正确",
+        "yes": "正确",
+        "right": "正确",
+        "ok": "正确",
+        "错误": "错误",
+        "错": "错误",
+        "wrong": "错误",
+        "no": "错误",
+        "不确定": "不确定",
+        "存疑": "不确定",
+        "待核": "不确定",
+    }
+    return mapping.get(value.lower(), value)
+
+
+def collect_review_decisions(root: Path) -> tuple[dict[int, dict], list[str]]:
+    review_paths = [
+        corpus_dir(root) / "classification_review.csv",
+        corpus_dir(root) / "classification_priority_review.csv",
+    ]
+    decisions: dict[int, dict] = {}
+    warnings = []
+    valid_types = set(ARTICLE_TYPE_NAMES)
+    for path in review_paths:
+        for row in read_review_csv(path):
+            result = normalized_review_result(row.get("review_result"))
+            suggested = (row.get("suggested_type") or "").strip()
+            note = (row.get("review_note") or "").strip()
+            if not result and not note:
+                continue
+            article_raw = (row.get("article_id") or "").strip()
+            if not article_raw.isdigit():
+                warnings.append(f"{path.name}: article_id 无效：{article_raw}")
+                continue
+            article_id = int(article_raw)
+            if suggested and suggested not in valid_types:
+                warnings.append(f"{path.name}: article_id={article_id} suggested_type 无效：{suggested}")
+                continue
+            existing = decisions.get(article_id)
+            decision = {
+                "article_id": article_id,
+                "review_result": result or "不确定",
+                "suggested_type": suggested,
+                "review_note": note,
+                "review_source": path.name,
+            }
+            if existing and existing != decision:
+                warnings.append(f"article_id={article_id} 存在多条人工校订记录，已采用后出现的 {path.name}")
+            decisions[article_id] = decision
+    return decisions, warnings
+
+
+def apply_review_decisions_to_labels(labels: list[dict], decisions: dict[int, dict]) -> tuple[list[dict], list[dict]]:
+    updated = []
+    applied = []
+    for label in labels:
+        item = dict(label)
+        decision = decisions.get(int(item["article_id"]))
+        if decision:
+            before_type = item.get("article_type") or ""
+            result = decision["review_result"]
+            suggested = decision.get("suggested_type") or ""
+            if result == "错误" and suggested:
+                item["article_type"] = suggested
+                item["article_type_name"] = ARTICLE_TYPE_NAMES.get(suggested, suggested)
+                item["classification_confidence"] = 100
+                item["classification_review_status"] = "人工已改"
+            elif result == "正确":
+                item["classification_review_status"] = "人工确认"
+            else:
+                item["classification_review_status"] = "人工存疑"
+            item["classification_review_result"] = result
+            item["classification_review_note"] = decision.get("review_note") or ""
+            item["classification_review_source"] = decision.get("review_source") or ""
+            item["classification_reviewed_at"] = now_iso()
+            applied.append(
+                {
+                    "article_id": item["article_id"],
+                    "title": item.get("title") or "",
+                    "before_type": before_type,
+                    "after_type": item.get("article_type") or "",
+                    "review_status": item["classification_review_status"],
+                    "review_note": item["classification_review_note"],
+                }
+            )
+        updated.append(item)
+    return updated, applied
+
+
+def corpus_review_apply_markdown(applied: list[dict], warnings: list[str], created_at: str) -> str:
+    rows = [["文章ID", "标题", "原类型", "现类型", "状态", "备注"]]
+    for item in applied[:200]:
+        rows.append(
+            [
+                str(item["article_id"]),
+                f"《{item['title']}》",
+                ARTICLE_TYPE_NAMES.get(item["before_type"], item["before_type"]),
+                ARTICLE_TYPE_NAMES.get(item["after_type"], item["after_type"]),
+                item["review_status"],
+                item["review_note"],
+            ]
+        )
+    if len(rows) == 1:
+        rows.append(["无", "暂无已填写的人工校订", "-", "-", "-", "-"])
+    warning_rows = [["提示"]]
+    for warning in warnings[:80]:
+        warning_rows.append([warning])
+    if len(warning_rows) == 1:
+        warning_rows.append(["无"])
+    changed = sum(1 for item in applied if item["before_type"] != item["after_type"])
+    confirmed = sum(1 for item in applied if item["review_status"] == "人工确认")
+    uncertain = sum(1 for item in applied if item["review_status"] == "人工存疑")
+    return f"""# 微信公众号分类人工校订应用报告
+
+生成时间：{created_at}
+
+## 总体结果
+
+- 已读取并应用人工校订：{len(applied)} 条。
+- 其中改分类：{changed} 条。
+- 人工确认正确：{confirmed} 条。
+- 人工标记存疑：{uncertain} 条。
+- 警告：{len(warnings)} 条。
+
+## 应用明细
+
+{markdown_table(rows)}
+
+## 警告
+
+{markdown_table(warning_rows)}
+
+## 使用说明
+
+1. 在 `classification_review.csv` 或 `classification_priority_review.csv` 中填写人工校订。
+2. 运行 `kb corpus-apply-reviews --save`。
+3. 再运行 `kb corpus-audit` 重建抽检表，查看校订后的优先问题是否减少。
+"""
 
 
 def corpus_priority_review_markdown(rows: list[dict], created_at: str) -> str:
@@ -3497,6 +3659,33 @@ def command_corpus_audit(args: argparse.Namespace) -> int:
     print(f"Report: {reports / '微信公众号文章分类抽检表.md'}")
     print(f"Priority report: {reports / '微信公众号分类优先校订清单.md'}")
     print(f"Guide: {reports / '微信公众号语料库人工校订说明.md'}")
+    return 0
+
+
+def command_corpus_apply_reviews(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    labels = load_article_labels(root)
+    decisions, warnings = collect_review_decisions(root)
+    updated, applied = apply_review_decisions_to_labels(labels, decisions)
+    if args.dry_run:
+        print(corpus_review_apply_markdown(applied, warnings, now_iso()))
+        log_operation(root, "corpus-apply-reviews", "dry-run", f"decisions={len(decisions)} applied={len(applied)}")
+        return 0
+
+    out_dir = corpus_dir(root)
+    if decisions:
+        write_jsonl(out_dir / "article_labels.jsonl", updated)
+    created_at = now_iso()
+    body = corpus_review_apply_markdown(applied, warnings, created_at)
+    if args.save:
+        path = report_dir(root) / "微信公众号分类人工校订应用报告.md"
+        path.write_text(body, encoding="utf-8")
+        append_wiki_log(root, f"生成分类人工校订应用报告：{path.relative_to(root)}")
+        print(path)
+    else:
+        print(body)
+    status = "ok" if not warnings else "warning"
+    log_operation(root, "corpus-apply-reviews", status, f"decisions={len(decisions)} applied={len(applied)} warnings={len(warnings)}")
     return 0
 
 
@@ -3717,6 +3906,7 @@ def verify_report_markdown(root: Path, created_at: str) -> str:
         "wiki/研究助手/Google Drive外部参考层状态.md",
         "wiki/研究助手/Obsidian同步状态.md",
         "wiki/研究助手/口径风险清单.md",
+        "wiki/研究助手/微信公众号分类人工校订应用报告.md",
         "index/corpus/article_labels.jsonl",
         "index/formulations.jsonl",
         "index/blacklist.csv",
@@ -5473,6 +5663,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--other", type=int, default=80)
     p.add_argument("--priority", type=int, default=100)
     p.set_defaults(func=command_corpus_audit)
+
+    p = sub.add_parser("corpus-apply-reviews", help="应用微信公众号分类人工校订结果")
+    p.add_argument("--save", action="store_true")
+    p.add_argument("--dry-run", action="store_true")
+    p.set_defaults(func=command_corpus_apply_reviews)
 
     p = sub.add_parser("corpus-style", help="生成上海民盟写作模板和文史盟史研究入口")
     p.set_defaults(func=command_corpus_style)

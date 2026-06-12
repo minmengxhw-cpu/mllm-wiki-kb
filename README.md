@@ -241,6 +241,8 @@ kb brief "80周年工作安排" --top-k 10
 ```bash
 kb corpus
 kb corpus-audit
+kb corpus-apply-reviews --dry-run
+kb corpus-apply-reviews --save
 kb corpus-style
 ```
 
@@ -267,6 +269,8 @@ kb corpus-style
 - `wiki/研究助手/微信公众号文章分类抽检表.md`：按类型、低置信、其他/待判汇总的抽检清单。
 - `wiki/研究助手/微信公众号分类优先校订清单.md`：按优先级排序的人工复核入口。
 - `wiki/研究助手/微信公众号语料库人工校订说明.md`：校订口径和回写流程。
+
+`corpus-apply-reviews` 会读取 `classification_review.csv` 和 `classification_priority_review.csv` 中已经填写的人工校订结果；只有 `review_result=错误` 且 `suggested_type` 合法时，才会回写 `article_labels.jsonl` 的主类型。运行 `corpus-audit` 重新生成抽检表时，会保留同一文章已填写的人工校订列。
 
 `corpus-style` 会生成写作和研究入口：
 
