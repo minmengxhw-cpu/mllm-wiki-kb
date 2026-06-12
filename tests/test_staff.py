@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from kb.cli import (  # noqa: E402
+    brief_body,
     build_parser,
     dict_to_row,
     external_sources_report_markdown,
@@ -48,6 +49,11 @@ class StaffCommandTests(unittest.TestCase):
         self.assertEqual(args.command, "staff")
         self.assertEqual(args.staff_command, "info")
         self.assertEqual(args.topic, "科技创新人才")
+
+    def test_parser_accepts_brief(self) -> None:
+        args = build_parser().parse_args(["brief", "80周年", "工作"])
+        self.assertEqual(args.command, "brief")
+        self.assertEqual(args.query, ["80周年", "工作"])
 
     def test_staff_check_flags_blacklist_and_missing_citation(self) -> None:
         root = self.make_root()
@@ -269,6 +275,25 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("[S1]", body)
         finally:
             shutil.rmtree(root)
+
+    def test_brief_body_uses_brief_structure(self) -> None:
+        row = dict_to_row(
+            {
+                "article_id": 1,
+                "chunk_id": 1,
+                "title": "民盟市委围绕80周年开展工作",
+                "account": "上海民盟",
+                "published_at": "2026-01-02",
+                "raw_path": "/tmp/brief.md",
+                "snippet": "围绕80周年开展相关工作。",
+                "score": 0,
+            }
+        )
+        body = brief_body("80周年工作", [row])
+        self.assertIn("民盟简报素材", body)
+        self.assertIn("三点摘要", body)
+        self.assertIn("简报结构建议", body)
+        self.assertIn("[S1]", body)
 
     def test_external_sources_report_summarizes_drive_layer(self) -> None:
         root = self.make_root()

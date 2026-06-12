@@ -198,6 +198,7 @@ kb staff topic "午间盟史课堂：费孝通与江村" --top-k 20
 kb staff info "科技创新人才" --top-k 12
 kb staff check "这里粘贴需要核稿的正文"
 kb staff check --file ~/Desktop/draft.txt
+kb brief "80周年工作安排" --top-k 10
 ```
 
 如果当前 shell 里没有全局 `kb` 命令，可在项目目录使用 `.venv/bin/kb staff ...`。
@@ -377,6 +378,7 @@ kb export --path wiki/人物/沈钧儒.md --format markdown --format docx
 - `kb ask`（带来源引用的抽取式问答）
 - `kb assistant`（民盟研究助手入口）
 - `kb staff`（盟参首席参谋入口：/稿 /史 /信 /题 /核）
+- `kb brief`（领导参阅/工作简报素材包）
 - `kb corpus`（微信公众号语料库体检、分类标签和样本库）
 - `kb compile`（自动编译带来源 wiki 页面）
 - `kb build-cards`（生成人物/事件/地点卡）

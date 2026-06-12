@@ -3319,6 +3319,23 @@ def command_external_sources(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_brief(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    query = " ".join(args.query).strip()
+    if not query:
+        print("brief requires a query", file=sys.stderr)
+        return 2
+    rows = search_rows(root, query, args.top_k)
+    body = brief_body(query, rows)
+    if args.save:
+        path = write_wiki_page(root, f"简报素材：{query}", "assistant", body, rows)
+        append_wiki_log(root, f"生成简报素材：{path.relative_to(root)}")
+        print(f"Saved: {path}\n")
+    print(body)
+    log_operation(root, "brief", "ok", f"{len(rows)} sources", {"sources": len(rows)})
+    return 0
+
+
 def source_title_list(rows: list[sqlite3.Row], limit: int = 12) -> str:
     lines = []
     seen: set[int] = set()
@@ -3487,6 +3504,48 @@ def assistant_body(query: str, mode: str, rows: list[sqlite3.Row]) -> str:
 | 编号 | 公众号 | 日期 | 标题 | raw 原文 |
 |---|---|---|---|---|
 {source_rows}
+"""
+
+
+def brief_body(query: str, rows: list[sqlite3.Row]) -> str:
+    source_rows = "\n".join(row_source_md(row, idx) for idx, row in enumerate(rows, 1))
+    return f"""# 民盟简报素材：{query}
+
+## 初步判断
+
+- 本次检索到 {len(rows)} 条片段，覆盖 {len({int(row['article_id']) for row in rows}) if rows else 0} 篇来源文章。
+- 本页用于快速形成领导参阅、工作简报或材料准备提纲，不是最终定稿。
+- 所有事实性表述必须回到 raw 原文核验；无法确认的判断标 `[待核]`。
+
+## 三点摘要
+
+- 主题相关材料已在本地公众号语料中形成可查线索，可先作为公开报道层依据。
+- 可重点提炼背景、主要做法、典型案例、问题线索和下一步建议。
+- 正式使用前需补充内部口径、最新数据、责任部门和权威来源。
+
+## 可用素材
+
+### 来源文章
+
+| 编号 | 公众号 | 日期 | 标题 | raw 原文 |
+|---|---|---|---|---|
+{source_rows}
+
+### 证据摘录
+
+{cited_excerpts(rows, 8)}
+
+### 简报结构建议
+
+- 背景：交代主题来源、工作场景或现实需求。
+- 进展：列出已有做法、活动、调研或履职成果。
+- 问题：从来源中提取可被证据支撑的问题，不做无来源推断。
+- 建议：围绕机制、协同、资源、人才、宣传或后续调研提出方向性建议。[待核]
+
+## 风险提示
+
+- 简报类材料容易把公开报道拔高为工作结论，必须人工复核。
+- 涉及领导、机构、会议、数据、政策和历史评价时，以权威口径为准。
 """
 
 
@@ -4800,16 +4859,6 @@ def command_export(args: argparse.Namespace) -> int:
     return 0
 
 
-def command_placeholder(name: str):
-    def _inner(args: argparse.Namespace) -> int:
-        root = project_root_from_args(args.project_root)
-        log_operation(root, name, "placeholder", "not implemented in phase 1")
-        print(f"`kb {name}` is a phase-2 placeholder. No changes made.")
-        return 0
-
-    return _inner
-
-
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="kb")
     parser.add_argument("--project-root", default=None, help="Project root, default: KB_PROJECT_ROOT or package root")
@@ -4870,7 +4919,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--sync-vault", default=None)
     p.set_defaults(func=command_assistant)
 
-    p = sub.add_parser("staff", help="盟参首席参谋入口：/稿 /史 /题 /核")
+    p = sub.add_parser("staff", help="盟参首席参谋入口：/稿 /史 /信 /题 /核")
     staff_sub = p.add_subparsers(dest="staff_command", required=True)
 
     p_staff = staff_sub.add_parser("draft", help="/稿：文稿素材包")
@@ -4960,10 +5009,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--output-name", default=None)
     p.set_defaults(func=command_export)
 
-    for name in ["brief"]:
-        p = sub.add_parser(name)
-        p.add_argument("args", nargs="*")
-        p.set_defaults(func=command_placeholder(name))
+    p = sub.add_parser("brief", help="生成领导参阅/工作简报素材包")
+    p.add_argument("query", nargs="+")
+    p.add_argument("--top-k", type=int, default=10)
+    p.add_argument("--save", action="store_true")
+    p.set_defaults(func=command_brief)
 
     return parser
 
