@@ -4943,7 +4943,7 @@ def command_refresh(args: argparse.Namespace) -> int:
     print(f"Duplicate articles: {duplicate_count}")
     print(f"Failed preview: {failed}")
     if args.dry_run:
-        print("Would rebuild index, cards, topic packs, writing workflows, priority status, and Obsidian sync.")
+        print("Would import, rebuild indexes, refresh cards, corpus reports, writing/style/history/policy materials, research dossiers, external-source status, verification report, and Obsidian sync.")
         log_operation(root, "refresh", "dry-run", f"new={new_count} duplicate={duplicate_count} failed={failed}")
         return 0
 
@@ -4958,6 +4958,22 @@ def command_refresh(args: argparse.Namespace) -> int:
     command_build_cards(build_args)
     command_build_packs(argparse.Namespace(project_root=args.project_root, top_k=args.top_k))
     command_build_writing_workflows(argparse.Namespace(project_root=args.project_root, top_k=args.top_k))
+    command_corpus(argparse.Namespace(project_root=args.project_root))
+    command_corpus_audit(
+        argparse.Namespace(
+            project_root=args.project_root,
+            per_type=20,
+            low_confidence=80,
+            other=80,
+            priority=100,
+        )
+    )
+    command_corpus_style(argparse.Namespace(project_root=args.project_root))
+    command_build_research_dossiers(argparse.Namespace(project_root=args.project_root, set="core-people", limit=0, top_k=args.top_k))
+    command_build_research_dossiers(argparse.Namespace(project_root=args.project_root, set="core-events", limit=0, top_k=args.top_k))
+    command_external_sources(argparse.Namespace(project_root=args.project_root, save=True))
+    command_assistant(argparse.Namespace(project_root=args.project_root, query=None, mode="auto", top_k=args.top_k, save=False, install=True, sync_vault=None))
+    command_verify(argparse.Namespace(project_root=args.project_root, save=True))
     priority_count = apply_priority_card_status(root)
     sync_count = 0
     if args.vault:
@@ -4967,7 +4983,7 @@ def command_refresh(args: argparse.Namespace) -> int:
     conn = connect_db(root)
     after_articles = conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0]
     conn.close()
-    message = f"articles {before_articles}->{after_articles}; indexed={indexed}; vectors={vector_indexed}; priority={priority_count}"
+    message = f"articles {before_articles}->{after_articles}; indexed={indexed}; vectors={vector_indexed}; corpus=refreshed; dossiers=refreshed; verify=refreshed; priority={priority_count}"
     append_wiki_log(root, f"一键刷新知识库：{message}")
     log_operation(
         root,

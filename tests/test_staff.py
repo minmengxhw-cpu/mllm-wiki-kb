@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import argparse
+import contextlib
+import io
 import shutil
 import sys
 import tempfile
@@ -13,6 +16,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from kb.cli import (  # noqa: E402
     brief_body,
     build_parser,
+    command_refresh,
     dict_to_row,
     external_sources_report_markdown,
     normalized_similarity,
@@ -30,6 +34,7 @@ class StaffCommandTests(unittest.TestCase):
     def make_root(self) -> Path:
         temp = Path(tempfile.mkdtemp())
         (temp / "index").mkdir(parents=True)
+        shutil.copy(ROOT / "schema.sql", temp / "schema.sql")
         shutil.copy(ROOT / "index" / "blacklist.csv", temp / "index" / "blacklist.csv")
         shutil.copy(ROOT / "index" / "formulations.jsonl", temp / "index" / "formulations.jsonl")
         return temp
@@ -392,6 +397,34 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("/数", body)
             self.assertIn("文章标签", body)
             self.assertIn("Drive 外部参考记录", body)
+        finally:
+            shutil.rmtree(root)
+
+    def test_refresh_dry_run_mentions_full_refresh_chain(self) -> None:
+        root = self.make_root()
+        input_dir = root / "input"
+        input_dir.mkdir()
+        (input_dir / "sample.md").write_text(
+            "# 测试文章\n\n原创 上海民盟 2026-01-01\n\n测试内容。",
+            encoding="utf-8",
+        )
+        try:
+            args = argparse.Namespace(
+                project_root=str(root),
+                input=str(input_dir),
+                limit=1,
+                top_k=2,
+                dry_run=True,
+                vault="",
+            )
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                code = command_refresh(args)
+            self.assertEqual(code, 0)
+            text = out.getvalue()
+            self.assertIn("corpus reports", text)
+            self.assertIn("research dossiers", text)
+            self.assertIn("verification report", text)
         finally:
             shutil.rmtree(root)
 
