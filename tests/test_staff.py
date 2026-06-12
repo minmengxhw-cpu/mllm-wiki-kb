@@ -22,6 +22,7 @@ from kb.cli import (  # noqa: E402
     staff_info_body,
     staff_material_draft_body,
     staff_stats_body,
+    verify_report_markdown,
 )
 
 
@@ -354,6 +355,29 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("已登记知识库：1 个", body)
             self.assertIn("谷超豪.md", body)
             self.assertIn("不等同于微信公众号主语料", body)
+        finally:
+            shutil.rmtree(root)
+
+    def test_verify_report_lists_staff_modes_and_outputs(self) -> None:
+        root = self.make_root()
+        try:
+            (root / "wiki" / "研究助手").mkdir(parents=True)
+            (root / "index" / "corpus").mkdir(parents=True)
+            (root / "index" / "external_sources").mkdir(parents=True)
+            (root / "index" / "corpus" / "article_labels.jsonl").write_text(
+                '{"article_id":1,"title":"测试","account":"上海民盟","year":"2025"}\n',
+                encoding="utf-8",
+            )
+            (root / "index" / "external_sources" / "google_drive_inventory.jsonl").write_text(
+                '{"title":"测试.md"}\n',
+                encoding="utf-8",
+            )
+            body = verify_report_markdown(root, "2026-06-12T00:00:00")
+            self.assertIn("盟参系统可用性验收报告", body)
+            self.assertIn("/稿", body)
+            self.assertIn("/数", body)
+            self.assertIn("文章标签", body)
+            self.assertIn("Drive 外部参考记录", body)
         finally:
             shutil.rmtree(root)
 

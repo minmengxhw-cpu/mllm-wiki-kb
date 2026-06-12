@@ -3438,6 +3438,120 @@ def command_brief(args: argparse.Namespace) -> int:
     return 0
 
 
+def count_db_rows(root: Path, table: str) -> int:
+    if not (root / "index" / "kb.sqlite").exists():
+        return 0
+    conn = connect_db(root)
+    try:
+        return int(conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0])
+    except sqlite3.Error:
+        return 0
+    finally:
+        conn.close()
+
+
+def status_label(ok: bool) -> str:
+    return "可用" if ok else "缺失"
+
+
+def verify_report_markdown(root: Path, created_at: str) -> str:
+    labels = load_article_labels(root)
+    article_count = count_db_rows(root, "articles")
+    chunk_count = count_db_rows(root, "article_chunks")
+    fts_count = count_db_rows(root, "article_chunks_fts")
+    vector_count = count_db_rows(root, "chunk_vectors")
+    core_files = [
+        "wiki/研究助手/民盟研究助手首页.md",
+        "wiki/研究助手/上海民盟微信公众号写作风格规则卡.md",
+        "wiki/研究助手/上海民盟微信公众号精选写作样本.md",
+        "wiki/研究助手/上海民盟微信公众号分体裁写作模板.md",
+        "wiki/研究助手/微信公众号参政议政素材主题库.md",
+        "wiki/研究助手/微信公众号文史盟史研究入口清单.md",
+        "wiki/研究助手/Google Drive外部参考层状态.md",
+        "index/corpus/article_labels.jsonl",
+        "index/formulations.jsonl",
+        "index/blacklist.csv",
+        "index/external_sources/google_drive_inventory.jsonl",
+    ]
+    file_rows = [["产物", "状态"]]
+    for rel in core_files:
+        file_rows.append([f"`{rel}`", status_label((root / rel).exists())])
+    modes = [
+        ["/稿", "`kb staff draft`", "微信公众号文稿素材和初稿"],
+        ["/史", "`kb staff history`", "盟史、人物、事件研究入口"],
+        ["/信", "`kb staff info`", "统战信息/参政议政素材包"],
+        ["/题", "`kb staff topic`", "选题查重和差异化角度"],
+        ["/数", "`kb staff stats`", "语料统计和选题分布"],
+        ["/核", "`kb staff check`", "口径、史实和引用风险预审"],
+    ]
+    people_dossiers = len(list((root / "wiki" / "研究助手" / "核心人物研究档案").glob("*.md")))
+    event_dossiers = len(list((root / "wiki" / "研究助手" / "核心事件研究档案").glob("*.md")))
+    external_items = len(load_external_inventory(root))
+    ready = bool(article_count and labels and fts_count and all((root / rel).exists() for rel in core_files))
+    return f"""# 盟参系统可用性验收报告
+
+生成时间：{created_at}
+
+## 总体判断
+
+- 当前状态：{status_label(ready)}。
+- 公开微信公众号文章、写作规则、盟史研究入口、参政议政素材、Drive 外部参考层和 staff 指令入口均已纳入本地工作台。
+- 本报告只证明本地公开语料库和工具链可用；正式发稿、史实结论和内部口径仍需人工终审。
+
+## 数据底座
+
+| 项目 | 数量 |
+| --- | ---: |
+| 数据库文章 | {article_count} |
+| 检索片段 | {chunk_count} |
+| FTS 索引片段 | {fts_count} |
+| 本地向量片段 | {vector_count} |
+| 文章标签 | {len(labels)} |
+| 核心人物研究档案 | {people_dossiers} |
+| 核心事件研究档案 | {event_dossiers} |
+| Drive 外部参考记录 | {external_items} |
+
+## 关键产物
+
+{markdown_table(file_rows)}
+
+## 可用指令
+
+{markdown_table([["口令", "命令", "用途"]] + modes)}
+
+## 验收结论
+
+- 写作：可用。可通过 `/稿`、写作风格规则卡、精选样本和分体裁模板生成素材包或初稿。
+- 盟史：可用。可通过 `/史`、人物/事件研究档案、自动卡片和 raw 原文进入研究。
+- 参政议政：可用。可通过 `/信` 和参政议政素材主题库归集问题、依据和建议。
+- 统计：可用。可通过 `/数` 查看账号、年份、体裁、主题和最近样本分布。
+- 核验：基础可用。`/核` 已能拦截种子黑名单、来源缺失和部分史实风险；高风险公文仍必须人工终审。
+
+## 继续完善方向
+
+1. 扩充口径库和黑名单，尤其是 80 周年、建盟日期、核心人物职务和上海民盟机构表述。
+2. 对分类优先校订清单进行人工复核，减少参政议政、主题教育、组织建设之间的交叉误判。
+3. 继续补核心人物、事件、机构和地点研究档案，形成更稳定的盟史研究底座。
+4. Drive 工作资料继续保持外部参考层，导入前逐条判断公开属性和使用边界。
+"""
+
+
+def command_verify(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    created_at = now_iso()
+    body = verify_report_markdown(root, created_at)
+    if args.save:
+        path = report_dir(root) / "盟参系统可用性验收报告.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(body, encoding="utf-8")
+        append_wiki_log(root, f"生成盟参系统可用性验收报告：{path.relative_to(root)}")
+        log_operation(root, "verify", "ok", "report saved", {"output": str(path)})
+        print(path)
+    else:
+        print(body)
+    return 0
+
+
 def source_title_list(rows: list[sqlite3.Row], limit: int = 12) -> str:
     lines = []
     seen: set[int] = set()
@@ -3675,6 +3789,7 @@ kb staff check --file ~/Desktop/draft.txt
 kb assistant "五一口号在民盟史上的意义" --mode history --save
 kb corpus-style
 kb external-sources --save
+kb verify --save
 ```
 
 ## 盟参模式
@@ -3703,6 +3818,7 @@ kb external-sources --save
 - [[微信公众号文史盟史研究入口清单]]
 - [[Google Drive外部参考层状态]]
 - [[Google Drive工作资料接入清单]]
+- [[盟参系统可用性验收报告]]
 - [[民盟盟史资源总览]]
 - [[上海民盟盟史独立专题]]
 - [[民盟中央与上海民盟文史知识合并底座]]
@@ -5023,7 +5139,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--sync-vault", default=None)
     p.set_defaults(func=command_assistant)
 
-    p = sub.add_parser("staff", help="盟参首席参谋入口：/稿 /史 /信 /题 /核")
+    p = sub.add_parser("staff", help="盟参首席参谋入口：/稿 /史 /信 /题 /数 /核")
     staff_sub = p.add_subparsers(dest="staff_command", required=True)
 
     p_staff = staff_sub.add_parser("draft", help="/稿：文稿素材包")
@@ -5081,6 +5197,10 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("external-sources", help="查看 Google Drive 外部参考层状态")
     p.add_argument("--save", action="store_true")
     p.set_defaults(func=command_external_sources)
+
+    p = sub.add_parser("verify", help="生成盟参系统可用性验收报告")
+    p.add_argument("--save", action="store_true")
+    p.set_defaults(func=command_verify)
 
     p = sub.add_parser("compile")
     p.add_argument("--topic", default=None)

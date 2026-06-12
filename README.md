@@ -279,9 +279,12 @@ kb corpus-style
 ```bash
 kb external-sources
 kb external-sources --save
+kb verify
+kb verify --save
 ```
 
 `external-sources` 会汇总 Drive 外部参考层登记情况；加 `--save` 会写入 `wiki/研究助手/Google Drive外部参考层状态.md`。
+`verify` 会生成系统可用性验收报告；加 `--save` 会写入 `wiki/研究助手/盟参系统可用性验收报告.md`。
 
 ## 自动编译 wiki 页面
 
@@ -381,6 +384,7 @@ kb export --path wiki/人物/沈钧儒.md --format markdown --format docx
 - `kb assistant`（民盟研究助手入口）
 - `kb staff`（盟参首席参谋入口：/稿 /史 /信 /题 /数 /核）
 - `kb brief`（领导参阅/工作简报素材包）
+- `kb verify`（盟参系统可用性验收报告）
 - `kb corpus`（微信公众号语料库体检、分类标签和样本库）
 - `kb compile`（自动编译带来源 wiki 页面）
 - `kb build-cards`（生成人物/事件/地点卡）
