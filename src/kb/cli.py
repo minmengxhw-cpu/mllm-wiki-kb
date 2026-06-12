@@ -1828,6 +1828,104 @@ def staff_info_body(root: Path, topic: str, rows: list[sqlite3.Row]) -> str:
 """
 
 
+def staff_stats_matches(labels: list[dict], query: str) -> list[dict]:
+    terms = [term for term in re.split(r"\s+", query.strip()) if term]
+    if not terms:
+        return labels
+    year_terms = {term for term in terms if re.fullmatch(r"\d{4}", term)}
+    text_terms = [term for term in terms if term not in year_terms]
+    matches = []
+    for label in labels:
+        if year_terms and str(label.get("year") or "") not in year_terms:
+            continue
+        haystack = " ".join(
+            [
+                str(label.get("title") or ""),
+                str(label.get("account") or ""),
+                str(label.get("year") or ""),
+                str(label.get("article_type_name") or ""),
+                " ".join(label.get("topic_tags") or []),
+                " ".join(label.get("people") or []),
+            ]
+        )
+        if all(term in haystack for term in text_terms):
+            matches.append(label)
+    if matches:
+        return matches
+    return [
+        label for label in labels
+        if (not year_terms or str(label.get("year") or "") in year_terms)
+        if any(term in " ".join([
+            str(label.get("title") or ""),
+            str(label.get("account") or ""),
+            str(label.get("year") or ""),
+            str(label.get("article_type_name") or ""),
+            " ".join(label.get("topic_tags") or []),
+        ]) for term in text_terms)
+    ]
+
+
+def counter_table(counter: Counter, left: str, right: str, limit: int = 20) -> str:
+    rows = [[left, right]]
+    rows.extend([[str(key), str(value)] for key, value in counter.most_common(limit)])
+    return markdown_table(rows)
+
+
+def staff_stats_body(root: Path, topic: str) -> str:
+    labels = load_article_labels(root)
+    matches = staff_stats_matches(labels, topic)
+    by_account = Counter(label.get("account") or "unknown" for label in matches)
+    by_year = Counter(label.get("year") or "unknown" for label in matches)
+    by_type = Counter(label.get("article_type_name") or "unknown" for label in matches)
+    topics = Counter()
+    for label in matches:
+        topics.update(label.get("topic_tags") or [])
+    recent_rows = [["日期", "账号", "类型", "标题", "raw 原文"]]
+    for item in sorted(matches, key=lambda label: label.get("published_at") or "", reverse=True)[:20]:
+        recent_rows.append([
+            item.get("published_at") or "日期不详",
+            item.get("account") or "",
+            item.get("article_type_name") or "",
+            f"《{item.get('title') or ''}》",
+            f"`{item.get('raw_path') or ''}`",
+        ])
+    return f"""# 盟参 /数：{topic}
+
+## 结论
+
+- 当前按文章标签库统计，命中 {len(matches)} 篇文章；全库标签总量 {len(labels)} 篇。
+- 统计结果用于选题研判、素材覆盖分析和人工校订优先级判断，不替代逐篇阅读。
+- 如果命中量异常偏大或偏小，应拆分关键词重新统计。
+
+## 素材
+
+### 按账号分布
+
+{counter_table(by_account, "账号", "篇数")}
+
+### 按年份分布
+
+{markdown_table([["年份", "篇数"]] + [[str(k), str(v)] for k, v in sorted(by_year.items(), reverse=True)])}
+
+### 按体裁分布
+
+{counter_table(by_type, "体裁", "篇数")}
+
+### 高频主题
+
+{counter_table(topics, "主题", "篇数")}
+
+### 最近样本
+
+{markdown_table(recent_rows)}
+
+## 风险提示
+
+- 统计基于机器标签，低置信和交叉体裁文章需要结合 `微信公众号分类优先校订清单.md` 人工复核。
+- 选题空白不能只凭“未命中”判断，需补充关键词、同义词和人工经验。
+"""
+
+
 def draft_has_citation(text: str) -> bool:
     return bool(re.search(r"\[[SM]\d+\]|raw:|raw 原文|来源|出处", text))
 
@@ -1966,6 +2064,10 @@ def command_staff(args: argparse.Namespace) -> int:
         elif args.staff_command == "info":
             body = staff_info_body(root, topic, rows)
             title = f"盟参信息素材：{topic}"
+        elif args.staff_command == "stats":
+            body = staff_stats_body(root, topic)
+            title = f"盟参统计看板：{topic}"
+            rows = []
         else:
             print(f"unknown staff command: {args.staff_command}", file=sys.stderr)
             return 2
@@ -3568,6 +3670,7 @@ kb staff draft "主题教育会议报道" --material "粘贴材料"
 kb staff history "沈钧儒"
 kb staff info "科技创新人才"
 kb staff topic "午间盟史课堂：费孝通与江村"
+kb staff stats "2025 参政议政"
 kb staff check --file ~/Desktop/draft.txt
 kb assistant "五一口号在民盟史上的意义" --mode history --save
 kb corpus-style
@@ -3580,6 +3683,7 @@ kb external-sources --save
 - `/史`：盟史、人物、事件、机构、地点研究入口，优先调用核心研究档案、自动卡片和 raw 原文。
 - `/信`：统战信息、社情民意、参政议政素材入口，按“问题发现、调研依据、对策建议、履职价值”组织。
 - `/题`：选题查重和差异化角度建议。
+- `/数`：账号、年份、体裁、主题热度和最近样本统计。
 - `/核`：文稿口径、黑名单、错别字、史实和引用风险预审。
 
 ## 工作规则
@@ -4943,6 +5047,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_staff.set_defaults(func=command_staff)
 
     p_staff = staff_sub.add_parser("info", help="/信：统战信息/参政议政素材包")
+    p_staff.add_argument("topic")
+    p_staff.add_argument("--top-k", type=int, default=12)
+    p_staff.add_argument("--save", action="store_true")
+    p_staff.set_defaults(func=command_staff)
+
+    p_staff = staff_sub.add_parser("stats", help="/数：语料统计和选题分布")
     p_staff.add_argument("topic")
     p_staff.add_argument("--top-k", type=int, default=12)
     p_staff.add_argument("--save", action="store_true")

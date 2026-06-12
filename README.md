@@ -187,7 +187,7 @@ kb assistant "上海民盟微信公众号人物采访写法" --mode writing --sa
 
 ## 盟参首席参谋
 
-`kb staff` 是面向日常工作的固定参谋入口，对应聊天窗口里的 `/稿 /史 /信 /题 /核`。
+`kb staff` 是面向日常工作的固定参谋入口，对应聊天窗口里的 `/稿 /史 /信 /题 /数 /核`。
 
 ```bash
 kb staff draft "80周年主委讲话" --top-k 12
@@ -196,6 +196,7 @@ kb staff draft "主题教育会议报道" --file ~/Desktop/material.txt
 kb staff history "沈钧儒" --top-k 12
 kb staff topic "午间盟史课堂：费孝通与江村" --top-k 20
 kb staff info "科技创新人才" --top-k 12
+kb staff stats "2025 参政议政" --top-k 12
 kb staff check "这里粘贴需要核稿的正文"
 kb staff check --file ~/Desktop/draft.txt
 kb brief "80周年工作安排" --top-k 10
@@ -203,13 +204,14 @@ kb brief "80周年工作安排" --top-k 10
 
 如果当前 shell 里没有全局 `kb` 命令，可在项目目录使用 `.venv/bin/kb staff ...`。
 
-五个模式统一输出：
+六个模式统一输出：
 
 - 结论：先判断当前材料能不能支撑写作、研究或放行。
 - 素材：列出同题历史稿、证据摘录、既有卡片或近似篇目，并带 `[S]` 来源和 raw 原文路径。
 - `/稿` 会先判断体裁，并自动带出 `上海民盟微信公众号精选写作样本.md` 中的同体裁样本。
 - `/稿 --material/--file` 会按体裁模板生成公众号初稿，并把缺失或无法确认的事实标成 `[待核]`。
 - `/信` 会按“问题发现、调研依据、对策建议、履职价值、风险核验”组织参政议政素材。
+- `/数` 会基于文章标签库输出账号、年份、体裁、主题和最近样本分布。
 - 生成初稿后会分开列出“用户材料核验”和“初稿核验”，便于继续补来源和改稿。
 - 风险提示：提示口径、史实争议、黑名单命中和 `[待核]` 项。
 
@@ -377,7 +379,7 @@ kb export --path wiki/人物/沈钧儒.md --format markdown --format docx
 - `kb search`（SQLite FTS5 + 本地向量补充）
 - `kb ask`（带来源引用的抽取式问答）
 - `kb assistant`（民盟研究助手入口）
-- `kb staff`（盟参首席参谋入口：/稿 /史 /信 /题 /核）
+- `kb staff`（盟参首席参谋入口：/稿 /史 /信 /题 /数 /核）
 - `kb brief`（领导参阅/工作简报素材包）
 - `kb corpus`（微信公众号语料库体检、分类标签和样本库）
 - `kb compile`（自动编译带来源 wiki 页面）

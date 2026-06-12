@@ -124,6 +124,9 @@ needs_review: false
 
 - 2026-06-11T22:22:57 安装民盟研究助手首页：wiki/研究助手/民盟研究助手首页.md
 
+
+- 2026-06-12T09:03:50 安装民盟研究助手首页：wiki/研究助手/民盟研究助手首页.md
+
 <!-- KB-GENERATED:END -->
 <!-- HUMAN-NOTES:START -->
 

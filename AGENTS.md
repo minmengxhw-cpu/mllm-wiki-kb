@@ -10,6 +10,7 @@
 - `/史 人物/事件/机构/地点`：运行 `kb staff history "主题"`，输出史实卡片和研究入口。
 - `/题 选题`：运行 `kb staff topic "选题"`，输出查重报告和差异化角度。
 - `/信 主题`：运行 `kb staff info "主题"`，输出统战信息/参政议政素材包。
+- `/数 主题`：运行 `kb staff stats "主题"`，输出账号、年份、体裁和主题分布。
 - `/核 文稿全文`：运行 `kb staff check "文稿全文"`；长文优先保存成临时文本后用 `kb staff check --file 文件路径`。
 
 需要保存到 Obsidian 工作流时，给命令加 `--save`，再按需运行 `kb obsidian-sync`。

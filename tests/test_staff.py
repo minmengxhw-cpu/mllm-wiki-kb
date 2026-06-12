@@ -21,6 +21,7 @@ from kb.cli import (  # noqa: E402
     staff_history_body,
     staff_info_body,
     staff_material_draft_body,
+    staff_stats_body,
 )
 
 
@@ -49,6 +50,12 @@ class StaffCommandTests(unittest.TestCase):
         self.assertEqual(args.command, "staff")
         self.assertEqual(args.staff_command, "info")
         self.assertEqual(args.topic, "科技创新人才")
+
+    def test_parser_accepts_staff_stats(self) -> None:
+        args = build_parser().parse_args(["staff", "stats", "2025 参政议政"])
+        self.assertEqual(args.command, "staff")
+        self.assertEqual(args.staff_command, "stats")
+        self.assertEqual(args.topic, "2025 参政议政")
 
     def test_parser_accepts_brief(self) -> None:
         args = build_parser().parse_args(["brief", "80周年", "工作"])
@@ -294,6 +301,34 @@ class StaffCommandTests(unittest.TestCase):
         self.assertIn("三点摘要", body)
         self.assertIn("简报结构建议", body)
         self.assertIn("[S1]", body)
+
+    def test_staff_stats_body_uses_article_labels(self) -> None:
+        root = self.make_root()
+        try:
+            corpus_dir = root / "index" / "corpus"
+            corpus_dir.mkdir(parents=True)
+            (corpus_dir / "article_labels.jsonl").write_text(
+                (
+                    '{"article_id":1,"title":"科技创新调研","account":"上海民盟","published_at":"2025-01-01",'
+                    '"year":"2025","article_type_name":"参政议政","topic_tags":["参政议政"],"people":[],'
+                    '"raw_path":"/tmp/1.md"}\n'
+                    '{"article_id":2,"title":"主题教育活动","account":"中国民主同盟","published_at":"2024-01-01",'
+                    '"year":"2024","article_type_name":"主题教育","topic_tags":["主题教育"],"people":[],'
+                    '"raw_path":"/tmp/2.md"}\n'
+                    '{"article_id":3,"title":"2025年度参政议政表彰","account":"中国民主同盟","published_at":"2026-01-01",'
+                    '"year":"2026","article_type_name":"参政议政","topic_tags":["参政议政"],"people":[],'
+                    '"raw_path":"/tmp/3.md"}\n'
+                ),
+                encoding="utf-8",
+            )
+            body = staff_stats_body(root, "2025 参政议政")
+            self.assertIn("盟参 /数", body)
+            self.assertIn("命中 1 篇文章", body)
+            self.assertIn("上海民盟", body)
+            self.assertIn("/tmp/1.md", body)
+            self.assertNotIn("/tmp/3.md", body)
+        finally:
+            shutil.rmtree(root)
 
     def test_external_sources_report_summarizes_drive_layer(self) -> None:
         root = self.make_root()
