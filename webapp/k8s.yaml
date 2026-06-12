@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mllmwiki-web
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: mllmwiki-web }
+  template:
+    metadata:
+      labels: { app: mllmwiki-web }
+    spec:
+      containers:
+        - name: web
+          image: registry.yun.local/mllmwiki-web:20260612r1
+          ports: [{ containerPort: 8000 }]
+          readinessProbe:
+            httpGet: { path: /healthz, port: 8000 }
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 50m, memory: 96Mi }
+            limits: { cpu: 500m, memory: 256Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mllmwiki-web
+  namespace: devops
+spec:
+  selector: { app: mllmwiki-web }
+  ports: [{ port: 80, targetPort: 8000 }]
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: mllmwiki-basic-auth
+  namespace: devops
+spec:
+  basicAuth:
+    secret: mllmwiki-auth
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: mllmwiki-web
+  namespace: devops
+spec:
+  entryPoints: [web]
+  routes:
+    - kind: Rule
+      match: Host(`mllmwiki.yun.local`) || Host(`mllmwiki.zcpz.cc`)
+      middlewares:
+        - name: mllmwiki-basic-auth
+      services:
+        - name: mllmwiki-web
+          port: 80
