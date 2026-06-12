@@ -292,11 +292,14 @@ kb corpus-style
 ```bash
 kb external-sources
 kb external-sources --save
+kb guardrails
+kb guardrails --save
 kb verify
 kb verify --save
 ```
 
 `external-sources` 会汇总 Drive 外部参考层登记情况；加 `--save` 会写入 `wiki/研究助手/Google Drive外部参考层状态.md`。
+`guardrails` 会汇总口径库和黑名单；加 `--save` 会写入 `wiki/研究助手/口径风险清单.md`，用于写稿前查看、成稿后核验。
 `verify` 会生成系统可用性验收报告；加 `--save` 会写入 `wiki/研究助手/盟参系统可用性验收报告.md`。
 
 ## 自动编译 wiki 页面

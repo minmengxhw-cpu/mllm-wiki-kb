@@ -3569,6 +3569,105 @@ def command_external_sources(args: argparse.Namespace) -> int:
     return 0
 
 
+def guardrails_report_markdown(root: Path, created_at: str) -> str:
+    blacklist = load_blacklist(root)
+    formulations = load_formulations(root)
+    severity_counts = Counter((item.get("severity") or "未标注").strip() for item in blacklist)
+    category_counts = Counter((item.get("category") or "未分类").strip() for item in blacklist)
+    formulation_status_counts = Counter((item.get("status") or "未标注").strip() for item in formulations)
+
+    severity_rows = [["严重程度", "数量"]]
+    for key in ["blocker", "high", "medium", "low", "未标注"]:
+        if severity_counts.get(key):
+            severity_rows.append([key, str(severity_counts[key])])
+
+    category_rows = [["类别", "数量"]]
+    for category, count in category_counts.most_common():
+        category_rows.append([category, str(count)])
+
+    formulation_rows = [["状态", "数量"]]
+    for status, count in formulation_status_counts.most_common():
+        formulation_rows.append([status, str(count)])
+
+    blacklist_rows = [["风险词", "类别", "严重程度", "建议表述"]]
+    for item in sorted(blacklist, key=lambda row: staff_severity_rank(row.get("severity")))[:80]:
+        blacklist_rows.append(
+            [
+                item.get("pattern") or "",
+                item.get("category") or "",
+                item.get("severity") or "",
+                item.get("canonical") or "",
+            ]
+        )
+
+    formulation_detail_rows = [["口径项", "状态", "规范表述", "风险变体"]]
+    for item in formulations[:80]:
+        variants = item.get("variants") or []
+        variant_text = "、".join(str(v) for v in variants) if isinstance(variants, list) else str(variants)
+        formulation_detail_rows.append(
+            [
+                item.get("term") or "",
+                item.get("status") or "",
+                item.get("canonical") or "",
+                variant_text,
+            ]
+        )
+
+    return f"""# 口径风险清单
+
+生成时间：{created_at}
+
+## 总体判断
+
+- 当前黑名单词条：{len(blacklist)} 条。
+- 当前口径库条目：{len(formulations)} 条。
+- 这些条目会被 `/核` 和 `kb staff check` 调用，用于提醒机构名称、人物姓名、史实雷区、公开语料边界和成稿边界。
+- 本清单是工作用种子库，不替代红头文件、内部口径和人工终审。
+
+## 黑名单严重程度
+
+{markdown_table(severity_rows)}
+
+## 黑名单类别
+
+{markdown_table(category_rows)}
+
+## 口径库状态
+
+{markdown_table(formulation_rows)}
+
+## 黑名单明细
+
+{markdown_table(blacklist_rows)}
+
+## 口径库明细
+
+{markdown_table(formulation_detail_rows)}
+
+## 使用办法
+
+1. 写稿前先用 `/稿` 输出素材包，必要时查看本页确认高风险表述。
+2. 成稿后用 `/核` 或 `kb staff check` 逐条拦截。
+3. 命中 blocker 或 high 的内容，不直接定稿，必须回到权威来源或正式口径核定。
+"""
+
+
+def command_guardrails(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    body = guardrails_report_markdown(root, now_iso())
+    if args.save:
+        path = report_dir(root) / "口径风险清单.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(body, encoding="utf-8")
+        append_wiki_log(root, f"生成口径风险清单：{path.relative_to(root)}")
+        log_operation(root, "guardrails", "ok", "report saved", {"output": str(path)})
+        print(path)
+    else:
+        print(body)
+        log_operation(root, "guardrails", "ok", "printed")
+    return 0
+
+
 def command_brief(args: argparse.Namespace) -> int:
     root = project_root_from_args(args.project_root)
     query = " ".join(args.query).strip()
@@ -3617,6 +3716,7 @@ def verify_report_markdown(root: Path, created_at: str) -> str:
         "wiki/研究助手/微信公众号文史盟史研究入口清单.md",
         "wiki/研究助手/Google Drive外部参考层状态.md",
         "wiki/研究助手/Obsidian同步状态.md",
+        "wiki/研究助手/口径风险清单.md",
         "index/corpus/article_labels.jsonl",
         "index/formulations.jsonl",
         "index/blacklist.csv",
@@ -5081,7 +5181,7 @@ def command_refresh(args: argparse.Namespace) -> int:
     print(f"Duplicate articles: {duplicate_count}")
     print(f"Failed preview: {failed}")
     if args.dry_run:
-        print("Would import, rebuild indexes, refresh cards, corpus reports, writing/style/history/policy materials, research dossiers, external-source status, verification report, Obsidian sync, and Obsidian status.")
+        print("Would import, rebuild indexes, refresh cards, corpus reports, writing/style/history/policy materials, research dossiers, external-source status, guardrails report, verification report, Obsidian sync, and Obsidian status.")
         log_operation(root, "refresh", "dry-run", f"new={new_count} duplicate={duplicate_count} failed={failed}")
         return 0
 
@@ -5110,6 +5210,7 @@ def command_refresh(args: argparse.Namespace) -> int:
     command_build_research_dossiers(argparse.Namespace(project_root=args.project_root, set="core-people", limit=0, top_k=args.top_k))
     command_build_research_dossiers(argparse.Namespace(project_root=args.project_root, set="core-events", limit=0, top_k=args.top_k))
     command_external_sources(argparse.Namespace(project_root=args.project_root, save=True))
+    command_guardrails(argparse.Namespace(project_root=args.project_root, save=True))
     command_assistant(argparse.Namespace(project_root=args.project_root, query=None, mode="auto", top_k=args.top_k, save=False, install=True, sync_vault=None))
     command_verify(argparse.Namespace(project_root=args.project_root, save=True))
     priority_count = apply_priority_card_status(root)
@@ -5379,6 +5480,10 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("external-sources", help="查看 Google Drive 外部参考层状态")
     p.add_argument("--save", action="store_true")
     p.set_defaults(func=command_external_sources)
+
+    p = sub.add_parser("guardrails", help="生成口径风险清单")
+    p.add_argument("--save", action="store_true")
+    p.set_defaults(func=command_guardrails)
 
     p = sub.add_parser("verify", help="生成盟参系统可用性验收报告")
     p.add_argument("--save", action="store_true")

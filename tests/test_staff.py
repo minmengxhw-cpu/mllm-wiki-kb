@@ -19,6 +19,7 @@ from kb.cli import (  # noqa: E402
     command_refresh,
     dict_to_row,
     external_sources_report_markdown,
+    guardrails_report_markdown,
     normalized_similarity,
     obsidian_status_markdown,
     obsidian_sync_status,
@@ -447,6 +448,22 @@ class StaffCommandTests(unittest.TestCase):
         self.assertEqual(args.command, "obsidian-status")
         self.assertTrue(args.save)
 
+    def test_guardrails_report_lists_blacklist_and_formulations(self) -> None:
+        root = self.make_root()
+        try:
+            body = guardrails_report_markdown(root, "2026-06-12T00:00:00")
+            self.assertIn("口径风险清单", body)
+            self.assertIn("黑名单词条", body)
+            self.assertIn("上海民盟市委", body)
+            self.assertIn("80周年纪念写作边界", body)
+        finally:
+            shutil.rmtree(root)
+
+    def test_parser_accepts_guardrails(self) -> None:
+        args = build_parser().parse_args(["guardrails", "--save"])
+        self.assertEqual(args.command, "guardrails")
+        self.assertTrue(args.save)
+
     def test_refresh_dry_run_mentions_full_refresh_chain(self) -> None:
         root = self.make_root()
         input_dir = root / "input"
@@ -471,6 +488,7 @@ class StaffCommandTests(unittest.TestCase):
             text = out.getvalue()
             self.assertIn("corpus reports", text)
             self.assertIn("research dossiers", text)
+            self.assertIn("guardrails report", text)
             self.assertIn("verification report", text)
         finally:
             shutil.rmtree(root)
