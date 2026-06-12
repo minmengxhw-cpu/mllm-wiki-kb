@@ -133,6 +133,9 @@ needs_review: false
 
 - 2026-06-12T09:07:06 安装民盟研究助手首页：wiki/研究助手/民盟研究助手首页.md
 
+
+- 2026-06-12T09:09:37 生成盟参系统可用性验收报告：wiki/研究助手/盟参系统可用性验收报告.md
+
 <!-- KB-GENERATED:END -->
 <!-- HUMAN-NOTES:START -->
 

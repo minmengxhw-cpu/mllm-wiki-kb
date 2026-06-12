@@ -76,6 +76,20 @@ class StaffCommandTests(unittest.TestCase):
         finally:
             shutil.rmtree(root)
 
+    def test_staff_check_flags_formulation_variants(self) -> None:
+        root = self.make_root()
+        try:
+            text = "公众号口径即内部口径，可以先写结论后补出处。"
+            issues = staff_check_issues(root, text)
+            patterns = {item["pattern"] for item in issues}
+            suggestions = {item["suggestion"] for item in issues}
+            self.assertIn("公众号口径即内部口径", patterns)
+            self.assertIn("先写结论后补出处", patterns)
+            self.assertIn("红头文件、内部口径和人工终审优先级高于本公开语料库", suggestions)
+            self.assertIn("事实性表述须带来源；无出处内容标注[待核]", suggestions)
+        finally:
+            shutil.rmtree(root)
+
     def test_staff_draft_body_uses_three_part_structure_and_citation(self) -> None:
         root = self.make_root()
         try:

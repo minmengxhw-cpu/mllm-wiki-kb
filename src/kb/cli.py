@@ -1057,6 +1057,25 @@ def match_blacklist(root: Path, text: str) -> list[dict]:
     return matches
 
 
+def match_formulation_risks(root: Path, text: str) -> list[dict]:
+    matches = []
+    for item in load_formulations(root):
+        canonical = str(item.get("canonical") or "").strip()
+        status = str(item.get("status") or "").strip()
+        for variant in value_variants({"variants": item.get("variants") or []}):
+            if variant and variant in text and variant != canonical:
+                matches.append(
+                    {
+                        "severity": "high" if status in {"禁用", "待核"} else "medium",
+                        "category": "口径",
+                        "pattern": variant,
+                        "suggestion": canonical or "请回到现行规范表述核定",
+                        "note": item.get("note") or "",
+                    }
+                )
+    return matches
+
+
 def staff_severity_rank(value: str | None) -> int:
     return {"blocker": 0, "high": 1, "medium": 2, "low": 3}.get((value or "").strip(), 4)
 
@@ -1942,6 +1961,7 @@ def staff_check_issues(root: Path, text: str) -> list[dict]:
                 "note": item.get("note") or "",
             }
         )
+    issues.extend(match_formulation_risks(root, text))
     if len(text.strip()) >= 20 and not draft_has_citation(text):
         issues.append(
             {
@@ -3525,7 +3545,7 @@ def verify_report_markdown(root: Path, created_at: str) -> str:
 - 盟史：可用。可通过 `/史`、人物/事件研究档案、自动卡片和 raw 原文进入研究。
 - 参政议政：可用。可通过 `/信` 和参政议政素材主题库归集问题、依据和建议。
 - 统计：可用。可通过 `/数` 查看账号、年份、体裁、主题和最近样本分布。
-- 核验：基础可用。`/核` 已能拦截种子黑名单、来源缺失和部分史实风险；高风险公文仍必须人工终审。
+- 核验：基础可用。`/核` 已能拦截种子黑名单、口径库错误变体、来源缺失和部分史实风险；高风险公文仍必须人工终审。
 
 ## 继续完善方向
 
