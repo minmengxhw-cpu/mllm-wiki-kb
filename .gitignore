@@ -12,3 +12,5 @@ data/raw/
 data/quarantine/
 data/attachments/
 exports/
+corpus_crawl/
+corpus/
