@@ -81,7 +81,7 @@
     ).join("");
     const ents = DATA.entities || {};
     view.innerHTML = `
-      <section class="hero">${SWIRL}
+      <section class="hero">
         <p class="eyebrow">上海民盟 · 研究知识底座</p>
         <h1>民盟知识库</h1>
         <p class="hero-sub">面向民盟、上海民盟、统一战线与盟史研究的结构化知识底座——人物、事件、盟史、履职素材、公众号写法，皆可检索追溯。</p>
