@@ -32,13 +32,13 @@
   }
 
   function renderSidebar() {
-    const order = DATA.category_order.filter((c) => CAT_COUNTS[c]);
-    const cats = order.map((c) =>
-      `<li><a href="#/c/${encodeURIComponent(c)}" data-cat="${esc(c)}"><span>${esc(c)}</span><span class="cat-n">${CAT_COUNTS[c]}</span></a></li>`
+    const dims = DATA.dimensions || [];
+    const dl = dims.map((d) =>
+      `<li><a href="#/d/${encodeURIComponent(d.name)}"><span>${esc(d.name)}</span><span class="cat-n">${d.count}</span></a></li>`
     ).join("");
     $("#sidebar").innerHTML = `
-      <p class="side-head">知识分类</p>
-      <ul class="cat-list">${cats}</ul>
+      <p class="side-head">民主党派工作 · 六维度</p>
+      <ul class="cat-list">${dl}</ul>
       <p class="side-head">专题视图</p>
       <ul class="cat-list">
         <li><a href="#/entities"><span>人物·事件·机构·地点</span><span class="cat-n">${entCount()}</span></a></li>
@@ -53,6 +53,7 @@
     window.scrollTo(0, 0);
     let m;
     if (h === "/" || h === "") return renderHome(view);
+    if ((m = h.match(/^\/d\/(.+)$/))) return renderDimension(view, decodeURIComponent(m[1]));
     if ((m = h.match(/^\/c\/(.+)$/))) return renderCategory(view, decodeURIComponent(m[1]));
     if ((m = h.match(/^\/p\/(.+)$/))) return renderPage(view, decodeURIComponent(m[1]));
     if (h.indexOf("/search") === 0) {
@@ -66,11 +67,11 @@
 
   /* ---------- 各视图 ---------- */
   function renderHome(view) {
-    const order = DATA.category_order.filter((c) => CAT_COUNTS[c]);
-    const cards = order.map((c) =>
-      `<a class="cat-card" href="#/c/${encodeURIComponent(c)}">
-        <div class="cc-top"><span class="cc-name">${esc(c)}</span><span class="cc-n">${CAT_COUNTS[c]}</span></div>
-        <p class="cc-desc">${esc(DATA.category_desc[c] || "")}</p></a>`
+    const dims = DATA.dimensions || [];
+    const cards = dims.map((d) =>
+      `<a class="cat-card${d.count ? "" : " dim-empty"}" href="#/d/${encodeURIComponent(d.name)}">
+        <div class="cc-top"><span class="cc-name">${esc(d.name)}</span><span class="cc-n">${d.count || "待补充"}</span></div>
+        <p class="cc-desc">${esc(d.desc)}</p></a>`
     ).join("");
     const recent = Object.values(DATA.pages).slice()
       .sort((a, b) => (b.last_compiled || "").localeCompare(a.last_compiled || "")).slice(0, 8);
@@ -91,10 +92,36 @@
           <span class="stat"><span class="s-num">${DATA.generated_pages}</span><span class="s-lab">知识页</span></span>
         </div>
       </section>
-      <section class="block"><div class="sec-title"><h2>知识分类</h2><span class="sec-rule"></span></div>
+      <section class="block"><div class="sec-title"><h2>民主党派工作 · 六大维度</h2><span class="sec-rule"></span></div>
+        <p class="page-lede" style="margin:-8px 0 16px">按《民主党派工作综合调研框架》六维度组织：参政议政 · 组织建设 · 思想建设 · 社会服务 · 理论研究 · 党派历史研究。</p>
         <div class="cat-grid">${cards}</div></section>
       <section class="block"><div class="sec-title"><h2>最近编译</h2><span class="sec-rule"></span></div>
         <ul class="recent-list">${recentHtml}</ul></section>`;
+  }
+
+  function renderDimension(view, dim) {
+    const d = (DATA.dimensions || []).find((x) => x.name === dim);
+    const items = Object.values(DATA.pages).filter((p) => p.dimension === dim)
+      .sort((a, b) => (a.category || "").localeCompare(b.category || "") || a.title.localeCompare(b.title));
+    const crumb = `<nav class="crumb"><a href="#/">首页</a> / ${esc(dim)}</nav>`;
+    const head = `<h1 class="page-h1">${esc(dim)} <span class="h1-n">${items.length} 页</span></h1>
+      <p class="page-lede">${esc(d ? d.desc : "")}</p>`;
+    if (!items.length) {
+      view.innerHTML = crumb + head +
+        '<p class="empty">该维度的知识页正在补充——语料编译完成后会陆续填充（参政议政 / 组织建设 / 社会服务 / 理论研究 等维度待新语料过编译后扩页）。</p>';
+      return;
+    }
+    const groups = {};
+    items.forEach((p) => { (groups[p.category] = groups[p.category] || []).push(p); });
+    let body = "";
+    Object.keys(groups).forEach((cat) => {
+      body += `<h3 class="sub-head">${esc(cat)} <span class="h1-n">${groups[cat].length}</span></h3>`;
+      body += `<ul class="page-list">${groups[cat].map((p) =>
+        `<li><a href="#/p/${encodeURIComponent(p.slug)}">${esc(p.title)}</a><span class="pl-meta">${
+          p.needs_review ? '<span class="badge-review">待校订</span>' : ""}${
+          p.source_count ? `<span class="pl-src">${p.source_count} 源</span>` : ""}</span></li>`).join("")}</ul>`;
+    });
+    view.innerHTML = crumb + head + body;
   }
 
   function renderCategory(view, cat) {

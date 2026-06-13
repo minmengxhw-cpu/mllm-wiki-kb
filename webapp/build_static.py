@@ -38,10 +38,38 @@ def build_content():
             "last_compiled": p["last_compiled"],
             "html": kbapp.render_md(p["body_md"]),
         }
+    # 六维度官方框架（《民主党派工作综合调研框架》）→ 现有 wiki 分类映射
+    DIM_ORDER = ["参政议政", "组织建设", "思想建设", "社会服务", "理论研究", "党派历史研究"]
+    DIM_DESC = {
+        "参政议政": "履职建言、社情民意、提案与民主监督",
+        "组织建设": "组织发展、领导班子与后备干部、机关建设",
+        "思想建设": "政治交接、主题教育、思想引领与宣传",
+        "社会服务": "智力支边、教育帮扶、烛光行动等品牌项目",
+        "理论研究": "统一战线学、多党合作与参政党建设理论",
+        "党派历史研究": "盟史、人物、事件与传统教育基地",
+    }
+    CAT_TO_DIM = {
+        "参政议政": "参政议政",
+        "思想宣传": "思想建设", "主题教育": "思想建设", "文稿素材": "思想建设",
+        "盟史": "党派历史研究", "人物": "党派历史研究", "事件": "党派历史研究",
+        "传统教育基地": "党派历史研究", "研究助手": "党派历史研究",
+    }
+    for p in out_pages.values():
+        p["dimension"] = CAT_TO_DIM.get(p["category"], "党派历史研究")
+    # 维度 → 分类 → 计数
+    dims = []
+    for dn in DIM_ORDER:
+        cats = {}
+        for p in out_pages.values():
+            if p["dimension"] == dn:
+                cats[p["category"]] = cats.get(p["category"], 0) + 1
+        dims.append({"name": dn, "desc": DIM_DESC[dn], "count": sum(cats.values()), "cats": cats})
     content = {
         "pages": out_pages,
         "category_order": kbapp.CATEGORY_ORDER,
         "category_desc": kbapp.CATEGORY_DESC,
+        "dimension_order": DIM_ORDER,
+        "dimensions": dims,
         "entities": ents,
         "formulations": formus,
         "generated_pages": len(out_pages),
