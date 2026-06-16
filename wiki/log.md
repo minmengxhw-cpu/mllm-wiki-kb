@@ -199,6 +199,21 @@ needs_review: false
 
 - 2026-06-17T05:53:38 生成 Obsidian 同步状态：wiki/研究助手/Obsidian同步状态.md
 
+
+- 2026-06-17T06:06:22 生成口径风险清单：wiki/研究助手/口径风险清单.md
+
+
+- 2026-06-17T06:06:34 生成盟参系统可用性验收报告：wiki/研究助手/盟参系统可用性验收报告.md
+
+
+- 2026-06-17T06:07:17 生成 Obsidian 同步状态：wiki/研究助手/Obsidian同步状态.md
+
+
+- 2026-06-17T06:07:50 生成盟参系统可用性验收报告：wiki/研究助手/盟参系统可用性验收报告.md
+
+
+- 2026-06-17T06:08:06 生成 Obsidian 同步状态：wiki/研究助手/Obsidian同步状态.md
+
 <!-- KB-GENERATED:END -->
 <!-- HUMAN-NOTES:START -->
 

@@ -41,6 +41,14 @@
 
 当用户要求“先把微信文章做实”“语料库体检”“文章分类”“写作样本库”时，优先运行 `kb corpus`，并基于以下产物回答：
 
+- `wiki/研究助手/盟参三阶段总工作台.md`
+- `wiki/研究助手/80周年专题工作台.md`
+- `wiki/研究助手/上海民盟五类写作模板精修版.md`
+- `wiki/研究助手/80周年口径风险清单.md`
+- `wiki/研究助手/盟史研究深化工作台.md`
+- `wiki/研究助手/上海民盟组织沿革时间线.md`
+- `wiki/研究助手/微信公众号新增与月度维护流程.md`
+- `wiki/研究助手/Google Drive分层接入与样本轮换流程.md`
 - `index/corpus/article_labels.jsonl`
 - `index/corpus/classification_review.csv`
 - `index/corpus/classification_priority_review.csv`
