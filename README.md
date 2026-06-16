@@ -236,6 +236,22 @@ kb brief "80周年工作安排" --top-k 10
 
 需要保存一次盟参输出时，加 `--save`，系统会写入 `wiki/研究助手/`。
 
+## 静态站与公开边界
+
+远端新增的 `webapp/` 和 `docs/` 可把本地 wiki 编译成 GitHub Pages 静态预览。默认加密模式需要口令：
+
+```bash
+KB_PASSPHRASE=自定义口令 python3 webapp/build_static.py
+```
+
+如需在私有仓库里生成无口令预览，可使用：
+
+```bash
+KB_PUBLIC=1 python3 webapp/build_static.py
+```
+
+注意：`KB_PUBLIC=1` 会生成明文 `docs/content.json`。构建脚本会脱敏本机绝对路径，但页面内容仍来自本知识库 wiki，只适合私有仓库或内部预览；公开发布前必须重新审查全文边界。红头文件、内部口径、未公开材料和 Google Drive 工作文件不得进入公开静态包。
+
 ## 微信公众号语料库建设
 
 ```bash

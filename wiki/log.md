@@ -184,6 +184,15 @@ needs_review: false
 
 - 2026-06-16T20:17:34 生成 Obsidian 同步状态：wiki/研究助手/Obsidian同步状态.md
 
+
+- 2026-06-16T20:43:30 盟参生成页面：wiki/研究助手/盟参文稿素材：上海民盟80周年主委讲话.md
+
+
+- 2026-06-16T20:43:44 生成盟参系统可用性验收报告：wiki/研究助手/盟参系统可用性验收报告.md
+
+
+- 2026-06-16T20:45:53 生成 Obsidian 同步状态：wiki/研究助手/Obsidian同步状态.md
+
 <!-- KB-GENERATED:END -->
 <!-- HUMAN-NOTES:START -->
 

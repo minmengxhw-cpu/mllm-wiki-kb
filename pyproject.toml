@@ -8,7 +8,12 @@ version = "0.1.0"
 description = "Local MLLM wiki knowledge base for Minmeng/United Front WeChat articles"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "cryptography>=42",
+    "Flask>=3",
+    "Markdown>=3",
+    "PyYAML>=6",
+]
 
 [project.scripts]
 kb = "kb.cli:main"
@@ -18,4 +23,3 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
