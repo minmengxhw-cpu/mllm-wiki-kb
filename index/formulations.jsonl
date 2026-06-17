@@ -11,3 +11,4 @@
 {"term":"上海民盟80周年纪念对象","canonical":"80周年相关表述必须先核定纪念对象；上海民盟地方组织、全国民盟、抗战胜利和具体事件不得混写","variants":["80周年就是民盟成立80周年","八秩华诞可泛指所有民盟纪念主题"],"first_seen":"2026-06","latest_source":"wiki:80周年口径风险清单","status":"现行","note":"用于80周年专题、讲话、活动报道和文史纪念。"}
 {"term":"三阶段维护闭环","canonical":"专题或月度维护完成后，必须同时完成wiki更新、Obsidian状态复核、静态站脱敏构建、测试检查和GitHub推送","variants":["只更新本地wiki即可收尾","只同步Obsidian不提交GitHub"],"first_seen":"2026-06","latest_source":"wiki:盟参三阶段总工作台","status":"现行","note":"用于长期维护和收尾审计。"}
 {"term":"Drive资料分层","canonical":"Google Drive工作材料先作为外部参考层；只有确认公开属性的材料才能进入微信公众号主语料","variants":["Drive资料自动混入主语料","内部讲话稿直接作为公众号样本"],"first_seen":"2026-06","latest_source":"wiki:Google Drive分层接入与样本轮换流程","status":"现行","note":"用于外部资料接入和公开边界控制。"}
+{"term":"80周年实战生产流程","canonical":"80周年稿件先查核心材料总表，再进入对应素材包，成稿后依次执行史实核验、称谓规范核验和/核预审","variants":["直接凭主题写80周年稿","先写成稿后再找来源"],"first_seen":"2026-06","latest_source":"wiki:80周年实战生产系统","status":"现行","note":"用于80周年写稿、审稿、查史和选题策划。"}
