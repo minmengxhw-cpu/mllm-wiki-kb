@@ -4,6 +4,7 @@ import argparse
 import contextlib
 import io
 import shutil
+import sqlite3
 import sys
 import tempfile
 import unittest
@@ -39,6 +40,7 @@ from kb.sources import (  # noqa: E402
     sources_dashboard_markdown,
 )
 from kb.staff_check import staff_check_issues  # noqa: E402
+from kb.store import ensure_schema_columns  # noqa: E402
 
 
 class StaffCommandTests(unittest.TestCase):
@@ -135,6 +137,24 @@ class StaffCommandTests(unittest.TestCase):
         vector = text_vector("沈钧儒 民盟史")
         self.assertEqual(len(vector), 256)
         self.assertGreater(sum(abs(item) for item in vector), 0)
+
+    def test_schema_has_authority_source_fields(self) -> None:
+        root = self.make_root()
+        try:
+            conn = sqlite3.connect(root / "index" / "kb.sqlite")
+            conn.row_factory = sqlite3.Row
+            conn.executescript((root / "schema.sql").read_text(encoding="utf-8"))
+            ensure_schema_columns(conn)
+            article_columns = {row["name"] for row in conn.execute("PRAGMA table_info(articles)").fetchall()}
+            source_columns = {row["name"] for row in conn.execute("PRAGMA table_info(sources)").fetchall()}
+            conn.close()
+            self.assertIn("authority_level", article_columns)
+            self.assertIn("source_tier", article_columns)
+            self.assertIn("is_citable", article_columns)
+            self.assertIn("authority_level", source_columns)
+            self.assertIn("is_citable", source_columns)
+        finally:
+            shutil.rmtree(root)
 
     def test_pro_source_tasks_skip_deferred_sources(self) -> None:
         sources = [

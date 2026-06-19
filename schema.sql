@@ -9,6 +9,10 @@ CREATE TABLE IF NOT EXISTS articles (
     source_path TEXT NOT NULL,
     raw_path TEXT,
     source_url TEXT,
+    source_id TEXT,
+    source_tier TEXT NOT NULL DEFAULT 'L4',
+    authority_level TEXT NOT NULL DEFAULT 'L4',
+    is_citable INTEGER NOT NULL DEFAULT 0,
     content_hash TEXT NOT NULL UNIQUE,
     imported_at TEXT NOT NULL,
     file_type TEXT,
@@ -86,6 +90,21 @@ CREATE TABLE IF NOT EXISTS operations_log (
     created_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS sources (
+    source_id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    url TEXT,
+    authority_level TEXT NOT NULL,
+    source_tier TEXT NOT NULL,
+    is_citable INTEGER NOT NULL DEFAULT 0,
+    collection_method TEXT,
+    update_frequency TEXT,
+    copyright_boundary TEXT,
+    note TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS chunk_vectors (
     chunk_id INTEGER PRIMARY KEY,
     article_id INTEGER NOT NULL,
@@ -101,6 +120,7 @@ CREATE INDEX IF NOT EXISTS idx_articles_source_url ON articles(source_url);
 CREATE INDEX IF NOT EXISTS idx_article_chunks_article_id ON article_chunks(article_id);
 CREATE INDEX IF NOT EXISTS idx_entities_type_name ON entities(entity_type, name);
 CREATE INDEX IF NOT EXISTS idx_chunk_vectors_article_id ON chunk_vectors(article_id);
+CREATE INDEX IF NOT EXISTS idx_sources_authority_level ON sources(authority_level);
 
 CREATE VIRTUAL TABLE IF NOT EXISTS article_chunks_fts USING fts5(
     content,

@@ -310,6 +310,9 @@ needs_review: false
 
 - 2026-06-19T17:27:01 生成 Obsidian 同步状态：wiki/研究助手/Obsidian同步状态.md
 
+
+- 2026-06-19T17:34:39 初始化项目目录和数据库
+
 <!-- KB-GENERATED:END -->
 <!-- HUMAN-NOTES:START -->
 
