@@ -354,6 +354,7 @@ def command_ingest_url(args: argparse.Namespace) -> int:
             title=args.title,
             published_at=args.published_at,
             timeout=args.timeout,
+            insecure=args.insecure,
         )
     except Exception as exc:
         print(f"URL fetch failed: {exc}", file=sys.stderr)
@@ -5163,6 +5164,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--title", default=None, help="覆盖标题")
     p.add_argument("--published-at", default=None, help="覆盖发布日期 YYYY-MM-DD")
     p.add_argument("--timeout", type=int, default=20)
+    p.add_argument("--insecure", action="store_true", help="显式允许跳过 TLS 证书校验，仅用于已确认的公开旧站页面")
     p.add_argument("--dry-run", action="store_true")
     p.set_defaults(func=command_ingest_url)
 

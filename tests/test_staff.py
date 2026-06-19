@@ -397,6 +397,7 @@ class StaffCommandTests(unittest.TestCase):
                 title=None,
                 published_at="2026-06-19",
                 timeout=5,
+                insecure=False,
                 dry_run=False,
             )
             with contextlib.redirect_stdout(io.StringIO()):
@@ -419,6 +420,19 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("权威网页正文", chunk["content"])
         finally:
             shutil.rmtree(root)
+
+    def test_html_main_text_prefers_nested_news_body(self) -> None:
+        raw = """
+        <html><body>
+        <div class="content">导航</div>
+        <div class="text_box"><p>第一段正文</p><div><p>嵌套正文 沈钧儒 救国会</p></div></div>
+        <div class="footer">友情链接</div>
+        </body></html>
+        """
+        text = html_main_text(raw)
+        self.assertIn("第一段正文", text)
+        self.assertIn("嵌套正文 沈钧儒 救国会", text)
+        self.assertNotIn("友情链接", text)
 
     def test_pro_source_tasks_skip_deferred_sources(self) -> None:
         sources = [

@@ -5,6 +5,7 @@ import html
 import json
 import re
 import shutil
+import ssl
 import urllib.request
 from dataclasses import dataclass
 from datetime import datetime
@@ -63,11 +64,41 @@ def html_title(raw: str) -> str | None:
     return title[:120] if title else None
 
 
+def html_balanced_block(raw: str, tag: str, attr_pattern: str) -> str | None:
+    start_match = re.search(rf"(?is)<{tag}\b(?=[^>]*{attr_pattern})[^>]*>", raw)
+    if not start_match:
+        return None
+    depth = 1
+    pos = start_match.end()
+    token_re = re.compile(rf"(?is)<(/?){tag}\b[^>]*>")
+    for match in token_re.finditer(raw, pos):
+        if match.group(1):
+            depth -= 1
+            if depth == 0:
+                return raw[start_match.start() : match.end()]
+        else:
+            depth += 1
+    return raw[start_match.start() :]
+
+
 def html_main_text(raw: str) -> str:
     candidates = []
+    for tag, attr_pattern in [
+        ("div", r"id=[\"'](?:ozoom|zoom|fontzoom)[\"']"),
+        ("div", r"class=[\"'][^\"']*text_box[^\"']*[\"']"),
+        ("div", r"class=[\"'][^\"']*Content[^\"']*[\"']"),
+        ("div", r"(?:id|class)=[\"'][^\"']*(?:article|main|正文)[^\"']*[\"']"),
+        ("founder-content", r""),
+        ("article", r""),
+        ("main", r""),
+    ]:
+        block = html_balanced_block(raw, tag, attr_pattern)
+        if block:
+            candidates.append(block)
     for pattern in [
         r"(?is)<article[^>]*>(.*?)</article>",
         r"(?is)<main[^>]*>(.*?)</main>",
+        r"(?is)<founder-content[^>]*>(.*?)</founder-content>",
         r"(?is)<div[^>]+(?:class|id)=[\"'][^\"']*(?:content|article|main|正文)[^\"']*[\"'][^>]*>(.*?)</div>",
     ]:
         candidates.extend(match.group(1) for match in re.finditer(pattern, raw))
@@ -76,7 +107,7 @@ def html_main_text(raw: str) -> str:
     return normalize_text(strip_html(raw))
 
 
-def fetch_url_text(url: str, timeout: int = 20) -> tuple[str, str]:
+def fetch_url_text(url: str, timeout: int = 20, insecure: bool = False) -> tuple[str, str]:
     request = urllib.request.Request(
         url,
         headers={
@@ -84,7 +115,8 @@ def fetch_url_text(url: str, timeout: int = 20) -> tuple[str, str]:
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,text/plain;q=0.8,*/*;q=0.7",
         },
     )
-    with urllib.request.urlopen(request, timeout=timeout) as response:
+    context = ssl._create_unverified_context() if insecure else None
+    with urllib.request.urlopen(request, timeout=timeout, context=context) as response:
         charset = response.headers.get_content_charset() or "utf-8"
         payload = response.read()
     return payload.decode(charset, errors="ignore"), charset
@@ -96,8 +128,9 @@ def extract_doc_from_url(
     title: str | None = None,
     published_at: str | None = None,
     timeout: int = 20,
+    insecure: bool = False,
 ) -> ArticleDoc:
-    raw, _charset = fetch_url_text(url, timeout=timeout)
+    raw, _charset = fetch_url_text(url, timeout=timeout, insecure=insecure)
     parsed = urlparse(url)
     inferred_account = account or parsed.netloc
     text = html_main_text(raw) if "<" in raw and ">" in raw else normalize_text(raw)
