@@ -366,19 +366,30 @@ def url_candidates_markdown(root: Path, created_at: str) -> str:
             ]
         )
 
-    dry_run_rows = [["编号", "建议命令"]]
+    dry_run_rows = [["编号", "状态", "在线预检命令", "手动文件导入命令"]]
     for item in candidates:
-        if item.get("intake_status") != "待预检":
+        if item.get("intake_status") == "已入库":
             continue
+        citable = "--is-citable " if item.get("is_citable") else ""
         command = (
             f"kb ingest-url \"{item.get('url')}\" "
             f"--source-id {item.get('source_id')} "
             f"--authority-level {item.get('authority_level')} "
             f"--source-tier {item.get('source_tier')} "
-            f"{'--is-citable ' if item.get('is_citable') else ''}"
+            f"{citable}"
             f"--dry-run"
         )
-        dry_run_rows.append([str(item.get("candidate_id") or ""), command])
+        file_command = (
+            f"kb ingest-file /path/to/saved-page.html "
+            f"--source-url \"{item.get('url')}\" "
+            f"--source-id {item.get('source_id')} "
+            f"--authority-level {item.get('authority_level')} "
+            f"--source-tier {item.get('source_tier')} "
+            f"{citable}"
+            f"--title \"{item.get('title')}\" "
+            f"--dry-run"
+        )
+        dry_run_rows.append([str(item.get("candidate_id") or ""), str(item.get("intake_status") or ""), command, file_command])
 
     return f"""# 第一批权威网页入库候选队列
 
@@ -404,7 +415,7 @@ def url_candidates_markdown(root: Path, created_at: str) -> str:
 
 {markdown_table(candidate_rows)}
 
-## 待预检命令
+## 未入库处理命令
 
 {markdown_table(dry_run_rows)}
 
@@ -413,5 +424,6 @@ def url_candidates_markdown(root: Path, created_at: str) -> str:
 1. 正文少于 300 字、只有导航栏或版权栏的页面，不全文入库。
 2. L1/L2 页面若正文抽取质量合格，才去掉 `--dry-run` 入库。
 3. 标题抽取错误时使用 `--title` 覆盖。
-4. 来源不确定、版权边界不清或页面不稳定时，只登记 URL，不作为事实定本。
+4. 在线抓取失败但公开页面可人工打开时，先保存网页或正文为本地文件，再用 `kb ingest-file` 补 `--source-url` 入库。
+5. 来源不确定、版权边界不清或页面不稳定时，只登记 URL，不作为事实定本。
 """

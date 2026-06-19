@@ -364,6 +364,12 @@ needs_review: false
 
 - 2026-06-19T23:36:59 生成 Obsidian 同步状态：wiki/研究助手/Obsidian同步状态.md
 
+
+- 2026-06-19T23:40:43 生成权威网页入库候选队列：wiki/研究助手/第一批权威网页入库候选队列.md
+
+
+- 2026-06-19T23:41:53 生成 Obsidian 同步状态：wiki/研究助手/Obsidian同步状态.md
+
 <!-- KB-GENERATED:END -->
 <!-- HUMAN-NOTES:START -->
 

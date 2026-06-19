@@ -292,6 +292,77 @@ def command_import(args: argparse.Namespace) -> int:
     return 0 if failed == 0 else 1
 
 
+def command_ingest_file(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    ensure_dirs(root)
+    init_db(root)
+    path = Path(args.file).expanduser().resolve()
+    if not path.exists():
+        print(f"File not found: {path}", file=sys.stderr)
+        return 2
+    source_tier = args.source_tier or args.authority_level
+    is_citable = 1 if args.is_citable else 0
+    try:
+        doc = extract_doc(path, path.parent)
+        if args.account:
+            doc.account = args.account
+        if args.title:
+            doc.title = args.title
+        if args.published_at:
+            doc.published_at = args.published_at
+        if args.source_url:
+            doc.source_url = args.source_url
+        content_hash = sha256_text(doc.text)
+    except Exception as exc:
+        print(f"File extract failed: {exc}", file=sys.stderr)
+        return 1
+    conn = connect_db(root)
+    try:
+        exists = conn.execute("SELECT id FROM articles WHERE content_hash = ?", (content_hash,)).fetchone()
+        print(f"File: {path}")
+        print(f"Title: {doc.title}")
+        print(f"Account: {doc.account or ''}")
+        print(f"Published at: {doc.published_at or ''}")
+        print(f"Source URL: {doc.source_url or ''}")
+        print(f"Authority: {args.authority_level} | Source tier: {source_tier} | Citable: {bool(is_citable)}")
+        if args.source_id:
+            print(f"Source id: {args.source_id}")
+        print(f"Chars: {len(doc.text)}")
+        print(f"Content hash: {content_hash[:12]}")
+        if exists:
+            print(f"Skipped duplicate: article_id={exists['id']}")
+            return 0
+        if args.dry_run:
+            print("Dry run: True")
+            print(clean_snippet(doc.text, 500))
+            log_operation(root, "ingest-file", "dry-run", "file previewed", {"file": str(path), "authority_level": args.authority_level})
+            return 0
+        with conn:
+            article_id = insert_article_doc(
+                conn,
+                root,
+                doc,
+                source_path=str(path),
+                source_id=args.source_id,
+                authority_level=args.authority_level,
+                source_tier=source_tier,
+                is_citable=is_citable,
+                content_hash=content_hash,
+            )
+        append_wiki_log(root, f"导入权威公开文件：article_id={article_id} {doc.title}")
+        log_operation(
+            root,
+            "ingest-file",
+            "ok",
+            f"article_id={article_id}",
+            {"file": str(path), "source_url": doc.source_url, "authority_level": args.authority_level, "source_id": args.source_id},
+        )
+        print(f"Imported: article_id={article_id}")
+        return 0
+    finally:
+        conn.close()
+
+
 def insert_article_doc(
     conn: sqlite3.Connection,
     root: Path,
@@ -5153,6 +5224,19 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--source-tier", default=None, help="来源层；默认等于 authority-level")
     p.add_argument("--is-citable", action="store_true", help="标记为可直接引用来源")
     p.set_defaults(func=command_import)
+
+    p = sub.add_parser("ingest-file", help="导入已手动保存的公开网页/文本，并补权威来源元数据")
+    p.add_argument("file")
+    p.add_argument("--source-url", default=None, help="原始公开 URL")
+    p.add_argument("--source-id", default=None, help="来源登记 ID，如 AUTH-001")
+    p.add_argument("--authority-level", choices=["L1", "L2", "L3", "L4"], default="L3")
+    p.add_argument("--source-tier", default=None, help="来源层；默认等于 authority-level")
+    p.add_argument("--is-citable", action="store_true", help="标记为可直接引用来源")
+    p.add_argument("--account", default=None, help="覆盖来源名称")
+    p.add_argument("--title", default=None, help="覆盖标题")
+    p.add_argument("--published-at", default=None, help="覆盖发布日期 YYYY-MM-DD")
+    p.add_argument("--dry-run", action="store_true")
+    p.set_defaults(func=command_ingest_file)
 
     p = sub.add_parser("ingest-url", help="抓取公开 URL 并按权威来源级别入库")
     p.add_argument("url")

@@ -20,6 +20,7 @@ from kb.cli import (  # noqa: E402
     command_refresh,
     command_check,
     command_import,
+    command_ingest_file,
     command_ingest_url,
     external_sources_report_markdown,
     guardrails_report_markdown,
@@ -141,6 +142,30 @@ class StaffCommandTests(unittest.TestCase):
             ]
         )
         self.assertEqual(args.command, "ingest-url")
+        self.assertEqual(args.source_id, "AUTH-001")
+        self.assertEqual(args.authority_level, "L1")
+        self.assertTrue(args.is_citable)
+        self.assertTrue(args.dry_run)
+
+    def test_parser_accepts_ingest_file(self) -> None:
+        args = build_parser().parse_args(
+            [
+                "ingest-file",
+                "/tmp/page.html",
+                "--source-url",
+                "https://example.test/page.html",
+                "--source-id",
+                "AUTH-001",
+                "--authority-level",
+                "L1",
+                "--source-tier",
+                "权威定本层",
+                "--is-citable",
+                "--dry-run",
+            ]
+        )
+        self.assertEqual(args.command, "ingest-file")
+        self.assertEqual(args.source_url, "https://example.test/page.html")
         self.assertEqual(args.source_id, "AUTH-001")
         self.assertEqual(args.authority_level, "L1")
         self.assertTrue(args.is_citable)
@@ -421,6 +446,52 @@ class StaffCommandTests(unittest.TestCase):
         finally:
             shutil.rmtree(root)
 
+    def test_ingest_file_can_store_manual_source_url(self) -> None:
+        root = self.make_root()
+        try:
+            local = root / "manual.html"
+            local.write_text(
+                """
+                <html><head><title>手动网页 - 官网</title></head>
+                <body><div class="text_box"><p>中国政协网 多党合作 手动导入正文</p></div><div>友情链接</div></body></html>
+                """,
+                encoding="utf-8",
+            )
+            args = argparse.Namespace(
+                project_root=str(root),
+                file=str(local),
+                source_url="https://example.test/manual.html",
+                source_id="AUTH-FILE",
+                authority_level="L1",
+                source_tier="权威定本层",
+                is_citable=True,
+                account="中国政协网",
+                title="手动导入标题",
+                published_at="2026-06-19",
+                dry_run=False,
+            )
+            with contextlib.redirect_stdout(io.StringIO()):
+                code = command_ingest_file(args)
+            self.assertEqual(code, 0)
+            conn = sqlite3.connect(root / "index" / "kb.sqlite")
+            conn.row_factory = sqlite3.Row
+            row = conn.execute(
+                "SELECT title, account, source_id, authority_level, source_tier, is_citable, source_url FROM articles"
+            ).fetchone()
+            chunk = conn.execute("SELECT content FROM article_chunks").fetchone()
+            conn.close()
+            self.assertEqual(row["title"], "手动导入标题")
+            self.assertEqual(row["account"], "中国政协网")
+            self.assertEqual(row["source_id"], "AUTH-FILE")
+            self.assertEqual(row["authority_level"], "L1")
+            self.assertEqual(row["source_tier"], "权威定本层")
+            self.assertEqual(row["is_citable"], 1)
+            self.assertEqual(row["source_url"], "https://example.test/manual.html")
+            self.assertIn("手动导入正文", chunk["content"])
+            self.assertNotIn("友情链接", chunk["content"])
+        finally:
+            shutil.rmtree(root)
+
     def test_html_main_text_prefers_nested_news_body(self) -> None:
         raw = """
         <html><body>
@@ -520,7 +591,9 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("已入库：1", body)
             self.assertIn("待预检：1", body)
             self.assertIn("kb ingest-url", body)
+            self.assertIn("kb ingest-file", body)
             self.assertIn("--source-id MEDIA-001", body)
+            self.assertIn("--source-url \"https://example.test/b\"", body)
         finally:
             shutil.rmtree(root)
 

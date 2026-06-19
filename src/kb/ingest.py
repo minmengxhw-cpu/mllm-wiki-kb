@@ -188,17 +188,22 @@ def extract_doc(path: Path, input_root: Path) -> ArticleDoc:
     suffix = path.suffix.lower()
     source_url = None
     if suffix in {".html", ".htm"}:
-        text = strip_html(raw)
+        text = html_main_text(raw)
+        source_url_match = re.search(r"(?is)<link[^>]+rel=[\"']canonical[\"'][^>]+href=[\"']([^\"']+)[\"']", raw)
+        if source_url_match:
+            source_url = html.unescape(source_url_match.group(1)).strip()
     elif suffix == ".json":
         data = json.loads(raw)
         text = data.get("content") or data.get("text") or data.get("html") or json.dumps(data, ensure_ascii=False)
         if "<" in text and ">" in text:
-            text = strip_html(text)
+            text = html_main_text(text)
         source_url = data.get("source_url") or data.get("url")
     else:
         text = raw
 
     title = None
+    if suffix in {".html", ".htm"}:
+        title = html_title(raw)
     lines = text.splitlines()
     for i, line in enumerate(lines[:40]):
         if i + 1 < len(lines) and set(lines[i + 1].strip()) == {"="}:
