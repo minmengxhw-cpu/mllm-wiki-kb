@@ -300,6 +300,9 @@ kb corpus-style
 
 `corpus-apply-reviews` 会读取 `classification_review.csv` 和 `classification_priority_review.csv` 中已经填写的人工校订结果；只有 `review_result=错误` 且 `suggested_type` 合法时，才会回写 `article_labels.jsonl` 的主类型。运行 `corpus-audit` 重新生成抽检表时，会保留同一文章已填写的人工校订列。
 
+
+语料库精修一期新增两个日常入口：`wiki/研究助手/微信公众号语料库精修一期工作台.md` 用于查看分类精修进度，`wiki/研究助手/上海民盟微信公众号标杆样本定稿表.md` 用于按体裁选取优先模仿样本。
+
 `corpus-style` 会生成写作和研究入口：
 
 - `wiki/研究助手/上海民盟微信公众号分体裁写作模板.md`：按体裁沉淀标题、导语、结构和风险提示。
