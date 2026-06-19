@@ -37,6 +37,7 @@ from kb.sources import (
     pro_sources_report_markdown,
     sources_dashboard_markdown,
     sync_sources_table,
+    url_candidates_markdown,
 )
 from kb.staff_check import (
     issue_table,
@@ -928,7 +929,7 @@ def external_reference_matches(root: Path, topic: str, limit: int = 6) -> list[d
 def external_reference_block(root: Path, topic: str) -> str:
     matches = external_reference_matches(root, topic)
     if not matches:
-        return "- 未命中 Drive 外部参考层；当前输出仍以微信公众号主语料为准。"
+        return "- 未命中 Drive 外部参考层；当前输出以本地检索来源为准，并按 L1-L4 权威级别区分使用。"
     rows = [["材料", "来源层", "导入判断", "链接"]]
     for item in matches:
         rows.append(
@@ -1042,6 +1043,22 @@ def command_sources(args: argparse.Namespace) -> int:
         append_wiki_log(root, f"生成权威公开资料来源体检：{path.relative_to(root)}")
         log_operation(root, "sources", "ok", f"authority source dashboard saved; synced={synced}", {"output": str(path), "synced": synced})
         print(f"Synced sources: {synced}")
+        print(path)
+    else:
+        print(body)
+    return 0
+
+
+def command_source_urls(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    created_at = now_iso()
+    body = url_candidates_markdown(root, created_at)
+    if args.save:
+        path = report_dir(root) / "第一批权威网页入库候选队列.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(body, encoding="utf-8")
+        append_wiki_log(root, f"生成权威网页入库候选队列：{path.relative_to(root)}")
+        log_operation(root, "source-urls", "ok", "authority url candidates saved", {"output": str(path)})
         print(path)
     else:
         print(body)
@@ -5242,6 +5259,10 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("sources", help="生成权威公开资料来源分级体检")
     p.add_argument("--save", action="store_true")
     p.set_defaults(func=command_sources)
+
+    p = sub.add_parser("source-urls", help="生成第一批权威网页 URL 入库候选队列")
+    p.add_argument("--save", action="store_true")
+    p.set_defaults(func=command_source_urls)
 
     p = sub.add_parser("guardrails", help="生成口径风险清单")
     p.add_argument("--save", action="store_true")

@@ -46,6 +46,10 @@ def load_pro_sources(root: Path) -> list[dict]:
     return load_jsonl(pro_sources_dir(root) / "source_map.jsonl")
 
 
+def load_url_candidates(root: Path) -> list[dict]:
+    return load_jsonl(pro_sources_dir(root) / "url_candidates.jsonl")
+
+
 def source_record(item: dict, now: str) -> dict:
     return {
         "source_id": str(item.get("source_id") or item.get("id") or item.get("name") or "").strip(),
@@ -331,4 +335,83 @@ def sources_dashboard_markdown(root: Path, created_at: str) -> str:
 2. L4 微信公众号语料只作写作样本和线索，不作最终定论。
 3. 冲突时按 L1 > L2 > L3 > L4 排序，并保留争议记录。
 4. 没有 L1-L3 支撑的结论必须标注 `[待核]`。
+"""
+
+
+def url_candidates_markdown(root: Path, created_at: str) -> str:
+    candidates = load_url_candidates(root)
+    by_status = Counter(str(item.get("intake_status") or "未标注") for item in candidates)
+    by_authority = Counter(str(item.get("authority_level") or "未分级") for item in candidates)
+
+    status_rows = [["状态", "数量"]]
+    for status, count in by_status.most_common():
+        status_rows.append([status, str(count)])
+
+    authority_rows = [["权威级别", "数量"]]
+    for level in ["L1", "L2", "L3", "L4", "未分级"]:
+        if by_authority.get(level):
+            authority_rows.append([level, str(by_authority[level])])
+
+    candidate_rows = [["编号", "状态", "级别", "标题", "URL", "说明"]]
+    for item in candidates:
+        url = str(item.get("url") or "")
+        candidate_rows.append(
+            [
+                str(item.get("candidate_id") or ""),
+                str(item.get("intake_status") or ""),
+                str(item.get("authority_level") or ""),
+                str(item.get("title") or ""),
+                f"[打开]({url})" if url.startswith(("http://", "https://")) else url,
+                str(item.get("quality_note") or ""),
+            ]
+        )
+
+    dry_run_rows = [["编号", "建议命令"]]
+    for item in candidates:
+        if item.get("intake_status") != "待预检":
+            continue
+        command = (
+            f"kb ingest-url \"{item.get('url')}\" "
+            f"--source-id {item.get('source_id')} "
+            f"--authority-level {item.get('authority_level')} "
+            f"--source-tier {item.get('source_tier')} "
+            f"{'--is-citable ' if item.get('is_citable') else ''}"
+            f"--dry-run"
+        )
+        dry_run_rows.append([str(item.get("candidate_id") or ""), command])
+
+    return f"""# 第一批权威网页入库候选队列
+
+生成时间：{created_at}
+
+## 总体判断
+
+- 当前候选 URL：{len(candidates)} 个。
+- 已入库：{by_status.get("已入库", 0)} 个。
+- 待预检：{by_status.get("待预检", 0)} 个。
+- 抽取不合格：{by_status.get("抽取不合格", 0)} 个。
+- 本队列用于推进 L1-L3 事实层建设；每条 URL 入库前必须先 dry-run 看正文质量。
+
+## 按状态
+
+{markdown_table(status_rows)}
+
+## 按权威级别
+
+{markdown_table(authority_rows)}
+
+## 候选清单
+
+{markdown_table(candidate_rows)}
+
+## 待预检命令
+
+{markdown_table(dry_run_rows)}
+
+## 入库规则
+
+1. 正文少于 300 字、只有导航栏或版权栏的页面，不全文入库。
+2. L1/L2 页面若正文抽取质量合格，才去掉 `--dry-run` 入库。
+3. 标题抽取错误时使用 `--title` 覆盖。
+4. 来源不确定、版权边界不清或页面不稳定时，只登记 URL，不作为事实定本。
 """

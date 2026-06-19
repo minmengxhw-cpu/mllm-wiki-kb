@@ -43,6 +43,7 @@ from kb.sources import (  # noqa: E402
     pro_sources_report_markdown,
     sources_dashboard_markdown,
     sync_sources_table,
+    url_candidates_markdown,
 )
 from kb.staff_check import staff_check_issues  # noqa: E402
 from kb.store import ensure_schema_columns  # noqa: E402
@@ -95,6 +96,11 @@ class StaffCommandTests(unittest.TestCase):
     def test_parser_accepts_sources(self) -> None:
         args = build_parser().parse_args(["sources", "--save"])
         self.assertEqual(args.command, "sources")
+        self.assertTrue(args.save)
+
+    def test_parser_accepts_source_urls(self) -> None:
+        args = build_parser().parse_args(["source-urls", "--save"])
+        self.assertEqual(args.command, "source-urls")
         self.assertTrue(args.save)
 
     def test_parser_accepts_authority_import_options(self) -> None:
@@ -472,6 +478,25 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("L1-L3 作为事实层", body)
             self.assertIn("民盟中央官网", body)
             self.assertIn("内部材料", body)
+        finally:
+            shutil.rmtree(root)
+
+    def test_url_candidates_report_contains_status_and_commands(self) -> None:
+        root = self.make_root()
+        try:
+            pro_dir = root / "index" / "pro_sources"
+            pro_dir.mkdir(parents=True)
+            (pro_dir / "url_candidates.jsonl").write_text(
+                '{"candidate_id":"URL-001","source_id":"AUTH-001","title":"民盟概况","url":"https://example.test/a","authority_level":"L1","source_tier":"权威定本层","is_citable":true,"intake_status":"已入库","quality_note":"正文合格"}\n'
+                '{"candidate_id":"URL-002","source_id":"MEDIA-001","title":"人民政协文章","url":"https://example.test/b","authority_level":"L2","source_tier":"权威机构公开源","is_citable":true,"intake_status":"待预检","quality_note":"待 dry-run"}\n',
+                encoding="utf-8",
+            )
+            body = url_candidates_markdown(root, "2026-06-19T00:00:00")
+            self.assertIn("第一批权威网页入库候选队列", body)
+            self.assertIn("已入库：1", body)
+            self.assertIn("待预检：1", body)
+            self.assertIn("kb ingest-url", body)
+            self.assertIn("--source-id MEDIA-001", body)
         finally:
             shutil.rmtree(root)
 
