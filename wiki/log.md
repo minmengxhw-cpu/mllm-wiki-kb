@@ -304,6 +304,12 @@ needs_review: false
 
 - 2026-06-19T17:18:17 生成 Obsidian 同步状态：wiki/研究助手/Obsidian同步状态.md
 
+
+- 2026-06-19T17:26:52 生成盟参系统可用性验收报告：wiki/研究助手/盟参系统可用性验收报告.md
+
+
+- 2026-06-19T17:27:01 生成 Obsidian 同步状态：wiki/研究助手/Obsidian同步状态.md
+
 <!-- KB-GENERATED:END -->
 <!-- HUMAN-NOTES:START -->
 

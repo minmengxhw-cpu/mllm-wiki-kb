@@ -31,6 +31,7 @@ from kb.cli import (  # noqa: E402
     staff_stats_body,
     verify_report_markdown,
 )
+from kb.ingest import chunk_text, extract_doc, normalize_text, sha256_text  # noqa: E402
 from kb.sources import (  # noqa: E402
     pro_source_intake_tasks,
     pro_source_query_seeds,
@@ -102,6 +103,32 @@ class StaffCommandTests(unittest.TestCase):
             self.assertEqual(code, 1)
         finally:
             shutil.rmtree(root)
+
+    def test_ingest_extracts_markdown_article_metadata(self) -> None:
+        root = self.make_root()
+        try:
+            account_dir = root / "input" / "上海民盟"
+            account_dir.mkdir(parents=True)
+            path = account_dir / "sample.md"
+            path.write_text(
+                "文章标题\n==============\n原创 作者 上海民盟 2026-06-19 10:00 上海\n\n正文内容\nhttps://mp.weixin.qq.com/s/example",
+                encoding="utf-8",
+            )
+            doc = extract_doc(path, root / "input")
+            self.assertEqual(doc.title, "文章标题")
+            self.assertEqual(doc.account, "上海民盟")
+            self.assertEqual(doc.published_at, "2026-06-19")
+            self.assertIn("正文内容", doc.text)
+            self.assertEqual(doc.source_url, "https://mp.weixin.qq.com/s/example")
+        finally:
+            shutil.rmtree(root)
+
+    def test_ingest_helpers_normalize_hash_and_chunk(self) -> None:
+        text = "正文\n\n点击上方蓝字关注我们\n\n![](x)\n\n第二段"
+        self.assertNotIn("点击上方", normalize_text(text))
+        self.assertEqual(sha256_text("abc"), sha256_text("abc"))
+        chunks = chunk_text("第一段\n\n第二段", max_chars=20)
+        self.assertEqual(chunks, ["第一段\n\n第二段"])
 
     def test_pro_source_tasks_skip_deferred_sources(self) -> None:
         sources = [

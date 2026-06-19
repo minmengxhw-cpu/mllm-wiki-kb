@@ -39,6 +39,7 @@
 - 种子库先保证可拦截高风险问题，再逐步扩展，不把未校订条目写成定论。
 - 来源管理纯逻辑位于 `src/kb/sources.py`；新增来源分级、任务生成和来源体检时优先改该模块，不继续膨胀 `src/kb/cli.py`。
 - 核稿硬门纯逻辑位于 `src/kb/staff_check.py`；新增黑名单匹配、口径变体、引用缺失和严重度规则时优先改该模块。
+- 文章导入纯逻辑位于 `src/kb/ingest.py`；新增解析格式、清洗规则、分块策略、raw 写入和隔离文件逻辑时优先改该模块。
 - 本地 CI 脚本 `scripts/ci.sh` 会运行单元测试、编译检查和 `kb check` 核稿硬门验证；GitHub Actions 工作流需具备 `workflow` scope 的 token 后再启用。
 - 静态站构建优先使用加密模式 `KB_PASSPHRASE=... python3 webapp/build_static.py`；`KB_PUBLIC=1` 只用于私有仓库或内部预览，生成前后必须确认本机绝对路径已脱敏，且 Google Drive 工作材料、内部文件和未公开口径未进入公开包。
 

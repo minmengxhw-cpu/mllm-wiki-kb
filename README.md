@@ -338,6 +338,8 @@ kb corpus-style
 
 核稿硬门的黑名单、口径变体、引用缺失检测已独立到 `src/kb/staff_check.py`；`cli.py` 只保留 `/核` 报告拼装和命令入口。
 
+文章导入的解析、清洗、分块、哈希、raw 原文写入和隔离文件逻辑已独立到 `src/kb/ingest.py`；`cli.py` 只保留 `scan/import` 命令流程和数据库写入。
+
 ```bash
 kb pro-sources --save
 ```
