@@ -1,4 +1,6 @@
-{"name":"周公馆","type":"place","aliases":[],"summary":"上海民盟传统教育和统一战线史相关地点，已有地点卡。","disputes":"地址、历史功能和展陈表述须核验。"}
-{"name":"虹桥疗养院","type":"place","aliases":[],"summary":"上海民盟地方史和传统教育相关地点，已有地点卡。","disputes":"具体历史事件和人物关系须核验。"}
-{"name":"上海清华同学会","type":"place","aliases":[],"summary":"上海民盟地方史相关地点，已有地点卡。","disputes":"地点属性、组织关系和历史阶段须核验。"}
-{"name":"上海市档案馆","type":"place","aliases":[],"summary":"上海民盟史料核验重要地点，已有地点卡。","disputes":"档案结论不得由机器替代人工考证。"}
+{"name": "周公馆", "type": "place", "aliases": [], "summary": "上海民盟传统教育和统一战线史相关地点，已有地点卡。", "disputes": "地址、历史功能和展陈表述须核验。"}
+{"name": "虹桥疗养院", "type": "place", "aliases": [], "summary": "上海民盟地方史和传统教育相关地点，已有地点卡。", "disputes": "具体历史事件和人物关系须核验。"}
+{"name": "上海清华同学会", "type": "place", "aliases": [], "summary": "上海民盟地方史相关地点，已有地点卡。", "disputes": "地点属性、组织关系和历史阶段须核验。"}
+{"name": "上海市档案馆", "type": "place", "aliases": [], "summary": "上海民盟史料核验重要地点，已有地点卡。", "disputes": "档案结论不得由机器替代人工考证。"}
+{"name": "中国民主同盟传统教育基地", "type": "place", "aliases": ["民盟传统教育基地"], "summary": "文史纪念和主题教育写作常用地点类别。", "disputes": "具体基地名称、挂牌时间和主管层级须核验。"}
+{"name": "重庆特园", "type": "place", "aliases": ["特园"], "summary": "民盟早期历史和民主运动重要地点，常与张澜、民盟成立和旧政协线索相关。", "disputes": "具体事件发生地和历史称谓须核验。"}
