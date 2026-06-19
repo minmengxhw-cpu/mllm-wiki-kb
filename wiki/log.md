@@ -385,6 +385,12 @@ needs_review: false
 
 - 2026-06-19T23:46:10 生成 Obsidian 同步状态：wiki/研究助手/Obsidian同步状态.md
 
+
+- 2026-06-19T23:49:19 生成权威事实覆盖仪表盘：wiki/研究助手/权威事实覆盖仪表盘.md
+
+
+- 2026-06-19T23:49:54 生成 Obsidian 同步状态：wiki/研究助手/Obsidian同步状态.md
+
 <!-- KB-GENERATED:END -->
 <!-- HUMAN-NOTES:START -->
 

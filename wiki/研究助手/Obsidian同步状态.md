@@ -1,6 +1,6 @@
 # Obsidian 同步状态
 
-生成时间：2026-06-19T23:46:10
+生成时间：2026-06-19T23:49:53
 
 ## 总体判断
 
@@ -13,10 +13,10 @@
 | --- | --- |
 | Vault | `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki` |
 | Vault 存在 | 可用 |
-| 源文件 | 157 |
-| 参与核对 | 156 |
+| 源文件 | 158 |
+| 参与核对 | 157 |
 | 已一致 | 154 |
-| 缺失 | 0 |
+| 缺失 | 1 |
 | 需更新 | 2 |
 | 整体状态 | 缺失 |
 
@@ -24,8 +24,9 @@
 
 | 类型 | 源文件 | 目标文件 |
 | --- | --- | --- |
+| 缺失 | `wiki/研究助手/权威事实覆盖仪表盘.md` | `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/权威事实覆盖仪表盘.md` |
 | 需更新 | `wiki/log.md` | `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/操作日志.md` |
-| 需更新 | `wiki/研究助手/第一批权威网页入库候选队列.md` | `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/第一批权威网页入库候选队列.md` |
+| 需更新 | `wiki/研究助手/民盟研究助手首页.md` | `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/民盟研究助手首页.md` |
 
 ## 使用建议
 

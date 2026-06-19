@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from kb.cli import (  # noqa: E402
     build_article_label,
     build_parser,
+    authority_coverage_markdown,
     classify_article,
     apply_review_decisions_to_labels,
     collect_review_decisions,
@@ -598,6 +599,50 @@ class CorpusCommandTests(unittest.TestCase):
         self.assertIn("相关人物线索", body)
         self.assertIn("待核字段", body)
         self.assertIn("沈钧儒", body)
+
+    def test_authority_coverage_markdown_marks_levels(self) -> None:
+        records = [
+            {
+                "kind": "核心人物",
+                "name": "沈钧儒",
+                "counts": {"L1": 1, "L2": 1, "L4": 2},
+                "status": "可优先用于事实核验",
+                "action": "优先人工校订事实卡",
+                "sources": [
+                    dict_to_row(
+                        {
+                            "article_id": 1,
+                            "chunk_id": 1,
+                            "title": "权威来源",
+                            "account": "民盟中央",
+                            "published_at": "2026-01-01",
+                            "raw_path": "/tmp/a.md",
+                            "snippet": "沈钧儒",
+                            "authority_level": "L1",
+                            "is_citable": 1,
+                        }
+                    )
+                ],
+            },
+            {
+                "kind": "核心事件",
+                "name": "五一口号",
+                "counts": {"L4": 3},
+                "status": "仅有样本线索，不能作定论",
+                "action": "先找 L1-L3 权威来源",
+                "sources": [],
+            },
+        ]
+        body = authority_coverage_markdown(records, "2026-06-19T00:00:00")
+        self.assertIn("权威事实覆盖仪表盘", body)
+        self.assertIn("沈钧儒", body)
+        self.assertIn("L1/可引用", body)
+        self.assertIn("仅有样本线索", body)
+
+    def test_parser_accepts_authority_coverage(self) -> None:
+        args = build_parser().parse_args(["authority-coverage", "--top-k", "12"])
+        self.assertEqual(args.command, "authority-coverage")
+        self.assertEqual(args.top_k, 12)
 
 
 if __name__ == "__main__":

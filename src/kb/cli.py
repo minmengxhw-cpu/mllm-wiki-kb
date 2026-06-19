@@ -4323,6 +4323,13 @@ RESEARCH_DOSSIER_SETS = {
     "core-events": ["五一口号", "旧政协", "新政协", "李闻事件", "民盟一届二中全会", "民盟一届三中全会", "民盟被迫解散", "中国民主政团同盟成立", "上海民盟组织建立"],
 }
 
+AUTHORITY_COVERAGE_TOPICS = [
+    ("制度主题", "新型政党制度", "新型政党制度 多党合作 政治协商 参政党"),
+    ("制度主题", "多党合作制度", "中国共产党领导的多党合作和政治协商制度"),
+    ("制度主题", "高素质参政党", "高素质参政党 民盟 参政党建设"),
+    ("制度主题", "全过程人民民主", "全过程人民民主 新型政党制度 多党合作"),
+]
+
 PERSON_RESEARCH_THEMES = {
     "民盟史主线": ["民盟", "民盟史", "中国民主同盟", "民主政团同盟"],
     "多党合作与政协": ["政协", "新政协", "旧政协", "五一口号", "多党合作"],
@@ -4867,6 +4874,119 @@ def event_dossier_rows(root: Path, name: str, top_k: int) -> list[sqlite3.Row]:
     return focused[:top_k]
 
 
+def authority_level_counts(rows: list[sqlite3.Row]) -> Counter:
+    counts = Counter()
+    for row in unique_source_rows(rows, len(rows)):
+        level = row["authority_level"] if "authority_level" in row.keys() and row["authority_level"] else "L4"
+        counts[str(level)] += 1
+    return counts
+
+
+def authority_coverage_status(counts: Counter) -> str:
+    if counts.get("L1", 0) > 0:
+        return "可优先用于事实核验"
+    if counts.get("L2", 0) > 0 or counts.get("L3", 0) > 0:
+        return "可作权威佐证，仍需补 L1"
+    if counts.get("L4", 0) > 0:
+        return "仅有样本线索，不能作定论"
+    return "暂无有效命中"
+
+
+def authority_coverage_action(counts: Counter) -> str:
+    if counts.get("L1", 0) > 0:
+        return "优先人工校订事实卡；补充正式出版物或档案互证"
+    if counts.get("L2", 0) > 0 or counts.get("L3", 0) > 0:
+        return "补民盟中央、统战部、政协官网或白皮书 L1 来源"
+    if counts.get("L4", 0) > 0:
+        return "先找 L1-L3 权威来源，再进入正式研究卡"
+    return "补关键词、补来源候选或人工登记线索"
+
+
+def authority_coverage_records(root: Path, top_k: int) -> list[dict]:
+    records = []
+    for name in RESEARCH_DOSSIER_SETS["core-people"]:
+        rows = person_dossier_rows(root, name, top_k)
+        records.append({"kind": "核心人物", "name": name, "rows": rows})
+    for name in RESEARCH_DOSSIER_SETS["core-events"]:
+        rows = event_dossier_rows(root, name, top_k)
+        records.append({"kind": "核心事件", "name": name, "rows": rows})
+    for kind, name, query in AUTHORITY_COVERAGE_TOPICS:
+        rows = search_rows(root, query, top_k)
+        records.append({"kind": kind, "name": name, "rows": rows})
+
+    out = []
+    for record in records:
+        sources = unique_source_rows(record["rows"], top_k)
+        counts = authority_level_counts(sources)
+        out.append(
+            {
+                "kind": record["kind"],
+                "name": record["name"],
+                "sources": sources,
+                "counts": counts,
+                "status": authority_coverage_status(counts),
+                "action": authority_coverage_action(counts),
+            }
+        )
+    return out
+
+
+def authority_coverage_markdown(records: list[dict], created_at: str) -> str:
+    summary = Counter()
+    for record in records:
+        summary[record["status"]] += 1
+    summary_rows = [["状态", "对象数"]] + [[key, str(value)] for key, value in summary.most_common()]
+
+    rows = [["类型", "对象", "L1", "L2", "L3", "L4", "状态", "下一步"]]
+    detail_sections = []
+    for record in records:
+        counts = record["counts"]
+        rows.append(
+            [
+                record["kind"],
+                record["name"],
+                str(counts.get("L1", 0)),
+                str(counts.get("L2", 0)),
+                str(counts.get("L3", 0)),
+                str(counts.get("L4", 0)),
+                record["status"],
+                record["action"],
+            ]
+        )
+        source_rows = [["编号", "级别", "日期", "来源", "标题"]]
+        for idx, row in enumerate(record["sources"][:5], 1):
+            source_rows.append([f"S{idx}", row_authority_label(row), row["published_at"] or "日期不详", row["account"] or "", f"《{row['title']}》"])
+        if len(source_rows) == 1:
+            source_rows.append(["-", "-", "-", "-", "未检索到来源"])
+        detail_sections.append(f"### {record['kind']}：{record['name']}\n\n{markdown_table(source_rows)}")
+
+    return f"""# 权威事实覆盖仪表盘
+
+生成时间：{created_at}
+
+本页用于判断核心人物、核心事件和制度主题是否已有 L1-L3 权威公开来源支撑。它服务于史实核验和研究卡人工校订，不替代正式史实结论。
+
+## 总体判断
+
+{markdown_table(summary_rows)}
+
+## 覆盖总表
+
+{markdown_table(rows)}
+
+## 逐项来源
+
+{chr(10).join(detail_sections)}
+
+## 使用规则
+
+1. `可优先用于事实核验` 表示已有 L1 来源，但正式使用仍需打开 raw 原文核对。
+2. `可作权威佐证，仍需补 L1` 表示已有 L2/L3，适合写研究线索，不宜直接作最终定论。
+3. `仅有样本线索` 表示主要来自公众号 L4，只能提示方向，不能作为史实定本。
+4. 每次补入新权威来源后，重新运行 `kb authority-coverage`，再更新人物卡和事件卡。
+"""
+
+
 def research_dossier_index_body(created: list[Path], created_at: str) -> str:
     rows = [["人物", "档案路径"]]
     for path in created:
@@ -4931,6 +5051,19 @@ def command_build_research_dossiers(args: argparse.Namespace) -> int:
     print(index_path)
     for path in created:
         print(path)
+    return 0
+
+
+def command_authority_coverage(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    created_at = now_iso()
+    records = authority_coverage_records(root, args.top_k)
+    path = root / "wiki" / "研究助手" / "权威事实覆盖仪表盘.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(authority_coverage_markdown(records, created_at), encoding="utf-8")
+    append_wiki_log(root, f"生成权威事实覆盖仪表盘：{path.relative_to(root)}")
+    log_operation(root, "authority-coverage", "ok", f"{len(records)} records", {"top_k": args.top_k, "output": str(path)})
+    print(path)
     return 0
 
 
@@ -5404,6 +5537,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--limit", type=int, default=0)
     p.add_argument("--top-k", type=int, default=24)
     p.set_defaults(func=command_build_research_dossiers)
+
+    p = sub.add_parser("authority-coverage", help="生成核心人物/事件/制度主题的 L1-L4 权威覆盖仪表盘")
+    p.add_argument("--top-k", type=int, default=24)
+    p.set_defaults(func=command_authority_coverage)
 
     p = sub.add_parser("curate-cards")
     p.set_defaults(func=command_curate_cards)
