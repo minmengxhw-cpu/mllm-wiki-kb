@@ -28,6 +28,8 @@ from kb.cli import (  # noqa: E402
     obsidian_sync_status,
     row_authority_label,
     row_source_md,
+    history_query_variants,
+    staff_query,
     staff_draft_body,
     staff_history_body,
     staff_info_body,
@@ -143,6 +145,14 @@ class StaffCommandTests(unittest.TestCase):
         self.assertEqual(args.authority_level, "L1")
         self.assertTrue(args.is_citable)
         self.assertTrue(args.dry_run)
+
+    def test_staff_history_query_expands_known_themes(self) -> None:
+        query = staff_query("history", "新型政党制度")
+        self.assertIn("多党合作", query)
+        self.assertIn("政治协商", query)
+        self.assertIn("人民政协", query)
+        variants = history_query_variants("新型政党制度")
+        self.assertIn("新型政党制度 多党合作", variants)
 
     def test_check_command_can_act_as_hard_gate(self) -> None:
         root = self.make_root()

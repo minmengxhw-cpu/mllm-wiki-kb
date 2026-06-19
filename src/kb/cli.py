@@ -815,7 +815,15 @@ def staff_query(mode: str, topic: str) -> str:
         "info": "参政议政 社情民意 调研 建议 提案 问题 对策 履职",
         "check": "上海民盟 民盟 盟史 口径 核验",
     }
-    return f"{topic} {extras.get(mode, '')}".strip()
+    topic_extras = []
+    if mode == "history":
+        if "新型政党制度" in topic:
+            topic_extras.extend(["多党合作", "政治协商", "人民政协"])
+        if "五一口号" in topic:
+            topic_extras.extend(["新政协", "民主党派", "响应"])
+        if "救国会" in topic or "七君子" in topic:
+            topic_extras.extend(["沈钧儒", "史良", "抗日救亡"])
+    return f"{topic} {' '.join(topic_extras)} {extras.get(mode, '')}".strip()
 
 
 def topic_query_variants(topic: str) -> list[str]:
@@ -824,6 +832,24 @@ def topic_query_variants(topic: str) -> list[str]:
     spaced = re.sub(r"(?<=[\u4e00-\u9fff])(?:与|和|及)(?=[\u4e00-\u9fff])", " ", spaced)
     spaced = re.sub(r"\s+", " ", spaced).strip()
     variants = [spaced, core, topic, staff_query("topic", spaced)]
+    out = []
+    seen = set()
+    for value in variants:
+        value = value.strip()
+        if value and value not in seen:
+            seen.add(value)
+            out.append(value)
+    return out
+
+
+def history_query_variants(topic: str) -> list[str]:
+    variants = [topic, staff_query("history", topic)]
+    if "新型政党制度" in topic:
+        variants.extend(["新型政党制度 多党合作", "新型政党制度 政治协商 人民政协"])
+    if "五一口号" in topic:
+        variants.extend(["五一口号 新政协 民主党派", "民盟 响应 五一口号"])
+    if "救国会" in topic or "七君子" in topic:
+        variants.extend(["沈钧儒 救国会 七君子", "救国会 抗日救亡 史良"])
     out = []
     seen = set()
     for value in variants:
@@ -875,6 +901,8 @@ def merge_search_rows(row_groups: list[list[sqlite3.Row]], top_k: int) -> list[s
 def staff_search_rows(root: Path, mode: str, topic: str, top_k: int) -> list[sqlite3.Row]:
     if mode == "topic":
         queries = topic_query_variants(topic)
+    elif mode == "history":
+        queries = history_query_variants(topic)
     else:
         queries = [staff_query(mode, topic)]
     groups = [search_rows(root, query, top_k) for query in queries]
