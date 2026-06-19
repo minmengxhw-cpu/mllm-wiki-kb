@@ -24,6 +24,8 @@ from kb.cli import (  # noqa: E402
     normalized_similarity,
     obsidian_status_markdown,
     obsidian_sync_status,
+    row_authority_label,
+    row_source_md,
     staff_draft_body,
     staff_history_body,
     staff_info_body,
@@ -31,7 +33,7 @@ from kb.cli import (  # noqa: E402
     staff_stats_body,
     verify_report_markdown,
 )
-from kb.indexing import dict_to_row, query_terms, text_vector  # noqa: E402
+from kb.indexing import dict_to_row, query_terms, search_rows, text_vector  # noqa: E402
 from kb.ingest import chunk_text, extract_doc, normalize_text, sha256_text  # noqa: E402
 from kb.sources import (  # noqa: E402
     pro_source_intake_tasks,
@@ -193,6 +195,86 @@ class StaffCommandTests(unittest.TestCase):
             self.assertEqual(rows[0]["authority_level"], "L1")
             self.assertEqual(rows[0]["is_citable"], 1)
             self.assertEqual(rows[1]["is_citable"], 0)
+        finally:
+            shutil.rmtree(root)
+
+    def test_search_rows_prioritizes_authority_sources(self) -> None:
+        root = self.make_root()
+        try:
+            conn = sqlite3.connect(root / "index" / "kb.sqlite")
+            conn.row_factory = sqlite3.Row
+            conn.executescript((root / "schema.sql").read_text(encoding="utf-8"))
+            ensure_schema_columns(conn)
+            with conn:
+                conn.execute(
+                    """
+                    INSERT INTO articles(
+                        title, account, published_at, source_path, raw_path, source_url,
+                        source_id, authority_level, source_tier, is_citable,
+                        content_hash, imported_at, file_type, status
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        "公众号样本",
+                        "上海民盟",
+                        "2026-01-01",
+                        "wx.md",
+                        "raw/wx.md",
+                        "",
+                        "WX-001",
+                        "L4",
+                        "参考与样本层",
+                        0,
+                        "hash-wx",
+                        "2026-06-19T00:00:00",
+                        "md",
+                        "imported",
+                    ),
+                )
+                wx_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+                conn.execute(
+                    """
+                    INSERT INTO articles(
+                        title, account, published_at, source_path, raw_path, source_url,
+                        source_id, authority_level, source_tier, is_citable,
+                        content_hash, imported_at, file_type, status
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        "权威资料",
+                        "民盟中央官网",
+                        "2020-01-01",
+                        "auth.md",
+                        "raw/auth.md",
+                        "https://example.test/auth",
+                        "AUTH-001",
+                        "L1",
+                        "权威定本层",
+                        1,
+                        "hash-auth",
+                        "2026-06-19T00:00:00",
+                        "md",
+                        "imported",
+                    ),
+                )
+                auth_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+                conn.execute(
+                    "INSERT INTO article_chunks(article_id, chunk_index, content, content_hash, token_estimate, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                    (wx_id, 0, "沈钧儒 民盟史 测试材料", "chunk-wx", 10, "2026-06-19T00:00:00"),
+                )
+                conn.execute(
+                    "INSERT INTO article_chunks(article_id, chunk_index, content, content_hash, token_estimate, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                    (auth_id, 0, "沈钧儒 民盟史 权威材料", "chunk-auth", 10, "2026-06-19T00:00:00"),
+                )
+            conn.close()
+            rows = search_rows(root, "沈钧儒 民盟史", 2)
+            self.assertEqual(rows[0]["authority_level"], "L1")
+            self.assertEqual(rows[0]["title"], "权威资料")
+            self.assertEqual(row_authority_label(rows[0]), "L1/可引用")
+            self.assertIn("L1/可引用", row_source_md(rows[0], 1))
+            self.assertEqual(rows[1]["authority_level"], "L4")
         finally:
             shutil.rmtree(root)
 

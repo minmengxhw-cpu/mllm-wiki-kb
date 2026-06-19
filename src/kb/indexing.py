@@ -10,6 +10,14 @@ from pathlib import Path
 from kb.store import connect_db, ensure_schema_columns, now_iso
 
 
+AUTHORITY_RANKS = {
+    "L1": 0,
+    "L2": 1,
+    "L3": 2,
+    "L4": 3,
+}
+
+
 def init_db_schema(root: Path) -> None:
     conn = connect_db(root)
     try:
@@ -183,6 +191,29 @@ def dict_to_row(data: dict) -> sqlite3.Row:
     return row
 
 
+def authority_rank(value: str | None) -> int:
+    return AUTHORITY_RANKS.get(str(value or "L4"), 9)
+
+
+def authority_select(prefix: str = "a") -> str:
+    return (
+        f"{prefix}.source_id AS source_id, "
+        f"{prefix}.authority_level AS authority_level, "
+        f"{prefix}.source_tier AS source_tier, "
+        f"{prefix}.is_citable AS is_citable"
+    )
+
+
+def sort_rows_by_authority(rows: list[sqlite3.Row]) -> list[sqlite3.Row]:
+    return sorted(
+        rows,
+        key=lambda row: (
+            authority_rank(row["authority_level"] if "authority_level" in row.keys() else None),
+            -int(row["is_citable"] or 0) if "is_citable" in row.keys() else 0,
+        ),
+    )
+
+
 def semantic_rows(root: Path, query: str, top_k: int) -> list[sqlite3.Row]:
     conn = connect_db(root)
     try:
@@ -194,7 +225,8 @@ def semantic_rows(root: Path, query: str, top_k: int) -> list[sqlite3.Row]:
         qvec = text_vector(query)
         rows = conn.execute(
             """
-            SELECT v.chunk_id, v.article_id, v.vector_json, c.content, a.title, a.account, a.published_at, a.raw_path
+            SELECT v.chunk_id, v.article_id, v.vector_json, c.content, a.title, a.account, a.published_at, a.raw_path,
+                   a.source_id, a.authority_level, a.source_tier, a.is_citable
             FROM chunk_vectors v
             JOIN article_chunks c ON c.id = v.chunk_id
             JOIN articles a ON a.id = v.article_id
@@ -216,6 +248,10 @@ def semantic_rows(root: Path, query: str, top_k: int) -> list[sqlite3.Row]:
                     "account": row["account"],
                     "published_at": row["published_at"],
                     "raw_path": row["raw_path"],
+                    "source_id": row["source_id"],
+                    "authority_level": row["authority_level"],
+                    "source_tier": row["source_tier"],
+                    "is_citable": row["is_citable"],
                     "snippet": row["content"][:220],
                     "score": score,
                 }
@@ -238,13 +274,26 @@ def search_rows(root: Path, query: str, top_k: int = 20) -> list[sqlite3.Row]:
             conn = connect_db(root)
         q = fts_query(query)
         rows = conn.execute(
-            """
-            SELECT article_id, chunk_id, title, account, published_at, raw_path,
+            f"""
+            SELECT article_chunks_fts.article_id AS article_id,
+                   article_chunks_fts.chunk_id AS chunk_id,
+                   a.title AS title,
+                   a.account AS account,
+                   a.published_at AS published_at,
+                   a.raw_path AS raw_path,
+                   a.source_id AS source_id,
+                   a.authority_level AS authority_level,
+                   a.source_tier AS source_tier,
+                   a.is_citable AS is_citable,
                    snippet(article_chunks_fts, 0, '[', ']', '...', 18) AS snippet,
                    bm25(article_chunks_fts) AS score
             FROM article_chunks_fts
+            JOIN articles a ON a.id = article_chunks_fts.article_id
             WHERE article_chunks_fts MATCH ?
-            ORDER BY score
+            ORDER BY
+                CASE a.authority_level WHEN 'L1' THEN 0 WHEN 'L2' THEN 1 WHEN 'L3' THEN 2 WHEN 'L4' THEN 3 ELSE 9 END,
+                a.is_citable DESC,
+                score
             LIMIT ?
             """,
             (q, top_k),
@@ -260,12 +309,18 @@ def search_rows(root: Path, query: str, top_k: int = 20) -> list[sqlite3.Row]:
             rows = conn.execute(
                 f"""
                 SELECT c.article_id, c.id AS chunk_id, a.title, a.account, a.published_at, a.raw_path,
+                       {authority_select("a")},
                        substr(c.content, 1, 220) AS snippet,
                        0 AS score
                 FROM article_chunks c
                 JOIN articles a ON a.id = c.article_id
                 WHERE {where}
-                ORDER BY a.published_at DESC, c.article_id, c.chunk_index
+                ORDER BY
+                    CASE a.authority_level WHEN 'L1' THEN 0 WHEN 'L2' THEN 1 WHEN 'L3' THEN 2 WHEN 'L4' THEN 3 ELSE 9 END,
+                    a.is_citable DESC,
+                    a.published_at DESC,
+                    c.article_id,
+                    c.chunk_index
                 LIMIT ?
                 """,
                 (*params, top_k),
@@ -280,12 +335,19 @@ def search_rows(root: Path, query: str, top_k: int = 20) -> list[sqlite3.Row]:
                 rows = conn.execute(
                     f"""
                     SELECT c.article_id, c.id AS chunk_id, a.title, a.account, a.published_at, a.raw_path,
+                           {authority_select("a")},
                            substr(c.content, 1, 220) AS snippet,
                            ({score_expr}) AS score
                     FROM article_chunks c
                     JOIN articles a ON a.id = c.article_id
                     WHERE {where}
-                    ORDER BY score DESC, a.published_at DESC, c.article_id, c.chunk_index
+                    ORDER BY
+                        CASE a.authority_level WHEN 'L1' THEN 0 WHEN 'L2' THEN 1 WHEN 'L3' THEN 2 WHEN 'L4' THEN 3 ELSE 9 END,
+                        a.is_citable DESC,
+                        score DESC,
+                        a.published_at DESC,
+                        c.article_id,
+                        c.chunk_index
                     LIMIT ?
                     """,
                     (*score_params, *params, top_k),
@@ -307,12 +369,19 @@ def search_rows(root: Path, query: str, top_k: int = 20) -> list[sqlite3.Row]:
                 supplement = conn.execute(
                     f"""
                     SELECT c.article_id, c.id AS chunk_id, a.title, a.account, a.published_at, a.raw_path,
+                           {authority_select("a")},
                            substr(c.content, 1, 220) AS snippet,
                            ({score_expr}) AS score
                     FROM article_chunks c
                     JOIN articles a ON a.id = c.article_id
                     WHERE ({where}){exclude}
-                    ORDER BY score DESC, a.published_at DESC, c.article_id, c.chunk_index
+                    ORDER BY
+                        CASE a.authority_level WHEN 'L1' THEN 0 WHEN 'L2' THEN 1 WHEN 'L3' THEN 2 WHEN 'L4' THEN 3 ELSE 9 END,
+                        a.is_citable DESC,
+                        score DESC,
+                        a.published_at DESC,
+                        c.article_id,
+                        c.chunk_index
                     LIMIT ?
                     """,
                     (*score_params, *params, *exclude_params, top_k - len(rows)),
@@ -330,4 +399,4 @@ def search_rows(root: Path, query: str, top_k: int = 20) -> list[sqlite3.Row]:
                     break
     finally:
         conn.close()
-    return rows
+    return sort_rows_by_authority(list(rows))

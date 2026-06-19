@@ -16,7 +16,7 @@ from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
-from kb.indexing import dict_to_row, query_terms, rebuild_fts, rebuild_vectors, search_rows
+from kb.indexing import authority_rank, dict_to_row, query_terms, rebuild_fts, rebuild_vectors, search_rows
 from kb.ingest import (
     chunk_text,
     extract_doc,
@@ -570,16 +570,27 @@ def clean_snippet(value: str, limit: int = 240) -> str:
 
 
 def row_source_line(row: sqlite3.Row, idx: int) -> str:
+    authority = row_authority_label(row)
     return (
-        f"[S{idx}] {row['account']}，{row['published_at'] or '日期不详'}，"
+        f"[S{idx}] {authority} {row['account']}，{row['published_at'] or '日期不详'}，"
         f"《{row['title']}》，raw: `{row['raw_path']}`"
     )
 
 
+def row_authority_label(row: sqlite3.Row) -> str:
+    keys = row.keys()
+    level = str(row["authority_level"] if "authority_level" in keys and row["authority_level"] else "L4")
+    citable = bool(int(row["is_citable"] or 0)) if "is_citable" in keys and row["is_citable"] is not None else False
+    if level in {"L1", "L2", "L3"}:
+        return f"{level}{'/可引用' if citable else '/待核'}"
+    return "L4/样本"
+
+
 def row_source_md(row: sqlite3.Row, idx: int) -> str:
     raw_path = row["raw_path"] or ""
+    source_label = f"{row['account'] or ''}（{row_authority_label(row)}）"
     return (
-        f"| S{idx} | {row['account'] or ''} | {row['published_at'] or '日期不详'} | "
+        f"| S{idx} | {source_label} | {row['published_at'] or '日期不详'} | "
         f"《{row['title']}》 | `{raw_path}` |"
     )
 
@@ -712,6 +723,15 @@ def topic_query_variants(topic: str) -> list[str]:
 
 
 def merge_search_rows(row_groups: list[list[sqlite3.Row]], top_k: int) -> list[sqlite3.Row]:
+    def ranked(items: list[sqlite3.Row]) -> list[sqlite3.Row]:
+        return sorted(
+            items,
+            key=lambda row: (
+                authority_rank(row["authority_level"] if "authority_level" in row.keys() else None),
+                -int(row["is_citable"] or 0) if "is_citable" in row.keys() else 0,
+            ),
+        )[:top_k]
+
     rows = []
     seen_chunks: set[str] = set()
     seen_articles: set[str] = set()
@@ -725,9 +745,9 @@ def merge_search_rows(row_groups: list[list[sqlite3.Row]], top_k: int) -> list[s
             seen_chunks.add(chunk_id)
             seen_articles.add(article_id)
             if len(rows) >= top_k:
-                return rows
+                return ranked(rows)
     if len(rows) >= top_k:
-        return rows
+        return ranked(rows)
     for group in row_groups:
         for row in group:
             article_id = str(row["article_id"])
@@ -736,8 +756,8 @@ def merge_search_rows(row_groups: list[list[sqlite3.Row]], top_k: int) -> list[s
             rows.append(row)
             seen_articles.add(article_id)
             if len(rows) >= top_k:
-                return rows
-    return rows
+                return ranked(rows)
+    return ranked(rows)
 
 
 def staff_search_rows(root: Path, mode: str, topic: str, top_k: int) -> list[sqlite3.Row]:
@@ -3723,7 +3743,10 @@ def command_search(args: argparse.Namespace) -> int:
     print(f"Results: {len(rows)}")
     for idx, row in enumerate(rows, 1):
         print(f"\n{idx}. {row['title']}")
-        print(f"   {row['account']} | {row['published_at']} | article_id={row['article_id']} chunk_id={row['chunk_id']}")
+        print(
+            f"   {row['account']} | {row['published_at']} | source={row_authority_label(row)} | "
+            f"article_id={row['article_id']} chunk_id={row['chunk_id']}"
+        )
         print(f"   raw: {row['raw_path']}")
         print(f"   {row['snippet']}")
     return 0

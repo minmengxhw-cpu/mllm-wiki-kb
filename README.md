@@ -342,6 +342,8 @@ kb corpus-style
 
 SQLite 连接与 schema 兼容逻辑位于 `src/kb/store.py`；FTS5、哈希向量与统一检索入口位于 `src/kb/indexing.py`，后续权威级别排序和 embedding 替换优先在这里落地。
 
+检索结果会透出 `L1-L4` 来源级别；`kb search`、`kb ask` 和 `kb staff` 默认按 L1-L3 事实层优先、L4 微信公众号样本层降级的原则组织来源。
+
 ```bash
 kb pro-sources --save
 ```
