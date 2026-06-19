@@ -219,6 +219,10 @@ def command_import(args: argparse.Namespace) -> int:
     skipped = 0
     failed = 0
     preview_rows = []
+    source_id = getattr(args, "source_id", None) or None
+    authority_level = getattr(args, "authority_level", None) or "L4"
+    source_tier = getattr(args, "source_tier", None) or authority_level
+    is_citable = 1 if getattr(args, "is_citable", False) else 0
     conn = connect_db(root)
     try:
         for path in files:
@@ -238,8 +242,9 @@ def command_import(args: argparse.Namespace) -> int:
                     cur = conn.execute(
                         """
                         INSERT INTO articles(title, account, author, published_at, source_path, raw_path, source_url,
+                                             source_id, authority_level, source_tier, is_citable,
                                              content_hash, imported_at, file_type, status)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """,
                         (
                             doc.title,
@@ -249,6 +254,10 @@ def command_import(args: argparse.Namespace) -> int:
                             str(path),
                             str(raw_path),
                             doc.source_url,
+                            source_id,
+                            authority_level,
+                            source_tier,
+                            is_citable,
                             content_hash,
                             now_iso(),
                             doc.file_type,
@@ -275,7 +284,15 @@ def command_import(args: argparse.Namespace) -> int:
             "import",
             status,
             f"imported={imported} skipped={skipped} failed={failed}",
-            {"input": str(input_dir), "limit": limit, "dry_run": args.dry_run},
+            {
+                "input": str(input_dir),
+                "limit": limit,
+                "dry_run": args.dry_run,
+                "source_id": source_id,
+                "authority_level": authority_level,
+                "source_tier": source_tier,
+                "is_citable": bool(is_citable),
+            },
         )
         if not args.dry_run:
             append_wiki_log(root, f"导入测试样本：imported={imported} skipped={skipped} failed={failed}")
@@ -284,6 +301,9 @@ def command_import(args: argparse.Namespace) -> int:
     print(f"Input: {input_dir}")
     print(f"Limit: {limit}")
     print(f"Dry run: {args.dry_run}")
+    print(f"Authority: {authority_level} | Source tier: {source_tier} | Citable: {bool(is_citable)}")
+    if source_id:
+        print(f"Source id: {source_id}")
     print(f"Imported/planned: {imported}")
     print(f"Skipped duplicate: {skipped}")
     print(f"Failed: {failed}")
@@ -4991,6 +5011,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--input", required=True)
     p.add_argument("--limit", type=int, default=20)
     p.add_argument("--dry-run", action="store_true")
+    p.add_argument("--source-id", default=None, help="来源登记 ID，如 AUTH-001")
+    p.add_argument("--authority-level", choices=["L1", "L2", "L3", "L4"], default="L4")
+    p.add_argument("--source-tier", default=None, help="来源层；默认等于 authority-level")
+    p.add_argument("--is-citable", action="store_true", help="标记为可直接引用来源")
     p.set_defaults(func=command_import)
 
     p = sub.add_parser("check")

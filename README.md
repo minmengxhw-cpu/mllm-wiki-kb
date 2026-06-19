@@ -97,6 +97,12 @@ kb import --input ~/Documents/微信公众号 --dry-run --limit 20
 kb import --input ~/Documents/微信公众号 --limit 20
 ```
 
+公开权威资料建议先放入单独目录，再显式标注来源级别：
+
+```bash
+kb import --input ~/Documents/权威资料/民盟中央 --source-id AUTH-001 --authority-level L1 --source-tier 权威定本层 --is-citable --limit 20
+```
+
 导入会：
 
 - 支持 `.md`、`.txt`、`.html`、`.htm`、`.json`

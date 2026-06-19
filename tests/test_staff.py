@@ -19,6 +19,7 @@ from kb.cli import (  # noqa: E402
     build_parser,
     command_refresh,
     command_check,
+    command_import,
     external_sources_report_markdown,
     guardrails_report_markdown,
     normalized_similarity,
@@ -94,6 +95,26 @@ class StaffCommandTests(unittest.TestCase):
         args = build_parser().parse_args(["sources", "--save"])
         self.assertEqual(args.command, "sources")
         self.assertTrue(args.save)
+
+    def test_parser_accepts_authority_import_options(self) -> None:
+        args = build_parser().parse_args(
+            [
+                "import",
+                "--input",
+                "/tmp/in",
+                "--source-id",
+                "AUTH-001",
+                "--authority-level",
+                "L1",
+                "--source-tier",
+                "权威定本层",
+                "--is-citable",
+            ]
+        )
+        self.assertEqual(args.source_id, "AUTH-001")
+        self.assertEqual(args.authority_level, "L1")
+        self.assertEqual(args.source_tier, "权威定本层")
+        self.assertTrue(args.is_citable)
 
     def test_check_command_can_act_as_hard_gate(self) -> None:
         root = self.make_root()
@@ -275,6 +296,40 @@ class StaffCommandTests(unittest.TestCase):
             self.assertEqual(row_authority_label(rows[0]), "L1/可引用")
             self.assertIn("L1/可引用", row_source_md(rows[0], 1))
             self.assertEqual(rows[1]["authority_level"], "L4")
+        finally:
+            shutil.rmtree(root)
+
+    def test_import_can_mark_authority_source_metadata(self) -> None:
+        root = self.make_root()
+        try:
+            input_dir = root / "authority-input"
+            input_dir.mkdir()
+            (input_dir / "auth.md").write_text(
+                "权威资料标题\n\n原创 民盟中央 2026-06-19 10:00 北京\n\n沈钧儒 民盟史 权威资料",
+                encoding="utf-8",
+            )
+            args = argparse.Namespace(
+                project_root=str(root),
+                input=str(input_dir),
+                limit=1,
+                dry_run=False,
+                source_id="AUTH-001",
+                authority_level="L1",
+                source_tier="权威定本层",
+                is_citable=True,
+            )
+            with contextlib.redirect_stdout(io.StringIO()):
+                code = command_import(args)
+            self.assertEqual(code, 0)
+            conn = sqlite3.connect(root / "index" / "kb.sqlite")
+            conn.row_factory = sqlite3.Row
+            row = conn.execute("SELECT title, source_id, authority_level, source_tier, is_citable FROM articles").fetchone()
+            conn.close()
+            self.assertEqual(row["title"], "权威资料标题")
+            self.assertEqual(row["source_id"], "AUTH-001")
+            self.assertEqual(row["authority_level"], "L1")
+            self.assertEqual(row["source_tier"], "权威定本层")
+            self.assertEqual(row["is_citable"], 1)
         finally:
             shutil.rmtree(root)
 
