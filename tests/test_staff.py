@@ -24,10 +24,6 @@ from kb.cli import (  # noqa: E402
     normalized_similarity,
     obsidian_status_markdown,
     obsidian_sync_status,
-    pro_source_intake_tasks,
-    pro_source_query_seeds,
-    pro_sources_report_markdown,
-    sources_dashboard_markdown,
     staff_check_issues,
     staff_draft_body,
     staff_history_body,
@@ -35,6 +31,12 @@ from kb.cli import (  # noqa: E402
     staff_material_draft_body,
     staff_stats_body,
     verify_report_markdown,
+)
+from kb.sources import (  # noqa: E402
+    pro_source_intake_tasks,
+    pro_source_query_seeds,
+    pro_sources_report_markdown,
+    sources_dashboard_markdown,
 )
 
 

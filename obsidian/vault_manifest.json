@@ -1,11 +1,11 @@
 {
-  "created_at": "2026-06-19T17:07:09",
+  "created_at": "2026-06-19T17:11:32",
   "vault": "/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki",
   "vault_exists": true,
   "source_files": 156,
   "checked_files": 155,
-  "current": 155,
+  "current": 153,
   "missing": 0,
-  "stale": 0,
-  "ready": true
+  "stale": 2,
+  "ready": false
 }
