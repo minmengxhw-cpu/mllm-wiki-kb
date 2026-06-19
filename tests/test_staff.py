@@ -24,7 +24,6 @@ from kb.cli import (  # noqa: E402
     normalized_similarity,
     obsidian_status_markdown,
     obsidian_sync_status,
-    staff_check_issues,
     staff_draft_body,
     staff_history_body,
     staff_info_body,
@@ -38,6 +37,7 @@ from kb.sources import (  # noqa: E402
     pro_sources_report_markdown,
     sources_dashboard_markdown,
 )
+from kb.staff_check import staff_check_issues  # noqa: E402
 
 
 class StaffCommandTests(unittest.TestCase):

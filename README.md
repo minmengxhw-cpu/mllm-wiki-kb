@@ -336,6 +336,8 @@ kb corpus-style
 
 来源管理逻辑已独立到 `src/kb/sources.py`；`src/kb/cli.py` 只负责命令入口、保存报告和日志记录。
 
+核稿硬门的黑名单、口径变体、引用缺失检测已独立到 `src/kb/staff_check.py`；`cli.py` 只保留 `/核` 报告拼装和命令入口。
+
 ```bash
 kb pro-sources --save
 ```
