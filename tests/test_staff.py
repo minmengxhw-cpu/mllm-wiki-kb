@@ -17,12 +17,17 @@ from kb.cli import (  # noqa: E402
     brief_body,
     build_parser,
     command_refresh,
+    command_check,
     dict_to_row,
     external_sources_report_markdown,
     guardrails_report_markdown,
     normalized_similarity,
     obsidian_status_markdown,
     obsidian_sync_status,
+    pro_source_intake_tasks,
+    pro_source_query_seeds,
+    pro_sources_report_markdown,
+    sources_dashboard_markdown,
     staff_check_issues,
     staff_draft_body,
     staff_history_body,
@@ -70,6 +75,102 @@ class StaffCommandTests(unittest.TestCase):
         args = build_parser().parse_args(["brief", "80周年", "工作"])
         self.assertEqual(args.command, "brief")
         self.assertEqual(args.query, ["80周年", "工作"])
+
+    def test_parser_accepts_pro_sources(self) -> None:
+        args = build_parser().parse_args(["pro-sources", "--priority", "P0", "--save"])
+        self.assertEqual(args.command, "pro-sources")
+        self.assertEqual(args.priority, "P0")
+        self.assertTrue(args.save)
+
+    def test_parser_accepts_sources(self) -> None:
+        args = build_parser().parse_args(["sources", "--save"])
+        self.assertEqual(args.command, "sources")
+        self.assertTrue(args.save)
+
+    def test_check_command_can_act_as_hard_gate(self) -> None:
+        root = self.make_root()
+        try:
+            args = argparse.Namespace(
+                project_root=str(root),
+                file=None,
+                text=["沈均儒参与民盟特设支部工作，中国民主同盟成立于1941年3月19日。"],
+            )
+            with contextlib.redirect_stdout(io.StringIO()):
+                code = command_check(args)
+            self.assertEqual(code, 1)
+        finally:
+            shutil.rmtree(root)
+
+    def test_pro_source_tasks_skip_deferred_sources(self) -> None:
+        sources = [
+            {
+                "source_id": "AUTH-001",
+                "name": "民盟中央官网",
+                "source_level": "S1_authoritative_official",
+                "priority": "P0",
+                "ingest_decision": "优先全文入库",
+                "topic_domains": ["民盟史"],
+                "url": "https://example.test",
+            },
+            {
+                "source_id": "AUTH-010",
+                "name": "上海统一战线官网",
+                "source_level": "S1_authoritative_official",
+                "priority": "P1",
+                "ingest_decision": "暂缓",
+            },
+            {
+                "source_id": "INT-001",
+                "name": "内部材料",
+                "source_level": "S6_internal_reference",
+                "priority": "P2",
+                "ingest_decision": "仅人工查阅",
+            },
+        ]
+        tasks = pro_source_intake_tasks(sources, "P0")
+        seeds = pro_source_query_seeds(tasks)
+        self.assertEqual(len(tasks), 1)
+        self.assertEqual(tasks[0]["source_id"], "AUTH-001")
+        self.assertGreaterEqual(len(seeds), 1)
+        self.assertIn("民盟中央官网", seeds[0]["query"])
+
+    def test_pro_sources_report_contains_guarded_workbench(self) -> None:
+        root = self.make_root()
+        try:
+            pro_dir = root / "index" / "pro_sources"
+            pro_dir.mkdir(parents=True)
+            (pro_dir / "source_map.jsonl").write_text(
+                '{"source_id":"AUTH-001","name":"民盟中央官网","source_level":"S1_authoritative_official","priority":"P0","ingest_decision":"优先全文入库","topic_domains":["民盟史"],"url":"https://example.test"}\n',
+                encoding="utf-8",
+            )
+            (pro_dir / "source_types.json").write_text(
+                '{"source_levels":[{"code":"S1_authoritative_official","name":"权威官方层"}]}',
+                encoding="utf-8",
+            )
+            body = pro_sources_report_markdown(root, "2026-06-19T00:00:00", "P0")
+            self.assertIn("专业语料库首批来源入库工作台", body)
+            self.assertIn("民盟中央官网", body)
+            self.assertIn("不把未核验材料直接写成史实结论", body)
+        finally:
+            shutil.rmtree(root)
+
+    def test_sources_dashboard_marks_authority_and_citable_boundary(self) -> None:
+        root = self.make_root()
+        try:
+            pro_dir = root / "index" / "pro_sources"
+            pro_dir.mkdir(parents=True)
+            (pro_dir / "source_map.jsonl").write_text(
+                '{"source_id":"AUTH-001","name":"民盟中央官网","source_level":"S1_authoritative_official","authority_level":"L1","source_tier":"权威定本层","is_citable":true,"ingest_decision":"优先全文入库","collection_method":"手动喂 URL + 站点解析","url":"https://example.test"}\n'
+                '{"source_id":"INT-001","name":"内部材料","source_level":"S6_internal_reference","authority_level":"L4","source_tier":"参考与样本层","is_citable":false,"ingest_decision":"仅人工查阅","collection_method":"人工查阅","url":""}\n',
+                encoding="utf-8",
+            )
+            body = sources_dashboard_markdown(root, "2026-06-19T00:00:00")
+            self.assertIn("权威公开资料来源体检", body)
+            self.assertIn("L1-L3 作为事实层", body)
+            self.assertIn("民盟中央官网", body)
+            self.assertIn("内部材料", body)
+        finally:
+            shutil.rmtree(root)
 
     def test_staff_check_flags_blacklist_and_missing_citation(self) -> None:
         root = self.make_root()

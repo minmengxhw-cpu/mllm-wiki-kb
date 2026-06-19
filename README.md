@@ -44,6 +44,15 @@ cd ~/Documents/mllm-wiki-kb
 PYTHONPATH=src python3 -m kb.cli --help
 ```
 
+## 核稿硬门
+
+```bash
+kb check "这里粘贴待核文稿"
+kb check --file ~/Desktop/draft.txt
+```
+
+`check` 不带正文时仍检查项目状态；带正文或 `--file` 时作为核稿硬门运行，命中黑名单、高风险口径或缺少来源时返回非 0，便于接入 CI 和正式发稿前预审。
+
 ## 初始化
 
 ```bash
@@ -316,6 +325,18 @@ kb corpus-style
 ## 专业多党合作语料库来源地图
 
 专业扩容层用于把微信公众号写作库升级为多党合作与民盟研究语料库。入口为 `wiki/研究助手/民盟与多党合作专业语料库来源地图.md` 和 `wiki/研究助手/专业语料库分层入库规则.md`；结构化来源登记在 `index/pro_sources/source_map.jsonl`，来源层级规则在 `index/pro_sources/source_types.json`。
+
+```bash
+kb pro-sources --save
+```
+
+`pro-sources` 会基于专业来源地图生成首批 P0 入库任务和查询种子，产物为 `index/pro_sources/intake_tasks.jsonl`、`index/pro_sources/query_seeds.jsonl` 和 `wiki/研究助手/专业语料库首批来源入库工作台.md`。它只生成目录任务，不把未核验材料直接写成史实结论。
+
+```bash
+kb sources --save
+```
+
+`sources` 会生成 `wiki/研究助手/权威公开资料来源体检.md`，用于检查 L1-L4 权威级别、可引用来源和入库判断覆盖情况。
 
 ## Google Drive 工作资料层
 

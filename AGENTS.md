@@ -31,6 +31,8 @@
 - 微信公众号文章分类抽检和人工校订表更新用 `kb corpus-audit`。
 - 上海民盟分体裁写作模板和文史盟史研究入口更新用 `kb corpus-style`。
 - Google Drive 外部参考层状态查看用 `kb external-sources`；需要写入 wiki 时用 `kb external-sources --save`。
+- 专业多党合作来源地图和首批入库任务用 `kb pro-sources --save`，产物在 `index/pro_sources/intake_tasks.jsonl`、`index/pro_sources/query_seeds.jsonl` 和 `wiki/研究助手/专业语料库首批来源入库工作台.md`。
+- 权威公开资料来源分级体检用 `kb sources --save`，用于确认 L1-L4 覆盖、可引用来源和入库边界。
 - 系统可用性验收用 `kb verify`；需要写入 wiki 时用 `kb verify --save`。
 - 核心人物研究档案更新用 `kb build-research-dossiers --set core-people`；核心事件研究档案更新用 `kb build-research-dossiers --set core-events`。
 - 盟参种子库位于 `index/formulations.jsonl`、`index/blacklist.csv`、`index/entities/*.jsonl`。
@@ -72,7 +74,11 @@
 - `wiki/研究助手/口径核稿库增强一期工作台.md`
 - `wiki/研究助手/民盟与多党合作专业语料库来源地图.md`
 - `wiki/研究助手/专业语料库分层入库规则.md`
+- `wiki/研究助手/专业语料库首批来源入库工作台.md`
+- `wiki/研究助手/权威公开资料来源体检.md`
 - `index/pro_sources/source_map.jsonl`
+- `index/pro_sources/intake_tasks.jsonl`
+- `index/pro_sources/query_seeds.jsonl`
 - `wiki/研究助手/微信公众号分类质量诊断报告.md`
 - `wiki/研究助手/微信公众号文章分类抽检表.md`
 - `wiki/研究助手/微信公众号分类优先校订清单.md`
