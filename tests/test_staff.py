@@ -18,7 +18,6 @@ from kb.cli import (  # noqa: E402
     build_parser,
     command_refresh,
     command_check,
-    dict_to_row,
     external_sources_report_markdown,
     guardrails_report_markdown,
     normalized_similarity,
@@ -31,6 +30,7 @@ from kb.cli import (  # noqa: E402
     staff_stats_body,
     verify_report_markdown,
 )
+from kb.indexing import dict_to_row, query_terms, text_vector  # noqa: E402
 from kb.ingest import chunk_text, extract_doc, normalize_text, sha256_text  # noqa: E402
 from kb.sources import (  # noqa: E402
     pro_source_intake_tasks,
@@ -129,6 +129,12 @@ class StaffCommandTests(unittest.TestCase):
         self.assertEqual(sha256_text("abc"), sha256_text("abc"))
         chunks = chunk_text("第一段\n\n第二段", max_chars=20)
         self.assertEqual(chunks, ["第一段\n\n第二段"])
+
+    def test_indexing_helpers_extract_known_terms_and_vectors(self) -> None:
+        self.assertEqual(query_terms("沈钧儒与民盟史"), ["盟史", "沈钧儒"])
+        vector = text_vector("沈钧儒 民盟史")
+        self.assertEqual(len(vector), 256)
+        self.assertGreater(sum(abs(item) for item in vector), 0)
 
     def test_pro_source_tasks_skip_deferred_sources(self) -> None:
         sources = [

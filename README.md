@@ -340,6 +340,8 @@ kb corpus-style
 
 文章导入的解析、清洗、分块、哈希、raw 原文写入和隔离文件逻辑已独立到 `src/kb/ingest.py`；`cli.py` 只保留 `scan/import` 命令流程和数据库写入。
 
+SQLite 连接与 schema 兼容逻辑位于 `src/kb/store.py`；FTS5、哈希向量与统一检索入口位于 `src/kb/indexing.py`，后续权威级别排序和 embedding 替换优先在这里落地。
+
 ```bash
 kb pro-sources --save
 ```
