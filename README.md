@@ -312,6 +312,11 @@ kb corpus-style
 
 这一步不修改微信公众号原文，也不把 SQLite 数据库提交到 GitHub。
 
+
+## 专业多党合作语料库来源地图
+
+专业扩容层用于把微信公众号写作库升级为多党合作与民盟研究语料库。入口为 `wiki/研究助手/民盟与多党合作专业语料库来源地图.md` 和 `wiki/研究助手/专业语料库分层入库规则.md`；结构化来源登记在 `index/pro_sources/source_map.jsonl`，来源层级规则在 `index/pro_sources/source_types.json`。
+
 ## Google Drive 工作资料层
 
 当前已登记三个 Drive 工作知识库：

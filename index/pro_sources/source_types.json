@@ -1,0 +1,63 @@
+{
+  "source_levels": [
+    {
+      "code": "S1_authoritative_official",
+      "name": "权威官方层",
+      "rank": 1,
+      "use": "事实核验、正式口径、制度表述",
+      "examples": "民盟中央、中央统战部、全国政协、上海政协、上海统战等"
+    },
+    {
+      "code": "S2_authoritative_media",
+      "name": "权威媒体层",
+      "rank": 2,
+      "use": "公开报道、政策背景、活动事实补强",
+      "examples": "人民政协报、团结报、新华社、人民日报等"
+    },
+    {
+      "code": "S3_publication_book",
+      "name": "正式出版物层",
+      "rank": 3,
+      "use": "盟史、人物、事件、地方史的深度依据",
+      "examples": "民盟史、政协文史资料、地方志、年鉴、纪念文集"
+    },
+    {
+      "code": "S4_academic_research",
+      "name": "学术研究层",
+      "rank": 4,
+      "use": "理论框架、研究综述、学术观点",
+      "examples": "CNKI、人大复印资料、统一战线学论文、政协理论论文"
+    },
+    {
+      "code": "S5_archive_clue",
+      "name": "档案线索层",
+      "rank": 5,
+      "use": "考证线索、待查档案目录、地方史补证",
+      "examples": "上海市档案馆、重庆档案馆、政协文史馆等"
+    },
+    {
+      "code": "S6_internal_reference",
+      "name": "内部参考层",
+      "rank": 6,
+      "use": "人工参考、写作材料、终审辅助",
+      "examples": "Google Drive 工作文件、内部讲话稿、调研材料"
+    }
+  ],
+  "evidence_roles": [
+    "事实依据",
+    "口径依据",
+    "理论依据",
+    "历史解释",
+    "写作样本",
+    "背景材料",
+    "待核线索",
+    "内部参考"
+  ],
+  "ingest_decisions": [
+    "优先全文入库",
+    "先建目录后抽取",
+    "只建索引不全文",
+    "仅人工查阅",
+    "暂缓"
+  ]
+}
