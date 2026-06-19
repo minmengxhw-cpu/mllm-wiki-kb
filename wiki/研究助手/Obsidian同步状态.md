@@ -1,10 +1,10 @@
 # Obsidian 同步状态
 
-生成时间：2026-06-19T17:11:32
+生成时间：2026-06-19T17:15:10
 
 ## 总体判断
 
-- 当前状态：缺失。
+- 当前状态：可用。
 - 本检查只核对本机知识库到 Obsidian Vault 的文件一致性；手机端是否完成 iCloud 云端下载，还需以手机 Obsidian 实际可见为准。
 
 ## 同步概览
@@ -15,17 +15,16 @@
 | Vault 存在 | 可用 |
 | 源文件 | 156 |
 | 参与核对 | 155 |
-| 已一致 | 153 |
+| 已一致 | 155 |
 | 缺失 | 0 |
-| 需更新 | 2 |
-| 整体状态 | 缺失 |
+| 需更新 | 0 |
+| 整体状态 | 可用 |
 
 ## 需要处理的文件
 
 | 类型 | 源文件 | 目标文件 |
 | --- | --- | --- |
-| 需更新 | `wiki/log.md` | `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/00-总索引/操作日志.md` |
-| 需更新 | `wiki/研究助手/盟参系统可用性验收报告.md` | `/Users/cheer/Library/Mobile Documents/iCloud~md~obsidian/Documents/MllmWiki/01-研究助手/盟参系统可用性验收报告.md` |
+| 无 | 已同步 | 已同步 |
 
 ## 使用建议
 
