@@ -33,6 +33,7 @@
 - Google Drive 外部参考层状态查看用 `kb external-sources`；需要写入 wiki 时用 `kb external-sources --save`。
 - 专业多党合作来源地图和首批入库任务用 `kb pro-sources --save`，产物在 `index/pro_sources/intake_tasks.jsonl`、`index/pro_sources/query_seeds.jsonl` 和 `wiki/研究助手/专业语料库首批来源入库工作台.md`。
 - 权威公开资料来源分级体检用 `kb sources --save`，用于确认 L1-L4 覆盖、可引用来源和入库边界。
+- 单篇公开权威网页入库用 `kb ingest-url URL --source-id AUTH-xxx --authority-level L1 --source-tier 权威定本层 --is-citable --dry-run` 先预览，确认正文抽取后再去掉 `--dry-run`。不确定版权或正文抽取质量时只登记来源，不全文入库。
 - 系统可用性验收用 `kb verify`；需要写入 wiki 时用 `kb verify --save`。
 - 核心人物研究档案更新用 `kb build-research-dossiers --set core-people`；核心事件研究档案更新用 `kb build-research-dossiers --set core-events`。
 - 盟参种子库位于 `index/formulations.jsonl`、`index/blacklist.csv`、`index/entities/*.jsonl`。

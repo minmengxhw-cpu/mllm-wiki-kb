@@ -20,6 +20,7 @@ from kb.cli import (  # noqa: E402
     command_refresh,
     command_check,
     command_import,
+    command_ingest_url,
     external_sources_report_markdown,
     guardrails_report_markdown,
     normalized_similarity,
@@ -35,7 +36,7 @@ from kb.cli import (  # noqa: E402
     verify_report_markdown,
 )
 from kb.indexing import dict_to_row, query_terms, search_rows, text_vector  # noqa: E402
-from kb.ingest import chunk_text, extract_doc, normalize_text, sha256_text  # noqa: E402
+from kb.ingest import chunk_text, extract_doc, html_main_text, html_title, normalize_text, sha256_text  # noqa: E402
 from kb.sources import (  # noqa: E402
     pro_source_intake_tasks,
     pro_source_query_seeds,
@@ -116,6 +117,27 @@ class StaffCommandTests(unittest.TestCase):
         self.assertEqual(args.source_tier, "权威定本层")
         self.assertTrue(args.is_citable)
 
+    def test_parser_accepts_ingest_url(self) -> None:
+        args = build_parser().parse_args(
+            [
+                "ingest-url",
+                "https://example.test/a.html",
+                "--source-id",
+                "AUTH-001",
+                "--authority-level",
+                "L1",
+                "--source-tier",
+                "权威定本层",
+                "--is-citable",
+                "--dry-run",
+            ]
+        )
+        self.assertEqual(args.command, "ingest-url")
+        self.assertEqual(args.source_id, "AUTH-001")
+        self.assertEqual(args.authority_level, "L1")
+        self.assertTrue(args.is_citable)
+        self.assertTrue(args.dry_run)
+
     def test_check_command_can_act_as_hard_gate(self) -> None:
         root = self.make_root()
         try:
@@ -155,6 +177,13 @@ class StaffCommandTests(unittest.TestCase):
         self.assertEqual(sha256_text("abc"), sha256_text("abc"))
         chunks = chunk_text("第一段\n\n第二段", max_chars=20)
         self.assertEqual(chunks, ["第一段\n\n第二段"])
+
+    def test_url_html_helpers_extract_title_and_main_text(self) -> None:
+        html = "<html><head><title>权威资料 - 网站名</title></head><body><article><h1>标题</h1><p>正文第一段</p><p>正文第二段</p></article></body></html>"
+        self.assertEqual(html_title(html), "权威资料")
+        text = html_main_text(html)
+        self.assertIn("正文第一段", text)
+        self.assertIn("正文第二段", text)
 
     def test_indexing_helpers_extract_known_terms_and_vectors(self) -> None:
         self.assertEqual(query_terms("沈钧儒与民盟史"), ["盟史", "沈钧儒"])
@@ -330,6 +359,48 @@ class StaffCommandTests(unittest.TestCase):
             self.assertEqual(row["authority_level"], "L1")
             self.assertEqual(row["source_tier"], "权威定本层")
             self.assertEqual(row["is_citable"], 1)
+        finally:
+            shutil.rmtree(root)
+
+    def test_ingest_url_can_store_authority_metadata(self) -> None:
+        root = self.make_root()
+        try:
+            local = root / "page.html"
+            local.write_text(
+                "<html><head><title>权威网页 - 官网</title></head><body><article><p>沈钧儒 民盟史 权威网页正文</p></article></body></html>",
+                encoding="utf-8",
+            )
+            args = argparse.Namespace(
+                project_root=str(root),
+                url=local.as_uri(),
+                source_id="AUTH-URL",
+                authority_level="L1",
+                source_tier="权威定本层",
+                is_citable=True,
+                account="权威官网",
+                title=None,
+                published_at="2026-06-19",
+                timeout=5,
+                dry_run=False,
+            )
+            with contextlib.redirect_stdout(io.StringIO()):
+                code = command_ingest_url(args)
+            self.assertEqual(code, 0)
+            conn = sqlite3.connect(root / "index" / "kb.sqlite")
+            conn.row_factory = sqlite3.Row
+            row = conn.execute(
+                "SELECT title, account, source_id, authority_level, source_tier, is_citable, source_url FROM articles"
+            ).fetchone()
+            chunk = conn.execute("SELECT content FROM article_chunks").fetchone()
+            conn.close()
+            self.assertEqual(row["title"], "权威网页")
+            self.assertEqual(row["account"], "权威官网")
+            self.assertEqual(row["source_id"], "AUTH-URL")
+            self.assertEqual(row["authority_level"], "L1")
+            self.assertEqual(row["source_tier"], "权威定本层")
+            self.assertEqual(row["is_citable"], 1)
+            self.assertEqual(row["source_url"], local.as_uri())
+            self.assertIn("权威网页正文", chunk["content"])
         finally:
             shutil.rmtree(root)
 

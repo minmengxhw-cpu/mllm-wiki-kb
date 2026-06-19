@@ -103,6 +103,13 @@ kb import --input ~/Documents/微信公众号 --limit 20
 kb import --input ~/Documents/权威资料/民盟中央 --source-id AUTH-001 --authority-level L1 --source-tier 权威定本层 --is-citable --limit 20
 ```
 
+也可以直接抓取公开网页，先 dry-run 查看正文抽取效果：
+
+```bash
+kb ingest-url "https://example.org/article.html" --source-id AUTH-001 --authority-level L1 --source-tier 权威定本层 --is-citable --dry-run
+kb ingest-url "https://example.org/article.html" --source-id AUTH-001 --authority-level L1 --source-tier 权威定本层 --is-citable
+```
+
 导入会：
 
 - 支持 `.md`、`.txt`、`.html`、`.htm`、`.json`

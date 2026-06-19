@@ -5,9 +5,11 @@ import html
 import json
 import re
 import shutil
+import urllib.request
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlparse
 from typing import Iterable
 
 
@@ -50,6 +52,77 @@ def strip_html(text: str) -> str:
     text = re.sub(r"(?i)</h[1-6]\s*>", "\n", text)
     text = re.sub(r"(?s)<[^>]+>", "", text)
     return html.unescape(text)
+
+
+def html_title(raw: str) -> str | None:
+    title_match = re.search(r"(?is)<title[^>]*>(.*?)</title>", raw)
+    if not title_match:
+        return None
+    title = normalize_text(strip_html(title_match.group(1)))
+    title = re.sub(r"\s*[-_]\s*[^-_]{2,40}$", "", title).strip()
+    return title[:120] if title else None
+
+
+def html_main_text(raw: str) -> str:
+    candidates = []
+    for pattern in [
+        r"(?is)<article[^>]*>(.*?)</article>",
+        r"(?is)<main[^>]*>(.*?)</main>",
+        r"(?is)<div[^>]+(?:class|id)=[\"'][^\"']*(?:content|article|main|正文)[^\"']*[\"'][^>]*>(.*?)</div>",
+    ]:
+        candidates.extend(match.group(1) for match in re.finditer(pattern, raw))
+    if candidates:
+        return max((normalize_text(strip_html(item)) for item in candidates), key=len)
+    return normalize_text(strip_html(raw))
+
+
+def fetch_url_text(url: str, timeout: int = 20) -> tuple[str, str]:
+    request = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "mllm-wiki-kb/0.1 (+personal research; public source intake)",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,text/plain;q=0.8,*/*;q=0.7",
+        },
+    )
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        charset = response.headers.get_content_charset() or "utf-8"
+        payload = response.read()
+    return payload.decode(charset, errors="ignore"), charset
+
+
+def extract_doc_from_url(
+    url: str,
+    account: str | None = None,
+    title: str | None = None,
+    published_at: str | None = None,
+    timeout: int = 20,
+) -> ArticleDoc:
+    raw, _charset = fetch_url_text(url, timeout=timeout)
+    parsed = urlparse(url)
+    inferred_account = account or parsed.netloc
+    text = html_main_text(raw) if "<" in raw and ">" in raw else normalize_text(raw)
+    inferred_title = title or html_title(raw)
+    if not inferred_title:
+        for line in text.splitlines()[:30]:
+            line = line.strip().lstrip("#").strip()
+            if line:
+                inferred_title = line[:120]
+                break
+    if not inferred_title:
+        inferred_title = parsed.path.rstrip("/").split("/")[-1] or parsed.netloc
+    if not published_at:
+        match = re.search(r"(20\d{2})[-年.](\d{1,2})[-月.](\d{1,2})", raw[:5000])
+        if match:
+            published_at = f"{match.group(1)}-{int(match.group(2)):02d}-{int(match.group(3)):02d}"
+    return ArticleDoc(
+        title=inferred_title,
+        account=inferred_account,
+        author=None,
+        published_at=published_at,
+        source_url=url,
+        text=text,
+        file_type="url",
+    )
 
 
 def normalize_text(text: str) -> str:

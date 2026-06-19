@@ -18,8 +18,10 @@ from pathlib import Path
 
 from kb.indexing import authority_rank, dict_to_row, query_terms, rebuild_fts, rebuild_vectors, search_rows
 from kb.ingest import (
+    ArticleDoc,
     chunk_text,
     extract_doc,
+    extract_doc_from_url,
     iter_input_files,
     quarantine_file,
     sha256_text,
@@ -238,41 +240,17 @@ def command_import(args: argparse.Namespace) -> int:
                     imported += 1
                     continue
                 with conn:
-                    raw_path = write_raw(root, doc, content_hash)
-                    cur = conn.execute(
-                        """
-                        INSERT INTO articles(title, account, author, published_at, source_path, raw_path, source_url,
-                                             source_id, authority_level, source_tier, is_citable,
-                                             content_hash, imported_at, file_type, status)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        """,
-                        (
-                            doc.title,
-                            doc.account,
-                            doc.author,
-                            doc.published_at,
-                            str(path),
-                            str(raw_path),
-                            doc.source_url,
-                            source_id,
-                            authority_level,
-                            source_tier,
-                            is_citable,
-                            content_hash,
-                            now_iso(),
-                            doc.file_type,
-                            "imported",
-                        ),
+                    insert_article_doc(
+                        conn,
+                        root,
+                        doc,
+                        source_path=str(path),
+                        source_id=source_id,
+                        authority_level=authority_level,
+                        source_tier=source_tier,
+                        is_citable=is_citable,
+                        content_hash=content_hash,
                     )
-                    article_id = cur.lastrowid
-                    for idx, chunk in enumerate(chunk_text(doc.text)):
-                        conn.execute(
-                            """
-                            INSERT INTO article_chunks(article_id, chunk_index, content, content_hash, token_estimate, created_at)
-                            VALUES (?, ?, ?, ?, ?, ?)
-                            """,
-                            (article_id, idx, chunk, sha256_text(chunk), max(1, len(chunk) // 2), now_iso()),
-                        )
                     imported += 1
             except Exception as exc:
                 failed += 1
@@ -311,6 +289,119 @@ def command_import(args: argparse.Namespace) -> int:
     for row in preview_rows[:10]:
         print(f"  [{row[3]}] {row[0]} | {row[1]} | {row[2]}")
     return 0 if failed == 0 else 1
+
+
+def insert_article_doc(
+    conn: sqlite3.Connection,
+    root: Path,
+    doc: ArticleDoc,
+    source_path: str,
+    source_id: str | None,
+    authority_level: str,
+    source_tier: str,
+    is_citable: int,
+    content_hash: str,
+) -> int:
+    raw_path = write_raw(root, doc, content_hash)
+    cur = conn.execute(
+        """
+        INSERT INTO articles(title, account, author, published_at, source_path, raw_path, source_url,
+                             source_id, authority_level, source_tier, is_citable,
+                             content_hash, imported_at, file_type, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            doc.title,
+            doc.account,
+            doc.author,
+            doc.published_at,
+            source_path,
+            str(raw_path),
+            doc.source_url,
+            source_id,
+            authority_level,
+            source_tier,
+            is_citable,
+            content_hash,
+            now_iso(),
+            doc.file_type,
+            "imported",
+        ),
+    )
+    article_id = cur.lastrowid
+    for idx, chunk in enumerate(chunk_text(doc.text)):
+        conn.execute(
+            """
+            INSERT INTO article_chunks(article_id, chunk_index, content, content_hash, token_estimate, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (article_id, idx, chunk, sha256_text(chunk), max(1, len(chunk) // 2), now_iso()),
+        )
+    return int(article_id)
+
+
+def command_ingest_url(args: argparse.Namespace) -> int:
+    root = project_root_from_args(args.project_root)
+    ensure_dirs(root)
+    init_db(root)
+    source_tier = args.source_tier or args.authority_level
+    is_citable = 1 if args.is_citable else 0
+    try:
+        doc = extract_doc_from_url(
+            args.url,
+            account=args.account,
+            title=args.title,
+            published_at=args.published_at,
+            timeout=args.timeout,
+        )
+    except Exception as exc:
+        print(f"URL fetch failed: {exc}", file=sys.stderr)
+        return 1
+    content_hash = sha256_text(doc.text)
+    conn = connect_db(root)
+    try:
+        exists = conn.execute("SELECT id FROM articles WHERE content_hash = ?", (content_hash,)).fetchone()
+        print(f"URL: {args.url}")
+        print(f"Title: {doc.title}")
+        print(f"Account: {doc.account or ''}")
+        print(f"Published at: {doc.published_at or ''}")
+        print(f"Authority: {args.authority_level} | Source tier: {source_tier} | Citable: {bool(is_citable)}")
+        if args.source_id:
+            print(f"Source id: {args.source_id}")
+        print(f"Chars: {len(doc.text)}")
+        print(f"Content hash: {content_hash[:12]}")
+        if exists:
+            print(f"Skipped duplicate: article_id={exists['id']}")
+            return 0
+        if args.dry_run:
+            print("Dry run: True")
+            print(clean_snippet(doc.text, 500))
+            log_operation(root, "ingest-url", "dry-run", "url previewed", {"url": args.url, "authority_level": args.authority_level})
+            return 0
+        with conn:
+            article_id = insert_article_doc(
+                conn,
+                root,
+                doc,
+                source_path=args.url,
+                source_id=args.source_id,
+                authority_level=args.authority_level,
+                source_tier=source_tier,
+                is_citable=is_citable,
+                content_hash=content_hash,
+            )
+        append_wiki_log(root, f"导入权威公开 URL：article_id={article_id} {doc.title}")
+        log_operation(
+            root,
+            "ingest-url",
+            "ok",
+            f"article_id={article_id}",
+            {"url": args.url, "authority_level": args.authority_level, "source_id": args.source_id},
+        )
+        print(f"Imported: article_id={article_id}")
+        return 0
+    finally:
+        conn.close()
 
 
 def command_check(args: argparse.Namespace) -> int:
@@ -5016,6 +5107,19 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--source-tier", default=None, help="来源层；默认等于 authority-level")
     p.add_argument("--is-citable", action="store_true", help="标记为可直接引用来源")
     p.set_defaults(func=command_import)
+
+    p = sub.add_parser("ingest-url", help="抓取公开 URL 并按权威来源级别入库")
+    p.add_argument("url")
+    p.add_argument("--source-id", default=None, help="来源登记 ID，如 AUTH-001")
+    p.add_argument("--authority-level", choices=["L1", "L2", "L3", "L4"], default="L3")
+    p.add_argument("--source-tier", default=None, help="来源层；默认等于 authority-level")
+    p.add_argument("--is-citable", action="store_true", help="标记为可直接引用来源")
+    p.add_argument("--account", default=None, help="覆盖来源名称")
+    p.add_argument("--title", default=None, help="覆盖标题")
+    p.add_argument("--published-at", default=None, help="覆盖发布日期 YYYY-MM-DD")
+    p.add_argument("--timeout", type=int, default=20)
+    p.add_argument("--dry-run", action="store_true")
+    p.set_defaults(func=command_ingest_url)
 
     p = sub.add_parser("check")
     p.add_argument("text", nargs="*", help="可选：直接粘贴待核文稿；不填时检查项目状态")
