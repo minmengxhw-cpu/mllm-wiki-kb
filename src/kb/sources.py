@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 from collections import Counter
 from pathlib import Path
 
@@ -43,6 +44,58 @@ def pro_sources_dir(root: Path) -> Path:
 
 def load_pro_sources(root: Path) -> list[dict]:
     return load_jsonl(pro_sources_dir(root) / "source_map.jsonl")
+
+
+def source_record(item: dict, now: str) -> dict:
+    return {
+        "source_id": str(item.get("source_id") or item.get("id") or item.get("name") or "").strip(),
+        "name": str(item.get("name") or "").strip(),
+        "url": str(item.get("url") or "").strip(),
+        "authority_level": str(item.get("authority_level") or "L4").strip(),
+        "source_tier": str(item.get("source_tier") or "参考与样本层").strip(),
+        "is_citable": 1 if item.get("is_citable") else 0,
+        "collection_method": str(item.get("collection_method") or "").strip(),
+        "update_frequency": str(item.get("update_frequency") or "").strip(),
+        "copyright_boundary": str(item.get("public_use_boundary") or item.get("copyright_boundary") or "").strip(),
+        "note": str(item.get("note") or item.get("ingest_decision") or "").strip(),
+        "created_at": now,
+        "updated_at": now,
+    }
+
+
+def sync_sources_table(conn: sqlite3.Connection, sources: list[dict], now: str) -> int:
+    count = 0
+    with conn:
+        for item in sources:
+            record = source_record(item, now)
+            if not record["source_id"] or not record["name"]:
+                continue
+            conn.execute(
+                """
+                INSERT INTO sources(
+                    source_id, name, url, authority_level, source_tier, is_citable,
+                    collection_method, update_frequency, copyright_boundary, note, created_at, updated_at
+                )
+                VALUES (
+                    :source_id, :name, :url, :authority_level, :source_tier, :is_citable,
+                    :collection_method, :update_frequency, :copyright_boundary, :note, :created_at, :updated_at
+                )
+                ON CONFLICT(source_id) DO UPDATE SET
+                    name = excluded.name,
+                    url = excluded.url,
+                    authority_level = excluded.authority_level,
+                    source_tier = excluded.source_tier,
+                    is_citable = excluded.is_citable,
+                    collection_method = excluded.collection_method,
+                    update_frequency = excluded.update_frequency,
+                    copyright_boundary = excluded.copyright_boundary,
+                    note = excluded.note,
+                    updated_at = excluded.updated_at
+                """,
+                record,
+            )
+            count += 1
+    return count
 
 
 def pro_source_level_names(root: Path) -> dict[str, str]:

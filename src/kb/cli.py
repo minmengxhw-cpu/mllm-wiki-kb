@@ -34,6 +34,7 @@ from kb.sources import (
     pro_sources_dir,
     pro_sources_report_markdown,
     sources_dashboard_markdown,
+    sync_sources_table,
 )
 from kb.staff_check import (
     issue_table,
@@ -897,11 +898,19 @@ def command_sources(args: argparse.Namespace) -> int:
     created_at = now_iso()
     body = sources_dashboard_markdown(root, created_at)
     if args.save:
+        sources = load_pro_sources(root)
+        conn = connect_db(root)
+        try:
+            ensure_schema_columns(conn)
+            synced = sync_sources_table(conn, sources, created_at)
+        finally:
+            conn.close()
         path = report_dir(root) / "权威公开资料来源体检.md"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(body, encoding="utf-8")
         append_wiki_log(root, f"生成权威公开资料来源体检：{path.relative_to(root)}")
-        log_operation(root, "sources", "ok", "authority source dashboard saved", {"output": str(path)})
+        log_operation(root, "sources", "ok", f"authority source dashboard saved; synced={synced}", {"output": str(path), "synced": synced})
+        print(f"Synced sources: {synced}")
         print(path)
     else:
         print(body)

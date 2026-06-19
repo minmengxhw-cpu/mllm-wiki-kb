@@ -38,6 +38,7 @@ from kb.sources import (  # noqa: E402
     pro_source_query_seeds,
     pro_sources_report_markdown,
     sources_dashboard_markdown,
+    sync_sources_table,
 )
 from kb.staff_check import staff_check_issues  # noqa: E402
 from kb.store import ensure_schema_columns  # noqa: E402
@@ -153,6 +154,45 @@ class StaffCommandTests(unittest.TestCase):
             self.assertIn("is_citable", article_columns)
             self.assertIn("authority_level", source_columns)
             self.assertIn("is_citable", source_columns)
+        finally:
+            shutil.rmtree(root)
+
+    def test_sync_sources_table_upserts_authority_sources(self) -> None:
+        root = self.make_root()
+        try:
+            conn = sqlite3.connect(root / "index" / "kb.sqlite")
+            conn.row_factory = sqlite3.Row
+            conn.executescript((root / "schema.sql").read_text(encoding="utf-8"))
+            ensure_schema_columns(conn)
+            count = sync_sources_table(
+                conn,
+                [
+                    {
+                        "source_id": "AUTH-001",
+                        "name": "民盟中央官网",
+                        "url": "https://www.mmzy.org.cn",
+                        "authority_level": "L1",
+                        "source_tier": "权威定本层",
+                        "is_citable": True,
+                        "collection_method": "手动喂 URL + 站点解析",
+                    },
+                    {
+                        "source_id": "WX-001",
+                        "name": "微信公众号样本",
+                        "authority_level": "L4",
+                        "source_tier": "参考与样本层",
+                        "is_citable": False,
+                    },
+                ],
+                "2026-06-19T00:00:00",
+            )
+            rows = conn.execute("SELECT source_id, authority_level, is_citable FROM sources ORDER BY source_id").fetchall()
+            conn.close()
+            self.assertEqual(count, 2)
+            self.assertEqual([row["source_id"] for row in rows], ["AUTH-001", "WX-001"])
+            self.assertEqual(rows[0]["authority_level"], "L1")
+            self.assertEqual(rows[0]["is_citable"], 1)
+            self.assertEqual(rows[1]["is_citable"], 0)
         finally:
             shutil.rmtree(root)
 

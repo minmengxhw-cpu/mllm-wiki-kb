@@ -313,6 +313,9 @@ needs_review: false
 
 - 2026-06-19T17:34:39 初始化项目目录和数据库
 
+
+- 2026-06-19T17:35:55 生成权威公开资料来源体检：wiki/研究助手/权威公开资料来源体检.md
+
 <!-- KB-GENERATED:END -->
 <!-- HUMAN-NOTES:START -->
 
