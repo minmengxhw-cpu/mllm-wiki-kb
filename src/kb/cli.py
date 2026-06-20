@@ -20,6 +20,7 @@ from kb.commands import assistant as assistant_commands
 from kb.commands import ingest as ingest_commands
 from kb.commands import index as index_commands
 from kb.commands import obsidian as obsidian_commands
+from kb.commands import refresh as refresh_commands
 from kb.commands import search_ask as search_ask_commands
 from kb.commands import sources as sources_commands
 from kb.commands import staff as staff_commands
@@ -310,205 +311,59 @@ def _configure_staff_commands() -> None:
     )
 
 
-def clean_snippet(*args, **kwargs):
+def _staff(name, *args, **kwargs):
     _configure_staff_commands()
-    return staff_commands.clean_snippet(*args, **kwargs)
+    return getattr(staff_commands, name)(*args, **kwargs)
 
-def row_source_line(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.row_source_line(*args, **kwargs)
-
-def row_authority_label(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.row_authority_label(*args, **kwargs)
-
-def row_source_md(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.row_source_md(*args, **kwargs)
-
-def unique_source_rows(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.unique_source_rows(*args, **kwargs)
-
-def staff_index_dir(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_index_dir(*args, **kwargs)
-
-def load_jsonl(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.load_jsonl(*args, **kwargs)
-
-def load_staff_entities(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.load_staff_entities(*args, **kwargs)
-
-def load_external_inventory(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.load_external_inventory(*args, **kwargs)
-
-def citation_table(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.citation_table(*args, **kwargs)
-
-def cited_excerpts(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.cited_excerpts(*args, **kwargs)
-
-def staff_formulation_lines(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_formulation_lines(*args, **kwargs)
-
-def staff_entity_lines(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_entity_lines(*args, **kwargs)
-
-def staff_risk_lines(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_risk_lines(*args, **kwargs)
-
-def staff_query(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_query(*args, **kwargs)
-
-def topic_query_variants(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.topic_query_variants(*args, **kwargs)
-
-def history_query_variants(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.history_query_variants(*args, **kwargs)
-
-def merge_search_rows(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.merge_search_rows(*args, **kwargs)
-
-def staff_search_rows(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_search_rows(*args, **kwargs)
-
-def staff_card_matches(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_card_matches(*args, **kwargs)
-
-def staff_cards_block(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_cards_block(*args, **kwargs)
-
-def external_reference_matches(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.external_reference_matches(*args, **kwargs)
-
-def external_reference_block(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.external_reference_block(*args, **kwargs)
-
-def external_sources_report_markdown(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.external_sources_report_markdown(*args, **kwargs)
-
-def research_dossier_matches(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.research_dossier_matches(*args, **kwargs)
-
-def research_dossier_block(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.research_dossier_block(*args, **kwargs)
-
-def staff_history_research_route(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_history_research_route(*args, **kwargs)
-
-def staff_draft_article_type(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_draft_article_type(*args, **kwargs)
-
-def staff_curated_writing_samples(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_curated_writing_samples(*args, **kwargs)
-
-def staff_draft_structure_block(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_draft_structure_block(*args, **kwargs)
-
-def material_points(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.material_points(*args, **kwargs)
-
-def material_field_hints(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.material_field_hints(*args, **kwargs)
-
-def title_suggestions(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.title_suggestions(*args, **kwargs)
-
-def draft_paragraphs_from_material(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.draft_paragraphs_from_material(*args, **kwargs)
-
-def staff_material_draft_body(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_material_draft_body(*args, **kwargs)
-
-def staff_draft_body(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_draft_body(*args, **kwargs)
-
-def staff_history_body(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_history_body(*args, **kwargs)
-
-def normalized_similarity(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.normalized_similarity(*args, **kwargs)
-
-def topic_similarity_rows(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.topic_similarity_rows(*args, **kwargs)
-
-def staff_topic_body(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_topic_body(*args, **kwargs)
-
-def staff_info_body(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_info_body(*args, **kwargs)
-
-def staff_stats_matches(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_stats_matches(*args, **kwargs)
-
-def counter_table(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.counter_table(*args, **kwargs)
-
-def staff_stats_body(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_stats_body(*args, **kwargs)
-
-def staff_check_body(*args, **kwargs):
-    _configure_staff_commands()
-    return staff_commands.staff_check_body(*args, **kwargs)
-
-def command_pro_sources(args: argparse.Namespace) -> int:
-    _configure_staff_commands()
-    return staff_commands.command_pro_sources(args)
-
-
-def command_sources(args: argparse.Namespace) -> int:
-    _configure_staff_commands()
-    return staff_commands.command_sources(args)
-
-
-def command_source_urls(args: argparse.Namespace) -> int:
-    _configure_staff_commands()
-    return staff_commands.command_source_urls(args)
-
-
-def command_staff(args: argparse.Namespace) -> int:
-    _configure_staff_commands()
-    return staff_commands.command_staff(args)
-
+clean_snippet = lambda *a, _n="clean_snippet", **k: _staff(_n, *a, **k)
+row_source_line = lambda *a, _n="row_source_line", **k: _staff(_n, *a, **k)
+row_authority_label = lambda *a, _n="row_authority_label", **k: _staff(_n, *a, **k)
+row_source_md = lambda *a, _n="row_source_md", **k: _staff(_n, *a, **k)
+unique_source_rows = lambda *a, _n="unique_source_rows", **k: _staff(_n, *a, **k)
+staff_index_dir = lambda *a, _n="staff_index_dir", **k: _staff(_n, *a, **k)
+load_jsonl = lambda *a, _n="load_jsonl", **k: _staff(_n, *a, **k)
+load_staff_entities = lambda *a, _n="load_staff_entities", **k: _staff(_n, *a, **k)
+load_external_inventory = lambda *a, _n="load_external_inventory", **k: _staff(_n, *a, **k)
+citation_table = lambda *a, _n="citation_table", **k: _staff(_n, *a, **k)
+cited_excerpts = lambda *a, _n="cited_excerpts", **k: _staff(_n, *a, **k)
+staff_formulation_lines = lambda *a, _n="staff_formulation_lines", **k: _staff(_n, *a, **k)
+staff_entity_lines = lambda *a, _n="staff_entity_lines", **k: _staff(_n, *a, **k)
+staff_risk_lines = lambda *a, _n="staff_risk_lines", **k: _staff(_n, *a, **k)
+staff_query = lambda *a, _n="staff_query", **k: _staff(_n, *a, **k)
+topic_query_variants = lambda *a, _n="topic_query_variants", **k: _staff(_n, *a, **k)
+history_query_variants = lambda *a, _n="history_query_variants", **k: _staff(_n, *a, **k)
+merge_search_rows = lambda *a, _n="merge_search_rows", **k: _staff(_n, *a, **k)
+staff_search_rows = lambda *a, _n="staff_search_rows", **k: _staff(_n, *a, **k)
+staff_card_matches = lambda *a, _n="staff_card_matches", **k: _staff(_n, *a, **k)
+staff_cards_block = lambda *a, _n="staff_cards_block", **k: _staff(_n, *a, **k)
+external_reference_matches = lambda *a, _n="external_reference_matches", **k: _staff(_n, *a, **k)
+external_reference_block = lambda *a, _n="external_reference_block", **k: _staff(_n, *a, **k)
+external_sources_report_markdown = lambda *a, _n="external_sources_report_markdown", **k: _staff(_n, *a, **k)
+research_dossier_matches = lambda *a, _n="research_dossier_matches", **k: _staff(_n, *a, **k)
+research_dossier_block = lambda *a, _n="research_dossier_block", **k: _staff(_n, *a, **k)
+staff_history_research_route = lambda *a, _n="staff_history_research_route", **k: _staff(_n, *a, **k)
+staff_draft_article_type = lambda *a, _n="staff_draft_article_type", **k: _staff(_n, *a, **k)
+staff_curated_writing_samples = lambda *a, _n="staff_curated_writing_samples", **k: _staff(_n, *a, **k)
+staff_draft_structure_block = lambda *a, _n="staff_draft_structure_block", **k: _staff(_n, *a, **k)
+material_points = lambda *a, _n="material_points", **k: _staff(_n, *a, **k)
+material_field_hints = lambda *a, _n="material_field_hints", **k: _staff(_n, *a, **k)
+title_suggestions = lambda *a, _n="title_suggestions", **k: _staff(_n, *a, **k)
+draft_paragraphs_from_material = lambda *a, _n="draft_paragraphs_from_material", **k: _staff(_n, *a, **k)
+staff_material_draft_body = lambda *a, _n="staff_material_draft_body", **k: _staff(_n, *a, **k)
+staff_draft_body = lambda *a, _n="staff_draft_body", **k: _staff(_n, *a, **k)
+staff_history_body = lambda *a, _n="staff_history_body", **k: _staff(_n, *a, **k)
+normalized_similarity = lambda *a, _n="normalized_similarity", **k: _staff(_n, *a, **k)
+topic_similarity_rows = lambda *a, _n="topic_similarity_rows", **k: _staff(_n, *a, **k)
+staff_topic_body = lambda *a, _n="staff_topic_body", **k: _staff(_n, *a, **k)
+staff_info_body = lambda *a, _n="staff_info_body", **k: _staff(_n, *a, **k)
+staff_stats_matches = lambda *a, _n="staff_stats_matches", **k: _staff(_n, *a, **k)
+counter_table = lambda *a, _n="counter_table", **k: _staff(_n, *a, **k)
+staff_stats_body = lambda *a, _n="staff_stats_body", **k: _staff(_n, *a, **k)
+staff_check_body = lambda *a, _n="staff_check_body", **k: _staff(_n, *a, **k)
+command_pro_sources = lambda *a, _n="command_pro_sources", **k: _staff(_n, *a, **k)
+command_sources = lambda *a, _n="command_sources", **k: _staff(_n, *a, **k)
+command_source_urls = lambda *a, _n="command_source_urls", **k: _staff(_n, *a, **k)
+command_staff = lambda *a, _n="command_staff", **k: _staff(_n, *a, **k)
 
 ARTICLE_TYPE_RULES = corpus_commands.ARTICLE_TYPE_RULES
 ARTICLE_TYPE_NAMES = corpus_commands.ARTICLE_TYPE_NAMES
@@ -519,30 +374,12 @@ TOPIC_KEYWORDS = corpus_commands.TOPIC_KEYWORDS
 def corpus_dir(root: Path) -> Path:
     return corpus_commands.corpus_dir(root)
 
-
 def report_dir(root: Path) -> Path:
     return root / "wiki" / "研究助手"
 
-
-def article_year(published_at: str | None) -> str:
-    return corpus_commands.article_year(published_at)
-
-
-def year_at_least(year: str | None, minimum: str) -> bool:
-    return corpus_commands.year_at_least(year, minimum)
-
-
-def classify_article(title: str, account: str | None, text: str) -> tuple[str, int, list[str]]:
-    return corpus_commands.classify_article(title, account, text)
-
-
 def write_jsonl(path: Path, items: list[dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        "\n".join(json.dumps(item, ensure_ascii=False, separators=(",", ":")) for item in items) + "\n",
-        encoding="utf-8",
-    )
-
+    path.write_text("\n".join(json.dumps(item, ensure_ascii=False, separators=(",", ":")) for item in items) + "\n", encoding="utf-8")
 
 def markdown_table(rows: list[list[str]]) -> str:
     if not rows:
@@ -551,105 +388,46 @@ def markdown_table(rows: list[list[str]]) -> str:
     lines.extend("| " + " | ".join(str(cell) for cell in row) + " |" for row in rows[1:])
     return "\n".join(lines)
 
+def _corpus(name, *args, **kwargs):
+    return getattr(corpus_commands, name)(*args, **kwargs)
 
-def build_article_label(row: sqlite3.Row) -> dict:
-    return corpus_commands.build_article_label(row)
-
-
-def load_article_labels(root: Path) -> list[dict]:
-    return corpus_commands.load_article_labels(root)
-
-
-def corpus_dashboard_markdown(labels: list[dict], created_at: str) -> str:
-    return corpus_commands.corpus_dashboard_markdown(labels, created_at)
-
-
-def apply_review_decisions_to_labels(labels: list[dict], decisions: dict[int, dict]) -> tuple[list[dict], list[dict]]:
-    return corpus_commands.apply_review_decisions_to_labels(labels, decisions)
-
-
-def collect_review_decisions(root: Path) -> tuple[dict[int, dict], list[str]]:
-    return corpus_commands.collect_review_decisions(root)
-
-
-def corpus_audit_markdown(labels: list[dict], created_at: str) -> str:
-    return corpus_commands.corpus_audit_markdown(labels, created_at)
-
-
-def corpus_review_apply_markdown(applied: list[dict], warnings: list[str], created_at: str) -> str:
-    return corpus_commands.corpus_review_apply_markdown(applied, warnings, created_at)
-
-
-def corpus_quality_diagnostic_markdown(labels: list[dict], created_at: str, limit: int = 30) -> str:
-    return corpus_commands.corpus_quality_diagnostic_markdown(labels, created_at, limit)
-
-
-def corpus_priority_review_markdown(rows: list[dict], created_at: str) -> str:
-    return corpus_commands.corpus_priority_review_markdown(rows, created_at)
-
-
-def corpus_priority_review_rows(labels: list[dict], limit: int = 100) -> list[dict]:
-    return corpus_commands.corpus_priority_review_rows(labels, limit)
-
-
-def corpus_review_rows(labels: list[dict], per_type: int, low_confidence_limit: int, other_limit: int) -> list[dict]:
-    return corpus_commands.corpus_review_rows(labels, per_type, low_confidence_limit, other_limit)
-
-
-def curated_writing_samples_markdown(labels: list[dict], created_at: str, limit_per_type: int = 8) -> str:
-    return corpus_commands.curated_writing_samples_markdown(labels, created_at, limit_per_type)
-
-
-def history_research_entry_markdown(labels: list[dict], created_at: str, limit_per_group: int = 40) -> str:
-    return corpus_commands.history_research_entry_markdown(labels, created_at, limit_per_group)
-
-
-def policy_advice_material_index_markdown(labels: list[dict], created_at: str, limit: int = 80) -> str:
-    return corpus_commands.policy_advice_material_index_markdown(labels, created_at, limit)
-
-
-def people_hits_for_text(text: str) -> list[str]:
-    return corpus_commands.people_hits_for_text(text)
-
-
-def shanghai_style_rule_card_markdown(labels: list[dict], created_at: str) -> str:
-    return corpus_commands.shanghai_style_rule_card_markdown(labels, created_at)
-
-
-def write_corpus_review_csv(path: Path, rows: list[dict]) -> None:
-    corpus_commands.write_corpus_review_csv(path, rows)
-
-
-def writing_sample_score(label: dict) -> tuple[int, list[str]]:
-    return corpus_commands.writing_sample_score(label)
-
-
-def writing_style_templates_markdown(labels: list[dict], created_at: str, limit_per_type: int = 12) -> str:
-    return corpus_commands.writing_style_templates_markdown(labels, created_at, limit_per_type)
-
+article_year = lambda *a, _n="article_year", **k: _corpus(_n, *a, **k)
+year_at_least = lambda *a, _n="year_at_least", **k: _corpus(_n, *a, **k)
+classify_article = lambda *a, _n="classify_article", **k: _corpus(_n, *a, **k)
+build_article_label = lambda *a, _n="build_article_label", **k: _corpus(_n, *a, **k)
+load_article_labels = lambda *a, _n="load_article_labels", **k: _corpus(_n, *a, **k)
+corpus_dashboard_markdown = lambda *a, _n="corpus_dashboard_markdown", **k: _corpus(_n, *a, **k)
+apply_review_decisions_to_labels = lambda *a, _n="apply_review_decisions_to_labels", **k: _corpus(_n, *a, **k)
+collect_review_decisions = lambda *a, _n="collect_review_decisions", **k: _corpus(_n, *a, **k)
+corpus_audit_markdown = lambda *a, _n="corpus_audit_markdown", **k: _corpus(_n, *a, **k)
+corpus_review_apply_markdown = lambda *a, _n="corpus_review_apply_markdown", **k: _corpus(_n, *a, **k)
+corpus_quality_diagnostic_markdown = lambda *a, _n="corpus_quality_diagnostic_markdown", **k: _corpus(_n, *a, **k)
+corpus_priority_review_markdown = lambda *a, _n="corpus_priority_review_markdown", **k: _corpus(_n, *a, **k)
+corpus_priority_review_rows = lambda *a, _n="corpus_priority_review_rows", **k: _corpus(_n, *a, **k)
+corpus_review_rows = lambda *a, _n="corpus_review_rows", **k: _corpus(_n, *a, **k)
+curated_writing_samples_markdown = lambda *a, _n="curated_writing_samples_markdown", **k: _corpus(_n, *a, **k)
+history_research_entry_markdown = lambda *a, _n="history_research_entry_markdown", **k: _corpus(_n, *a, **k)
+policy_advice_material_index_markdown = lambda *a, _n="policy_advice_material_index_markdown", **k: _corpus(_n, *a, **k)
+people_hits_for_text = lambda *a, _n="people_hits_for_text", **k: _corpus(_n, *a, **k)
+shanghai_style_rule_card_markdown = lambda *a, _n="shanghai_style_rule_card_markdown", **k: _corpus(_n, *a, **k)
+write_corpus_review_csv = lambda *a, _n="write_corpus_review_csv", **k: _corpus(_n, *a, **k)
+writing_sample_score = lambda *a, _n="writing_sample_score", **k: _corpus(_n, *a, **k)
+writing_style_templates_markdown = lambda *a, _n="writing_style_templates_markdown", **k: _corpus(_n, *a, **k)
 
 def _configure_corpus_commands() -> None:
     corpus_commands.configure(project_root_from_args, append_wiki_log, log_operation)
 
 
-def command_corpus_audit(args: argparse.Namespace) -> int:
-    _configure_corpus_commands()
-    return corpus_commands.command_corpus_audit(args)
+command_corpus_audit = lambda args, _n="command_corpus_audit": (_configure_corpus_commands(), getattr(corpus_commands, _n)(args))[1]
 
 
-def command_corpus_apply_reviews(args: argparse.Namespace) -> int:
-    _configure_corpus_commands()
-    return corpus_commands.command_corpus_apply_reviews(args)
+command_corpus_apply_reviews = lambda args, _n="command_corpus_apply_reviews": (_configure_corpus_commands(), getattr(corpus_commands, _n)(args))[1]
 
 
-def command_corpus(args: argparse.Namespace) -> int:
-    _configure_corpus_commands()
-    return corpus_commands.command_corpus(args)
+command_corpus = lambda args, _n="command_corpus": (_configure_corpus_commands(), getattr(corpus_commands, _n)(args))[1]
 
 
-def command_corpus_style(args: argparse.Namespace) -> int:
-    _configure_corpus_commands()
-    return corpus_commands.command_corpus_style(args)
+command_corpus_style = lambda args, _n="command_corpus_style": (_configure_corpus_commands(), getattr(corpus_commands, _n)(args))[1]
 
 
 def _configure_assistant_commands() -> None:
@@ -671,73 +449,27 @@ def _configure_assistant_commands() -> None:
     )
 
 
-def command_external_sources(*args, **kwargs):
+def _assistant(name, *args, **kwargs):
     _configure_assistant_commands()
-    return assistant_commands.command_external_sources(*args, **kwargs)
+    return getattr(assistant_commands, name)(*args, **kwargs)
 
-def guardrails_report_markdown(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.guardrails_report_markdown(*args, **kwargs)
-
-def command_guardrails(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.command_guardrails(*args, **kwargs)
-
-def command_brief(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.command_brief(*args, **kwargs)
-
-def count_db_rows(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.count_db_rows(*args, **kwargs)
-
-def status_label(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.status_label(*args, **kwargs)
-
-def verify_report_markdown(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.verify_report_markdown(*args, **kwargs)
-
-def command_verify(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.command_verify(*args, **kwargs)
-
-def source_title_list(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.source_title_list(*args, **kwargs)
-
-def timeline_candidates(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.timeline_candidates(*args, **kwargs)
-
-def entity_candidates(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.entity_candidates(*args, **kwargs)
-
-def infer_assistant_mode(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.infer_assistant_mode(*args, **kwargs)
-
-def assistant_mode_name(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.assistant_mode_name(*args, **kwargs)
-
-def assistant_body(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.assistant_body(*args, **kwargs)
-
-def brief_body(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.brief_body(*args, **kwargs)
-
-def assistant_home_body(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.assistant_home_body(*args, **kwargs)
-
-def command_assistant(*args, **kwargs):
-    _configure_assistant_commands()
-    return assistant_commands.command_assistant(*args, **kwargs)
+command_external_sources = lambda *a, _n="command_external_sources", **k: _assistant(_n, *a, **k)
+guardrails_report_markdown = lambda *a, _n="guardrails_report_markdown", **k: _assistant(_n, *a, **k)
+command_guardrails = lambda *a, _n="command_guardrails", **k: _assistant(_n, *a, **k)
+command_brief = lambda *a, _n="command_brief", **k: _assistant(_n, *a, **k)
+count_db_rows = lambda *a, _n="count_db_rows", **k: _assistant(_n, *a, **k)
+status_label = lambda *a, _n="status_label", **k: _assistant(_n, *a, **k)
+verify_report_markdown = lambda *a, _n="verify_report_markdown", **k: _assistant(_n, *a, **k)
+command_verify = lambda *a, _n="command_verify", **k: _assistant(_n, *a, **k)
+source_title_list = lambda *a, _n="source_title_list", **k: _assistant(_n, *a, **k)
+timeline_candidates = lambda *a, _n="timeline_candidates", **k: _assistant(_n, *a, **k)
+entity_candidates = lambda *a, _n="entity_candidates", **k: _assistant(_n, *a, **k)
+infer_assistant_mode = lambda *a, _n="infer_assistant_mode", **k: _assistant(_n, *a, **k)
+assistant_mode_name = lambda *a, _n="assistant_mode_name", **k: _assistant(_n, *a, **k)
+assistant_body = lambda *a, _n="assistant_body", **k: _assistant(_n, *a, **k)
+brief_body = lambda *a, _n="brief_body", **k: _assistant(_n, *a, **k)
+assistant_home_body = lambda *a, _n="assistant_home_body", **k: _assistant(_n, *a, **k)
+command_assistant = lambda *a, _n="command_assistant", **k: _assistant(_n, *a, **k)
 
 def command_search(args: argparse.Namespace) -> int:
     return search_ask_commands.command_search(args, project_root_from_args, log_operation, row_authority_label)
@@ -778,267 +510,77 @@ def _configure_compile_commands() -> None:
     )
 
 
-def wiki_dir_for_page_type(page_type: str, topic: str = "") -> str:
-    return compile_commands.wiki_dir_for_page_type(page_type, topic)
-
-
-def make_frontmatter(title: str, page_type: str, source_count: int, confidence: str = "medium") -> str:
+def _compile(name, *args, **kwargs):
     _configure_compile_commands()
-    return compile_commands.make_frontmatter(title, page_type, source_count, confidence)
-
-
-def write_wiki_page(root: Path, title: str, page_type: str, body: str, sources: list[sqlite3.Row]) -> Path:
-    _configure_compile_commands()
-    return compile_commands.write_wiki_page(root, title, page_type, body, sources)
-
-
-def compile_body(topic: str, page_type: str, rows: list[sqlite3.Row]) -> str:
-    _configure_compile_commands()
-    return compile_commands.compile_body(topic, page_type, rows)
-
-
-def topic_pack_body(topic: str, mode: str, rows: list[sqlite3.Row]) -> str:
-    _configure_compile_commands()
-    return compile_commands.topic_pack_body(topic, mode, rows)
-
-
-def writing_workflow_body(name: str, spec: dict[str, list[str] | str], rows: list[sqlite3.Row]) -> str:
-    _configure_compile_commands()
-    return compile_commands.writing_workflow_body(name, spec, rows)
-
-
-def writing_workflow_section_text(workflow: str, section: str) -> str:
-    return compile_commands.writing_workflow_section_text(workflow, section)
-
-
-def command_compile(args: argparse.Namespace) -> int:
-    _configure_compile_commands()
-    return compile_commands.command_compile(args)
-
-
-def update_frontmatter_fields(path: Path, updates: dict[str, str]) -> None:
-    return compile_commands.update_frontmatter_fields(path, updates)
-
-
-def apply_priority_card_status(root: Path) -> int:
-    _configure_compile_commands()
-    return compile_commands.apply_priority_card_status(root)
-
-
-def card_body(name: str, page_type: str, rows: list[sqlite3.Row]) -> str:
-    _configure_compile_commands()
-    return compile_commands.card_body(name, page_type, rows)
-
-
-def dossier_dir(root: Path) -> Path:
-    return compile_commands.dossier_dir(root)
-
-
-def event_dossier_dir(root: Path) -> Path:
-    return compile_commands.event_dossier_dir(root)
-
-
-def row_text(row: sqlite3.Row) -> str:
-    return compile_commands.row_text(row)
-
-
-def rows_matching_keywords(rows: list[sqlite3.Row], keywords: list[str]) -> list[sqlite3.Row]:
-    _configure_compile_commands()
-    return compile_commands.rows_matching_keywords(rows, keywords)
-
-
-def dossier_theme_sections(sources: list[sqlite3.Row], themes: dict[str, list[str]]) -> tuple[list[list[str]], list[str]]:
-    _configure_compile_commands()
-    return compile_commands.dossier_theme_sections(sources, themes)
-
-
-def person_research_dossier_body(name: str, rows: list[sqlite3.Row], created_at: str) -> str:
-    _configure_compile_commands()
-    return compile_commands.person_research_dossier_body(name, rows, created_at)
-
-
-def event_research_dossier_body(name: str, rows: list[sqlite3.Row], created_at: str) -> str:
-    _configure_compile_commands()
-    return compile_commands.event_research_dossier_body(name, rows, created_at)
-
-
-def write_person_research_dossier(root: Path, name: str, rows: list[sqlite3.Row], created_at: str) -> Path:
-    _configure_compile_commands()
-    return compile_commands.write_person_research_dossier(root, name, rows, created_at)
-
-
-def write_event_research_dossier(root: Path, name: str, rows: list[sqlite3.Row], created_at: str) -> Path:
-    _configure_compile_commands()
-    return compile_commands.write_event_research_dossier(root, name, rows, created_at)
-
-
-def person_dossier_rows(root: Path, name: str, top_k: int) -> list[sqlite3.Row]:
-    _configure_compile_commands()
-    return compile_commands.person_dossier_rows(root, name, top_k)
-
-
-def event_dossier_rows(root: Path, name: str, top_k: int) -> list[sqlite3.Row]:
-    _configure_compile_commands()
-    return compile_commands.event_dossier_rows(root, name, top_k)
-
-
-def authority_level_counts(rows: list[sqlite3.Row]) -> Counter:
-    _configure_compile_commands()
-    return compile_commands.authority_level_counts(rows)
-
-
-def authority_coverage_status(counts: Counter) -> str:
-    return compile_commands.authority_coverage_status(counts)
-
-
-def authority_coverage_action(counts: Counter) -> str:
-    return compile_commands.authority_coverage_action(counts)
-
-
-def authority_coverage_records(root: Path, top_k: int) -> list[dict]:
-    _configure_compile_commands()
-    return compile_commands.authority_coverage_records(root, top_k)
-
-
-def authority_coverage_markdown(records: list[dict], created_at: str) -> str:
-    _configure_compile_commands()
-    return compile_commands.authority_coverage_markdown(records, created_at)
-
-
-def research_dossier_index_body(created: list[Path], created_at: str) -> str:
-    _configure_compile_commands()
-    return compile_commands.research_dossier_index_body(created, created_at)
-
-
-def event_research_dossier_index_body(created: list[Path], created_at: str) -> str:
-    _configure_compile_commands()
-    return compile_commands.event_research_dossier_index_body(created, created_at)
-
-
-def command_build_research_dossiers(args: argparse.Namespace) -> int:
-    _configure_compile_commands()
-    return compile_commands.command_build_research_dossiers(args)
-
-
-def command_authority_coverage(args: argparse.Namespace) -> int:
-    _configure_compile_commands()
-    return compile_commands.command_authority_coverage(args)
-
-
-def command_build_cards(args: argparse.Namespace) -> int:
-    _configure_compile_commands()
-    return compile_commands.command_build_cards(args)
-
-
-def command_curate_cards(args: argparse.Namespace) -> int:
-    _configure_compile_commands()
-    return compile_commands.command_curate_cards(args)
-
-
-def command_build_packs(args: argparse.Namespace) -> int:
-    _configure_compile_commands()
-    return compile_commands.command_build_packs(args)
-
-
-def command_build_writing_workflows(args: argparse.Namespace) -> int:
-    _configure_compile_commands()
-    return compile_commands.command_build_writing_workflows(args)
-
-
-def preview_import(root: Path, input_dir: Path, limit: int) -> tuple[int, int, int]:
-    conn = connect_db(root)
-    new_count = 0
-    duplicate_count = 0
-    failed = 0
-    try:
-        for path in list(iter_input_files(input_dir))[:limit]:
-            try:
-                doc = extract_doc(path, input_dir)
-                content_hash = sha256_text(doc.text)
-                exists = conn.execute("SELECT id FROM articles WHERE content_hash = ?", (content_hash,)).fetchone()
-                if exists:
-                    duplicate_count += 1
-                else:
-                    new_count += 1
-            except Exception:
-                failed += 1
-    finally:
-        conn.close()
-    return new_count, duplicate_count, failed
-
-
-def command_refresh(args: argparse.Namespace) -> int:
-    root = project_root_from_args(args.project_root)
-    ensure_dirs(root)
-    init_db(root)
-    input_dir = Path(args.input).expanduser().resolve()
-    if not input_dir.exists():
-        print(f"Input directory not found: {input_dir}", file=sys.stderr)
-        return 2
-    limit = args.limit
-    new_count, duplicate_count, failed = preview_import(root, input_dir, limit)
-    print(f"Input: {input_dir}")
-    print(f"Dry run: {args.dry_run}")
-    print(f"New articles: {new_count}")
-    print(f"Duplicate articles: {duplicate_count}")
-    print(f"Failed preview: {failed}")
-    if args.dry_run:
-        print("Would import, rebuild indexes, refresh cards, corpus reports, writing/style/history/policy materials, research dossiers, external-source status, guardrails report, verification report, Obsidian sync, and Obsidian status.")
-        log_operation(root, "refresh", "dry-run", f"new={new_count} duplicate={duplicate_count} failed={failed}")
-        return 0
-
-    conn = connect_db(root)
-    before_articles = conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0]
-    conn.close()
-    import_args = argparse.Namespace(project_root=args.project_root, input=str(input_dir), limit=limit, dry_run=False)
-    import_code = command_import(import_args)
-    rows, indexed = rebuild_fts(root)
-    _, vector_indexed = rebuild_vectors(root)
-    build_args = argparse.Namespace(project_root=args.project_root, set="all", limit=0, top_k=args.top_k)
-    command_build_cards(build_args)
-    command_build_packs(argparse.Namespace(project_root=args.project_root, top_k=args.top_k))
-    command_build_writing_workflows(argparse.Namespace(project_root=args.project_root, top_k=args.top_k))
-    command_corpus(argparse.Namespace(project_root=args.project_root))
-    command_corpus_audit(
-        argparse.Namespace(
-            project_root=args.project_root,
-            per_type=20,
-            low_confidence=80,
-            other=80,
-            priority=100,
-        )
+    return getattr(compile_commands, name)(*args, **kwargs)
+
+wiki_dir_for_page_type = lambda *a, _n="wiki_dir_for_page_type", **k: _compile(_n, *a, **k)
+make_frontmatter = lambda *a, _n="make_frontmatter", **k: _compile(_n, *a, **k)
+write_wiki_page = lambda *a, _n="write_wiki_page", **k: _compile(_n, *a, **k)
+compile_body = lambda *a, _n="compile_body", **k: _compile(_n, *a, **k)
+topic_pack_body = lambda *a, _n="topic_pack_body", **k: _compile(_n, *a, **k)
+writing_workflow_body = lambda *a, _n="writing_workflow_body", **k: _compile(_n, *a, **k)
+writing_workflow_section_text = lambda *a, _n="writing_workflow_section_text", **k: _compile(_n, *a, **k)
+command_compile = lambda *a, _n="command_compile", **k: _compile(_n, *a, **k)
+update_frontmatter_fields = lambda *a, _n="update_frontmatter_fields", **k: _compile(_n, *a, **k)
+apply_priority_card_status = lambda *a, _n="apply_priority_card_status", **k: _compile(_n, *a, **k)
+card_body = lambda *a, _n="card_body", **k: _compile(_n, *a, **k)
+dossier_dir = lambda *a, _n="dossier_dir", **k: _compile(_n, *a, **k)
+event_dossier_dir = lambda *a, _n="event_dossier_dir", **k: _compile(_n, *a, **k)
+row_text = lambda *a, _n="row_text", **k: _compile(_n, *a, **k)
+rows_matching_keywords = lambda *a, _n="rows_matching_keywords", **k: _compile(_n, *a, **k)
+dossier_theme_sections = lambda *a, _n="dossier_theme_sections", **k: _compile(_n, *a, **k)
+person_research_dossier_body = lambda *a, _n="person_research_dossier_body", **k: _compile(_n, *a, **k)
+event_research_dossier_body = lambda *a, _n="event_research_dossier_body", **k: _compile(_n, *a, **k)
+write_person_research_dossier = lambda *a, _n="write_person_research_dossier", **k: _compile(_n, *a, **k)
+write_event_research_dossier = lambda *a, _n="write_event_research_dossier", **k: _compile(_n, *a, **k)
+person_dossier_rows = lambda *a, _n="person_dossier_rows", **k: _compile(_n, *a, **k)
+event_dossier_rows = lambda *a, _n="event_dossier_rows", **k: _compile(_n, *a, **k)
+authority_level_counts = lambda *a, _n="authority_level_counts", **k: _compile(_n, *a, **k)
+authority_coverage_status = lambda *a, _n="authority_coverage_status", **k: _compile(_n, *a, **k)
+authority_coverage_action = lambda *a, _n="authority_coverage_action", **k: _compile(_n, *a, **k)
+authority_coverage_records = lambda *a, _n="authority_coverage_records", **k: _compile(_n, *a, **k)
+authority_coverage_markdown = lambda *a, _n="authority_coverage_markdown", **k: _compile(_n, *a, **k)
+research_dossier_index_body = lambda *a, _n="research_dossier_index_body", **k: _compile(_n, *a, **k)
+event_research_dossier_index_body = lambda *a, _n="event_research_dossier_index_body", **k: _compile(_n, *a, **k)
+command_build_research_dossiers = lambda *a, _n="command_build_research_dossiers", **k: _compile(_n, *a, **k)
+command_authority_coverage = lambda *a, _n="command_authority_coverage", **k: _compile(_n, *a, **k)
+command_build_cards = lambda *a, _n="command_build_cards", **k: _compile(_n, *a, **k)
+command_curate_cards = lambda *a, _n="command_curate_cards", **k: _compile(_n, *a, **k)
+command_build_packs = lambda *a, _n="command_build_packs", **k: _compile(_n, *a, **k)
+command_build_writing_workflows = lambda *a, _n="command_build_writing_workflows", **k: _compile(_n, *a, **k)
+
+def _configure_refresh_commands() -> None:
+    refresh_commands.configure(
+        project_root_from_args,
+        ensure_dirs,
+        init_db,
+        append_wiki_log,
+        log_operation,
+        command_import,
+        command_build_cards,
+        command_build_packs,
+        command_build_writing_workflows,
+        command_corpus,
+        command_corpus_audit,
+        command_corpus_style,
+        command_build_research_dossiers,
+        command_external_sources,
+        command_guardrails,
+        command_assistant,
+        command_verify,
+        apply_priority_card_status,
+        command_obsidian_sync,
+        command_obsidian_status,
     )
-    command_corpus_style(argparse.Namespace(project_root=args.project_root))
-    command_build_research_dossiers(argparse.Namespace(project_root=args.project_root, set="core-people", limit=0, top_k=args.top_k))
-    command_build_research_dossiers(argparse.Namespace(project_root=args.project_root, set="core-events", limit=0, top_k=args.top_k))
-    command_external_sources(argparse.Namespace(project_root=args.project_root, save=True))
-    command_guardrails(argparse.Namespace(project_root=args.project_root, save=True))
-    command_assistant(argparse.Namespace(project_root=args.project_root, query=None, mode="auto", top_k=args.top_k, save=False, install=True, sync_vault=None))
-    command_verify(argparse.Namespace(project_root=args.project_root, save=True))
-    priority_count = apply_priority_card_status(root)
-    sync_count = 0
-    if args.vault:
-        sync_args = argparse.Namespace(project_root=args.project_root, vault=args.vault, dry_run=False)
-        sync_code = command_obsidian_sync(sync_args)
-        sync_count = 0 if sync_code else len(list((Path(args.vault).expanduser()).rglob("*.md")))
-        command_obsidian_status(argparse.Namespace(project_root=args.project_root, vault=args.vault, save=True))
-        command_verify(argparse.Namespace(project_root=args.project_root, save=True))
-        command_obsidian_sync(sync_args)
-    conn = connect_db(root)
-    after_articles = conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0]
-    conn.close()
-    message = f"articles {before_articles}->{after_articles}; indexed={indexed}; vectors={vector_indexed}; corpus=refreshed; dossiers=refreshed; verify=refreshed; priority={priority_count}"
-    append_wiki_log(root, f"一键刷新知识库：{message}")
-    log_operation(
-        root,
-        "refresh",
-        "ok" if import_code == 0 else "partial",
-        message,
-        {"input": str(input_dir), "new_preview": new_count, "duplicates_preview": duplicate_count, "vault_files": sync_count},
-    )
-    print(f"Refresh complete: {message}")
-    return import_code
 
+
+def _refresh(name, *args, **kwargs):
+    _configure_refresh_commands()
+    return getattr(refresh_commands, name)(*args, **kwargs)
+
+preview_import = lambda *a, **k: _refresh("preview_import", *a, **k)
+command_refresh = lambda *a, **k: _refresh("command_refresh", *a, **k)
 
 def page_path_for_export(root: Path, title: str | None, path_value: str | None) -> Path:
     return export_commands.page_path_for_export(root, title, path_value)
