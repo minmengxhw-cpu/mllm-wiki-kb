@@ -290,6 +290,10 @@ def command_index(args: argparse.Namespace) -> int:
     return index_commands.command_index(args, project_root_from_args, log_operation)
 
 
+def command_reindex_vectors(args: argparse.Namespace) -> int:
+    return index_commands.command_reindex_vectors(args, project_root_from_args, log_operation)
+
+
 def _configure_staff_commands() -> None:
     staff_commands.configure(
         project_root_from_args,
@@ -672,6 +676,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("index")
     p.set_defaults(func=command_index)
+
+    p = sub.add_parser("reindex-vectors", help="重建本地语义向量索引；模型不可用时自动回退哈希向量")
+    p.add_argument("--model", default=None, help="本地 sentence-transformers 模型，默认 BAAI/bge-small-zh-v1.5")
+    p.set_defaults(func=command_reindex_vectors)
 
     p = sub.add_parser("refresh")
     p.add_argument("--input", default="~/Downloads/微信公众号")

@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from kb.cli import (  # noqa: E402
     brief_body,
     build_parser,
+    command_reindex_vectors,
     command_refresh,
     command_check,
     command_import,
@@ -89,6 +90,11 @@ class StaffCommandTests(unittest.TestCase):
         args = build_parser().parse_args(["brief", "80周年", "工作"])
         self.assertEqual(args.command, "brief")
         self.assertEqual(args.query, ["80周年", "工作"])
+
+    def test_parser_accepts_reindex_vectors(self) -> None:
+        args = build_parser().parse_args(["reindex-vectors", "--model", "hash-local-v1"])
+        self.assertEqual(args.command, "reindex-vectors")
+        self.assertEqual(args.model, "hash-local-v1")
 
     def test_parser_accepts_pro_sources(self) -> None:
         args = build_parser().parse_args(["pro-sources", "--priority", "P0", "--save"])
@@ -241,11 +247,14 @@ class StaffCommandTests(unittest.TestCase):
             ensure_schema_columns(conn)
             article_columns = {row["name"] for row in conn.execute("PRAGMA table_info(articles)").fetchall()}
             source_columns = {row["name"] for row in conn.execute("PRAGMA table_info(sources)").fetchall()}
+            vector_columns = {row["name"] for row in conn.execute("PRAGMA table_info(chunk_vectors)").fetchall()}
             conn.close()
             self.assertIn("authority_level", article_columns)
             self.assertIn("source_tier", article_columns)
             self.assertIn("is_citable", article_columns)
             self.assertIn("authority_level", source_columns)
+            self.assertIn("model", vector_columns)
+            self.assertIn("dim", vector_columns)
             self.assertIn("is_citable", source_columns)
         finally:
             shutil.rmtree(root)

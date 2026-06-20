@@ -108,6 +108,8 @@ CREATE TABLE IF NOT EXISTS sources (
 CREATE TABLE IF NOT EXISTS chunk_vectors (
     chunk_id INTEGER PRIMARY KEY,
     article_id INTEGER NOT NULL,
+    model TEXT NOT NULL DEFAULT 'hash-local-v1',
+    dim INTEGER NOT NULL DEFAULT 256,
     vector_json TEXT NOT NULL,
     updated_at TEXT NOT NULL,
     FOREIGN KEY(chunk_id) REFERENCES article_chunks(id) ON DELETE CASCADE,

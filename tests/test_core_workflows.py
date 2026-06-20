@@ -20,6 +20,7 @@ from kb.cli import (  # noqa: E402
     command_import,
     command_index,
     command_obsidian_sync,
+    command_reindex_vectors,
     command_search,
     command_staff,
     ensure_dirs,
@@ -123,6 +124,26 @@ class CoreWorkflowFeatureTests(unittest.TestCase):
             with contextlib.redirect_stdout(io.StringIO()) as out:
                 self.assertEqual(command_staff(args), 0)
             self.assertIn("[待核]", out.getvalue())
+        finally:
+            shutil.rmtree(root)
+
+    def test_reindex_vectors_records_model_and_dim(self) -> None:
+        root = self.make_root()
+        try:
+            input_root = self.write_fixture_articles(root)
+            self.import_fixture(root, input_root)
+            args = argparse.Namespace(project_root=str(root), model="hash-local-v1")
+            with contextlib.redirect_stdout(io.StringIO()) as out:
+                self.assertEqual(command_reindex_vectors(args), 0)
+            self.assertIn("Vector model: hash-local-v1", out.getvalue())
+            conn = connect_db(root)
+            try:
+                rows = conn.execute("SELECT DISTINCT model, dim FROM chunk_vectors").fetchall()
+                self.assertEqual(len(rows), 1)
+                self.assertEqual(rows[0]["model"], "hash-local-v1")
+                self.assertEqual(rows[0]["dim"], 256)
+            finally:
+                conn.close()
         finally:
             shutil.rmtree(root)
 

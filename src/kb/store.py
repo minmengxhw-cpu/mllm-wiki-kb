@@ -70,6 +70,8 @@ def ensure_schema_columns(conn: sqlite3.Connection) -> None:
         CREATE TABLE IF NOT EXISTS chunk_vectors (
             chunk_id INTEGER PRIMARY KEY,
             article_id INTEGER NOT NULL,
+            model TEXT NOT NULL DEFAULT 'hash-local-v1',
+            dim INTEGER NOT NULL DEFAULT 256,
             vector_json TEXT NOT NULL,
             updated_at TEXT NOT NULL,
             FOREIGN KEY(chunk_id) REFERENCES article_chunks(id) ON DELETE CASCADE,
@@ -77,4 +79,13 @@ def ensure_schema_columns(conn: sqlite3.Connection) -> None:
         )
         """
     )
+    vector_columns = {row["name"] for row in conn.execute("PRAGMA table_info(chunk_vectors)").fetchall()}
+    vector_additions = {
+        "model": "ALTER TABLE chunk_vectors ADD COLUMN model TEXT NOT NULL DEFAULT 'hash-local-v1'",
+        "dim": "ALTER TABLE chunk_vectors ADD COLUMN dim INTEGER NOT NULL DEFAULT 256",
+    }
+    for name, sql in vector_additions.items():
+        if name not in vector_columns:
+            conn.execute(sql)
     conn.execute("CREATE INDEX IF NOT EXISTS idx_chunk_vectors_article_id ON chunk_vectors(article_id)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_chunk_vectors_model ON chunk_vectors(model)")

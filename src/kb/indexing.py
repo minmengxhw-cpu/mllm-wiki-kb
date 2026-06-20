@@ -7,6 +7,7 @@ import re
 import sqlite3
 from pathlib import Path
 
+from kb.embeddings import HASH_MODEL, resolve_embedding_backend
 from kb.store import connect_db, ensure_schema_columns, now_iso
 
 
@@ -154,7 +155,7 @@ def cosine_similarity(left: list[float], right: list[float]) -> float:
     return sum(a * b for a, b in zip(left, right))
 
 
-def rebuild_vectors(root: Path) -> tuple[int, int]:
+def rebuild_vectors_with_info(root: Path, preferred_model: str | None = None) -> tuple[int, int, str, int, str | None]:
     conn = connect_db(root)
     try:
         ensure_schema_columns(conn)
@@ -167,17 +168,31 @@ def rebuild_vectors(root: Path) -> tuple[int, int]:
             ORDER BY c.id
             """
         ).fetchall()
+        backend, status = resolve_embedding_backend(preferred_model)
         with conn:
-            for row in rows:
-                vector = text_vector(f"{row['title']}\n{row['content']}")
+            texts = [f"{row['title']}\n{row['content']}" for row in rows]
+            vectors = backend.encode(texts)
+            for row, vector in zip(rows, vectors):
                 conn.execute(
-                    "INSERT INTO chunk_vectors(chunk_id, article_id, vector_json, updated_at) VALUES (?, ?, ?, ?)",
-                    (row["chunk_id"], row["article_id"], json.dumps(vector, separators=(",", ":")), now_iso()),
+                    "INSERT INTO chunk_vectors(chunk_id, article_id, model, dim, vector_json, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+                    (
+                        row["chunk_id"],
+                        row["article_id"],
+                        status.model,
+                        len(vector),
+                        json.dumps(vector, separators=(",", ":")),
+                        now_iso(),
+                    ),
                 )
         count = conn.execute("SELECT COUNT(*) FROM chunk_vectors").fetchone()[0]
-        return len(rows), count
+        return len(rows), count, status.model, status.dim, status.fallback_reason
     finally:
         conn.close()
+
+
+def rebuild_vectors(root: Path) -> tuple[int, int]:
+    rows, count, _, _, _ = rebuild_vectors_with_info(root)
+    return rows, count
 
 
 def dict_to_row(data: dict) -> sqlite3.Row:
@@ -222,19 +237,35 @@ def semantic_rows(root: Path, query: str, top_k: int) -> list[sqlite3.Row]:
             conn.close()
             rebuild_vectors(root)
             conn = connect_db(root)
-        qvec = text_vector(query)
+        model_row = conn.execute(
+            "SELECT model, dim, COUNT(*) AS count FROM chunk_vectors GROUP BY model, dim ORDER BY count DESC LIMIT 1"
+        ).fetchone()
+        model = model_row["model"] if model_row else HASH_MODEL
+        dim = int(model_row["dim"] or 256) if model_row else 256
+        backend, status = resolve_embedding_backend(model)
+        if status.model != model:
+            return []
+        qvec = backend.encode([query])[0]
+        if len(qvec) != dim:
+            return []
         rows = conn.execute(
             """
-            SELECT v.chunk_id, v.article_id, v.vector_json, c.content, a.title, a.account, a.published_at, a.raw_path,
+            SELECT v.chunk_id, v.article_id, v.model, v.dim, v.vector_json, c.content, a.title, a.account, a.published_at, a.raw_path,
                    a.source_id, a.authority_level, a.source_tier, a.is_citable
             FROM chunk_vectors v
             JOIN article_chunks c ON c.id = v.chunk_id
             JOIN articles a ON a.id = v.article_id
+            WHERE v.model = ? AND v.dim = ?
             """
+            ,
+            (model, dim),
         ).fetchall()
         scored = []
         for row in rows:
-            score = cosine_similarity(qvec, json.loads(row["vector_json"]))
+            vector = json.loads(row["vector_json"])
+            if len(vector) != len(qvec):
+                continue
+            score = cosine_similarity(qvec, vector)
             if score > 0:
                 scored.append((score, row))
         scored.sort(key=lambda item: item[0], reverse=True)
